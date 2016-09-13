@@ -1,0 +1,32 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="dhewm 3 is a Doom 3 GPL source port"
+HOMEPAGE="https://github.com/dhewm/dhewm3"
+SCM_REPOSITORY="https://github.com/dhewm/dhewm3.git"
+DOWNLOADS=""
+
+CMAKE_SOURCE=${WORK}/neo
+
+require scm-git cmake [ api=2 ]
+
+LICENCES="GPL-3"
+
+SLOT="0"
+PLATFORMS="~x86 ~amd64"
+
+#TODO SDL1.2 or SDL2
+
+MYOPTIONS="curl [[ description = [ Required for server downloads ] ]]"
+
+DEPENDENCIES="
+sys-libs/zlib
+media-libs/openal
+media-libs/SDL[>=1.2]
+media-libs/libogg
+media-libs/libvorbis
+
+curl? ( net-misc/curl )
+"
+
+

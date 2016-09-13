@@ -1,0 +1,95 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Doom 2 GPL source port and Skulltag successor"
+HOMEPAGE="https://zandronum.com"
+SCM_REPOSITORY="https://bitbucket.org/Torr_Samaho/zandronum"
+
+SLOT="0"
+PLATFORMS="~x86 ~amd64"
+
+DOWNLOADS="
+platform:amd64? ( http://zandronum.com/essentials/fmod/fmodapi42416linux64.tar.gz -> fmodapi.tar.gz )
+platform:x86? ( http://zandronum.com/essentials/fmod/fmodapi42416linux.tar.gz -> fmodapi.tar.gz )
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCMAKE_BUILD_TYPE=Release
+	-DSERVERONLY=ON
+)
+
+#if optionq server
+
+#if ! optionq gtk ; then
+#        CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_GTK=ON )
+#fi
+#if ! optionq sound ; then
+#        CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_SOUND=ON )
+#fi
+#if ! optionq opengl ; then
+#        CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_GL=ON )
+#fi
+#if ! optionq asm ; then
+#        CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_ASM=ON )
+#fi
+
+#einfo ${WORK}
+#einfo ${WORKBASE}
+
+require scm-hg cmake [ api=2 ]
+
+#LICENCES="GPL-3" Sleepycat New BSD License
+
+#TODO SDL1.2 or SDL2
+
+MYOPTIONS="
+	client
+	server
+	gtk
+	sound
+	gl
+	asm
+
+	(
+		providers:
+		jpeg
+		jpeg-turbo
+	) [[ number-selected = exactly-one ]]
+	platform:
+		x86
+		amd64
+"
+
+
+#TODO jpeg-turbo? jpeg?  ]
+DEPENDENCIES="
+media-libs/SDL:*[>=1.2.8]
+
+dev-db/sqlite
+
+gtk? ( x11-libs/gtk+:2 )
+
+asm? ( dev-lang/nasm )
+
+media-libs/libjpeg-turbo
+
+sys-libs/zlib
+app-arch/bzip2
+x11-apps/gxmessage
+
+sound? ( media-libs/openal media-sound/fluidsynth )
+
+"
+
+
+src_compile(){
+
+edo pushd "${WORK}"/server
+cmake_src_compile
+edo popd
+
+edo pushd "${WORK}"/client
+cmake_src_compile
+edo popd
+
+}

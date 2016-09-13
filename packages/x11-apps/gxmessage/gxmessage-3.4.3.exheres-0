@@ -1,0 +1,22 @@
+# Copyright 2008 Alexander Færøy <ahf@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+#require xorg
+#TODO: Changelog
+SUMMARY="gxxmessage is a gtk+3 clone of xmessage"
+DOWNLOADS="http://homepages.ihug.co.nz/~trmusson/stuff/gxmessage-3.4.3.tar.gz"
+
+LICENCES="X11"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+	x11-libs/libX11
+        x11-libs/libXaw
+        x11-libs/libXt
+	x11-libs/gtk+:3
+"
+
+
