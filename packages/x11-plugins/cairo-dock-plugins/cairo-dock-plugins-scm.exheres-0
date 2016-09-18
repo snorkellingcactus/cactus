@@ -1,4 +1,6 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'cairo-dock-plugins-2.2.0.4.exheres-0' from Exherbo, which is:
+# Copyright 2009 Jan Meier jan@codejunky.org
 # Distributed under the terms of the GNU General Public License v2
 
 #https://www.archlinux.org/packages/community/x86_64/cairo-dock-plug-ins/
