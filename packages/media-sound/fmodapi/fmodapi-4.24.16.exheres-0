@@ -1,39 +1,34 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'fmod-4.38.02.ebuild', which is:
 # Copyright 1999-2012 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# $Id$
-
-PV_NO_DOTS=${PNV//[.|-]/}linux
 
 SUMMARY="music and sound effects library, and a sound processing system"
 HOMEPAGE="http://www.fmod.org"
 
-MIRROR="http://web.archive.org/web/20151111191152/http://doomgod.com/ports/fmod/"
 #MIRROR="http://ponce.cc/slackware/sources/repo/"
 #Require registration:
 #MIRROR="http://www.fmod.org/download/fmodex/api/Linux/"
+MIRROR="http://web.archive.org/web/20151111191152/http://doomgod.com/ports/fmod/"
+
+PV_NO_DOTS=${PNV//[.|-]/}linux
 
 DOWNLOADS="
-	platform:x86? ( $MIRROR/${PV_NO_DOTS}.tar.gz )
-	platform:amd64? ( $MIRROR/${PV_NO_DOTS}64.tar.gz )
+	platform:x86?	( $MIRROR/${PV_NO_DOTS}.tar.gz		)
+	platform:amd64?	( $MIRROR/${PV_NO_DOTS}64.tar.gz	)
 "
-
-#LICENSES="BSD BSD-2 fmod"
+PLATFORMS="~x86 ~amd64"
+LICENCES="BSD BSD-2 fmod"
 SLOT="1"
-PLATFORMS="~amd64 ~x86"
+
 MYOPTIONS="
-	examples
-	documentation
-	libraries
 	development
+	documentation
+	examples
+	libraries
 	platform:
-		x86
 		amd64
+		x86
 "
-
-#QA_FLAGS_IGNORED="opt/fmodex/tools/fsbanklib/.*"
-
-#QA_TEXTRELS="opt/fmodex/fmoddesignerapi/api/lib/*
-#opt/fmodex/api/lib/*"
 
 src_unpack()
 {
@@ -47,6 +42,7 @@ src_unpack()
 }
 
 src_compile() { :; }
+
 src_install() {
 	if option libraries
 	then
@@ -91,5 +87,6 @@ src_install() {
 
 		dodoc "${WORK}"/{documentation/*.txt,fmoddesignerapi/*.TXT}
 	fi
+
 	rm -rf "${IMAGE}"/usr/$(exhost --target)/lib/{documentation,fmoddesignerapi/*.TXT}
 }

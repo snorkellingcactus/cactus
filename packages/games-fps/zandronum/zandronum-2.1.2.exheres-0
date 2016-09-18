@@ -1,3 +1,8 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'default.nix' from Nix, which is:
+# Copyright (c) 2003-2016 Eelco Dolstra and the Nixpkgs/NixOS contributors
+
 #DOWNLOADS="https://bitbucket.org/Torr_Samaho/zandronum/get/ZA_2.1.2.tar.bz2"
 
 SLOT='2'

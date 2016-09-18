@@ -1,6 +1,9 @@
-require doomseeker
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
 
 DEPENDENCIES="
 	x11-libs/qtbase:5
 	x11-libs/qtmultimedia:5
 "
+
+require doomseeker

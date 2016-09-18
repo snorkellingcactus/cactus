@@ -1,20 +1,15 @@
-# Copyright 2009 Adriaan Leijnse <adriaan@leijnse.net>
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
 
 SCM_REPOSITORY="https://github.com/kmatheussen/${PN}.git"
-
-require scm-git
-
 SUMMARY="A program for recording soundfiles with jack."
-#TODO: HomePage, ogg, lame, liblo, new_jack_latency_api
-HOMEPAGE="http://www.notam02.no/arkiv/src/"
-
+HOMEPAGE="https://github.com/kmatheussen/jack_capture"
+PLATFORMS="~x86 ~amd64"
 LICENCES="GPL-2"
 SLOT="0"
-PLATFORMS="~amd64"
 #MYOPTIONS="gtk [[ description = [ Enable Gtk2 frontend ] ]]"
-MYOPTIONS=""
 
+#TODO: ogg, lame, liblo, new_jack_latency_api
 DEPENDENCIES="
     build+run:
         media-sound/jack-audio-connection-kit
@@ -26,10 +21,11 @@ BUGS_TO="snorkellingcactus@gmail.com"
 
 DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/MakeFile.patch" )
 
+require scm-git
 
 jack_capture_make()
 {
-#Warning: empty variables produce errors.
+    #Warning: empty variables produce errors.
 	emake "${@}" -f Makefile PREFIX=${IMAGE}/usr/$(exhost --target)/\
         PKG_CONFIG=$(which "${PKG_CONFIG}")\
         CC=$(which "${CC}")\
@@ -40,10 +36,12 @@ jack_capture_make()
 
 src_compile()
 {
+    #Prevent banned gcc
 	sed -i -- 's/gcc/${CC}/g' ${WORK}/*
 
 	jack_capture_make jack_capture
 
+# For some reason it's not translated to binary.
 #	optionq gtk && jack_capture_make jack_capture_gui2
 }
 src_install()

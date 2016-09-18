@@ -1,3 +1,4 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Copyright 2009 Pierre Lejeune <superheron@gmail.com>
 # Distributed under the terms of the GNU General Public License v2
 # Based in part upon 'kbuild-0.1.5-r1.ebuild', which is:
@@ -9,10 +10,9 @@ HOMEPAGE="http://svn.netlabs.org/kbuild/wiki"
 #http://www.filewatcher.com/m/kBuild-0.1.9998-src.tar.gz.2604001-0.html
 DOWNLOADS="ftp://mirror.its.dal.ca/freebsd/distfiles/kBuild-0.1.9998-src.tar.gz"
 
+PLATFORMS="~amd64 ~x86"
 LICENCES="GPL-2"
 SLOT="0"
-PLATFORMS="~amd64 ~x86"
-MYOPTIONS=""
 
 UPSTREAM_DOCUMENTATION="
     ${HOMEPAGE}/Documentation [[ description = [ Official documentation ] ]]

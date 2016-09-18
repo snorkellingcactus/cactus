@@ -1,15 +1,12 @@
-# Copyright 2008 Alexander Færøy <ahf@exherbo.org>
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the GNU General Public License v2
 
-#require xorg
-#TODO: Changelog
+#TODO: Changelog, require xorg?
 SUMMARY="gxxmessage is a gtk+3 clone of xmessage"
 DOWNLOADS="http://homepages.ihug.co.nz/~trmusson/stuff/gxmessage-3.4.3.tar.gz"
-
+PLATFORMS="~amd64 ~x86"
 LICENCES="X11"
 SLOT="0"
-PLATFORMS="~amd64 ~x86"
-MYOPTIONS=""
 
 DEPENDENCIES="
     build+run:

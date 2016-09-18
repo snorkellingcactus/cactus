@@ -1,27 +1,26 @@
-# Copyright 2009 Adriaan Leijnse <adriaan@leijnse.net>
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
 
 SCM_REPOSITORY="http://repo.or.cz/a2jmidid.git"
 
-require scm-git waf
-
 SUMMARY="a2jmidid is daemon that implements automatic bridging."
-#TODO: HomePage, dbus? --disable-dbus, --enable-pkg-config-dbus-service-dir
-HOMEPAGE="http://www.notam02.no/arkiv/src/"
+#TODO: dbus? --disable-dbus, --enable-pkg-config-dbus-service-dir
+HOMEPAGE="http://home.gna.org/a2jmidid/"
 
 LICENCES="GPL-2"
 SLOT="0"
-PLATFORMS="~amd64"
-MYOPTIONS=""
+PLATFORMS="~x86 ~amd64"
 
-#alsa-lib, virtual/pkgconfig, require python?
+BUGS_TO="snorkellingcactus@gmail.com"
+
+#TODO: alsa-lib, virtual/pkgconfig, require python?
 DEPENDENCIES="
     build+run:
         media-sound/jack-audio-connection-kit
 	
 "
 
-BUGS_TO="snorkellingcactus@gmail.com"
+require scm-git waf
 
 src_configure()
 {

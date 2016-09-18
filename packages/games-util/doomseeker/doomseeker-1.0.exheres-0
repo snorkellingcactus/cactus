@@ -1,7 +1,8 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
 SCM_TAG='1.0'
 
-require doomseeker
+DEPENDENCIES="x11-libs/qt:4"
 
-DEPENDENCIES="
-	x11-libs/qt:4
-"
+require doomseeker
