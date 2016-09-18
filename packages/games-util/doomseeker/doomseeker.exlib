@@ -1,0 +1,41 @@
+#https://github.com/gentoo-mirror/earshark/blob/master/games-util/doomseeker/doomseeker-1.0-r1.ebuild
+
+SCM_REPOSITORY='https://bitbucket.org/Doomseeker/doomseeker'
+#SCM_TAG='1.0'
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCMAKE_BUILD_TYPE=Release
+	-DCMAKE_PREFIX=/usr/$(exhost --target)
+)
+
+require cmake scm-hg
+
+#TODO: chocolate-doom odamex vavoom wine
+
+SUMMARY="Internet Doom server browser"
+HOMEPAGE="http://doomseeker.drdteam.org/"
+
+PLATFORMS="~amd64 ~x86"
+
+MYOPTIONS="zandronum"
+DEPENDENCIES="
+	sys-libs/zlib
+	app-arch/bzip2
+
+	x11-libs/qtbase:5
+	x11-libs/qtmultimedia:5
+"
+SLOT='0'
+
+
+src_prepare() {
+	default
+
+	#libs go into libdir, not share
+	sed -i -e "s:DESTINATION share/:DESTINATION /usr/$(exhost --target)/lib/:" "${WORK}"/${PVN}/src/plugins/PluginFooter.txt
+	sed -i -e "s:INSTALL_PREFIX \"/share/doomseeker/\":\"/usr/$(exhost --target)/lib/doomseeker/\":" "${WORK}"/${PVN}/src/core/main.cpp
+
+	#fix some paths
+	sed -i -e "s:LIBRARY DESTINATION lib:LIBRARY DESTINATION /usr/$(exhost --target)/lib:" "${WORK}"/${PVN}/src/wadseeker/CMakeLists.txt
+	sed -i -e "s:Icon=/usr/local:Icon=/usr:" "${WORK}"/${PVN}/media/Doomseeker.desktop
+}

@@ -1,0 +1,7 @@
+SCM_TAG='1.0'
+
+require doomseeker
+
+DEPENDENCIES="
+	x11-libs/qt:4
+"

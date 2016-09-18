@@ -1,0 +1,6 @@
+require doomseeker
+
+DEPENDENCIES="
+	x11-libs/qtbase:5
+	x11-libs/qtmultimedia:5
+"
