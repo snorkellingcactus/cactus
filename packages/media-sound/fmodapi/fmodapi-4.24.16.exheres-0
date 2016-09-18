@@ -1,0 +1,95 @@
+# Copyright 1999-2012 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Id$
+
+PV_NO_DOTS=${PNV//[.|-]/}linux
+
+SUMMARY="music and sound effects library, and a sound processing system"
+HOMEPAGE="http://www.fmod.org"
+
+MIRROR="http://web.archive.org/web/20151111191152/http://doomgod.com/ports/fmod/"
+#MIRROR="http://ponce.cc/slackware/sources/repo/"
+#Require registration:
+#MIRROR="http://www.fmod.org/download/fmodex/api/Linux/"
+
+DOWNLOADS="
+	platform:x86? ( $MIRROR/${PV_NO_DOTS}.tar.gz )
+	platform:amd64? ( $MIRROR/${PV_NO_DOTS}64.tar.gz )
+"
+
+#LICENSES="BSD BSD-2 fmod"
+SLOT="1"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="
+	examples
+	documentation
+	libraries
+	development
+	platform:
+		x86
+		amd64
+"
+
+#QA_FLAGS_IGNORED="opt/fmodex/tools/fsbanklib/.*"
+
+#QA_TEXTRELS="opt/fmodex/fmoddesignerapi/api/lib/*
+#opt/fmodex/api/lib/*"
+
+src_unpack()
+{
+	default
+
+	fbits=''
+
+	optionq platform:amd64 && fbits='64'
+
+	WORK="${WORKBASE}/${PV_NO_DOTS}${fbits}"
+}
+
+src_compile() { :; }
+src_install() {
+	if option libraries
+	then
+		pushd "${WORK}"/api/lib
+
+		cp -f libfmodex${fbits}-${PV}.so libfmodex.so.${PV} || die
+		ln -sf libfmodex.so.${PV} libfmodex.so || die
+		ln -sf libfmodex.so.${PV} libfmodex.so.4 || die
+
+		dolib.so libfmodex.so.${PV}
+	        dolib.so libfmodex.so
+	        dolib.so libfmodex.so.4
+
+		cp -f libfmodex${fbits}L-${PV}.so libfmodexL.so.${PV} || die
+		ln -sf libfmodexL.so.${PV} libfmodexL.so || die
+		ln -sf libfmodexL.so.${PV} libfmodexL.so.4 || die
+
+		dolib libfmodexL.so.${PV}
+		dolib libfmodexL.so
+		dolib libfmodexL.so.4
+
+		popd
+	fi
+
+	if optionq development
+	then
+		dodir /usr/$(exhost --target)/include/fmodex
+	
+		cp "${WORK}"/api/inc/* "${IMAGE}"/usr/$(exhost --target)/include/fmodex
+	fi
+
+	if option examples
+	then
+		insinto /usr/share/doc/${PNV}/examples
+		doins -r  ${WORK}/examples/*
+	fi
+
+	if optionq documentation
+	then
+		insinto /usr/share/doc/${PNV}/pdf
+	        doins "${WORK}"/documentation/*.pdf
+
+		dodoc "${WORK}"/{documentation/*.txt,fmoddesignerapi/*.TXT}
+	fi
+	rm -rf "${IMAGE}"/usr/$(exhost --target)/lib/{documentation,fmoddesignerapi/*.TXT}
+}

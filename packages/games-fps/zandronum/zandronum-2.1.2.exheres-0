@@ -1,0 +1,14 @@
+#DOWNLOADS="https://bitbucket.org/Torr_Samaho/zandronum/get/ZA_2.1.2.tar.bz2"
+
+SLOT='2'
+SCM_TAG='ZA_2.1.2'
+
+require zandronum
+
+src_unpack()
+{
+	zan_src_unpack
+
+	#https://github.com/NixOS/nixpkgs/pull/16739/commits/97dd3b3e6294e38a8a5b52c647e1d4d5b68ae9c1
+	sed -ie 's| restrict| _restrict|g' "${WORKBASE}"/${PNV}/dumb/include/dumb.h "${WORKBASE}"/${PNV}/dumb/src/it/*.c
+}

@@ -1,0 +1,36 @@
+# Copyright 2009 Adriaan Leijnse <adriaan@leijnse.net>
+# Distributed under the terms of the Gnu General Public License v2
+
+SCM_REPOSITORY="http://repo.or.cz/a2jmidid.git"
+
+require scm-git waf
+
+SUMMARY="a2jmidid is daemon that implements automatic bridging."
+#TODO: HomePage, dbus? --disable-dbus, --enable-pkg-config-dbus-service-dir
+HOMEPAGE="http://www.notam02.no/arkiv/src/"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+#alsa-lib, virtual/pkgconfig, require python?
+DEPENDENCIES="
+    build+run:
+        media-sound/jack-audio-connection-kit
+	
+"
+
+BUGS_TO="snorkellingcactus@gmail.com"
+
+src_configure()
+{
+	ewaf --jobs=1 configure \
+        --prefix=/usr/$(exhost --target)/ \
+        "${WAF_DEFAULT_PARAMS[@]}" \
+        "${WAF_SRC_CONFIGURE_PARAMS[@]}" \
+        $(for s in "${WAF_SRC_CONFIGURE_OPTIONS[@]}" ; do option ${s} ; done) \
+        $(for s in "${WAF_SRC_CONFIGURE_OPTION_ENABLES[@]}" ; do option_enable ${s} ; done) \
+        $(for s in "${WAF_SRC_CONFIGURE_OPTION_WITHS[@]}" ; do option_with ${s} ; done) \
+        $(for s in "${WAF_SRC_CONFIGURE_TESTS[@]}" ; do expecting_tests ${s} ; done)
+}

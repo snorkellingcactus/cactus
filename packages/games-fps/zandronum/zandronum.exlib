@@ -1,0 +1,181 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="https://bitbucket.org/Torr_Samaho/zandronum"
+SUMMARY="Doom 2 GPL source port and Skulltag successor"
+HOMEPAGE="https://zandronum.com"
+
+PLATFORMS="~x86 ~amd64"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCMAKE_BUILD_TYPE=Release
+	-DFMOD_LIBRARY=/usr/$(exhost --target)/lib/libfmodex.so
+	-DCMAKE_LINKER:FILEPATH=$(which $(exhost --tool-prefix)ld	)
+	-DCMAKE_OBJCOPY:FILEPATH=$(which $(exhost --tool-prefix)objcopy	)
+	-DCMAKE_OBJDUMP:FILEPATH=$(which $(exhost --tool-prefix)objdump	)
+	-DCMAKE_STRIP:FILEPATH=$(which $(exhost --tool-prefix)strip	)
+)
+
+require cmake [ api=2 ] scm-hg
+
+#LICENCES="GPL-3" Sleepycat New BSD License
+
+#TODO SDL1.2 or SDL2
+
+MYOPTIONS="
+	client
+	server
+	gtk
+	sound
+	gl
+	asm
+
+	(
+		providers:
+		jpeg
+		jpeg-turbo
+	) [[ number-selected = exactly-one ]]
+	platform:
+		x86
+		amd64
+"
+
+#libgme https://bitbucket.org/mpyne/game-music-emu/src
+#TODO jpeg-turbo? jpeg?, Xcursor, python>3, opengl, GME (Game-Music-Emu), fluidsynth, timidity++ compile: bzip2, pkgconfig
+
+DEPENDENCIES="
+media-libs/SDL:*[>=1.2.8]
+
+dev-db/sqlite[>=3.14.1]
+
+gtk? ( x11-libs/gtk+:2 )
+
+asm? ( dev-lang/nasm )
+
+media-libs/libjpeg-turbo
+
+sys-libs/zlib
+app-arch/bzip2
+x11-apps/gxmessage
+media-sound/fmodapi
+
+sound? ( media-libs/openal media-sound/fluidsynth )
+
+"
+
+zan_src_unpack()
+{
+	cmake_src_unpack
+	#https://gitweb.gentoo.org/user/haarp.git/commit/?id=e2ce2d2e6c39cafd731cb7a6dc8391b456835058
+	# Use the dynamically-linked system-sqlite instead
+        sed -i -e "/add_subdirectory( sqlite )/d" "${WORKBASE}"/${PNV}/CMakeLists.txt
+	sed -i -e "/..\/sqlite\//d" "${WORKBASE}"/${PNV}/src/CMakeLists.txt
+}
+
+zan_src_configure()
+{
+	if ! optionq gtk ; then
+		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_GTK=ON )
+	fi
+	if ! optionq sound ; then
+		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_SOUND=ON )
+	fi
+	if ! optionq gl ; then
+		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_GL=ON )
+	fi
+	if ! optionq asm ; then
+		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_ASM=ON )
+	fi
+
+	if optionq client
+        then
+
+		mkdir "${WORK}"/client
+
+	        pushd "${WORK}"/client
+		        cmake_src_configure
+	        popd
+	fi
+
+	if optionq server
+        then
+		CMAKE_SRC_CONFIGURE_PARAMS+=( -DSERVERONLY=ON )
+
+		mkdir ${WORK}/server
+
+                pushd "${WORK}"/server
+                        cmake_src_configure
+                popd
+        fi
+}
+
+zan_src_compile()
+{
+	if optionq client
+        then
+		pushd "${WORK}"/client
+			emake
+		popd
+	fi
+
+	if optionq server
+	then		
+		pushd "${WORK}"/server
+			emake
+		popd
+        fi
+}
+
+zan_dobin()
+{
+	echo '#!/bin/sh' > $1 &&
+        echo >> $1 &&
+        echo "exec $2 \"\$@\"" >> $1
+
+	dobin $1
+}
+
+zan_src_install()
+{
+	Z_DIR=/usr/$(exhost --target)/share/games/${PNV}
+
+	insinto ${Z_DIR}
+
+	if optionq server  
+	then
+		doins "${WORK}"/server/${PN}-server
+
+		edo chmod 755 "${IMAGE}"/${Z_DIR}/${PN}-server
+
+		zan_dobin ${PNV}-server ${Z_DIR}/${PN}-server
+        fi
+
+	if optionq client
+        then
+		doins "${WORK}"/client/${PN}
+                doins "${WORK}"/client/output_sdl/liboutput_sdl.so
+                doins "${WORK}"/client/*.pk3
+
+		zan_dobin ${PNV} ${Z_DIR}/${PN}
+
+		edo chmod 755 "${IMAGE}"/${Z_DIR}/${PN}
+		edo chmod 755 "${IMAGE}"/${Z_DIR}/liboutput_sdl.so
+	fi
+}
+
+src_unpack()
+{
+	zan_src_unpack
+}
+src_configure()
+{
+	zan_src_configure
+}
+src_compile()
+{
+	zan_src_compile
+}
+src_install()
+{
+	zan_src_install
+}

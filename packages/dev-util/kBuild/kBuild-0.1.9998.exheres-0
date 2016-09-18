@@ -1,0 +1,61 @@
+# Copyright 2009 Pierre Lejeune <superheron@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'kbuild-0.1.5-r1.ebuild', which is:
+#     Copyright 1999-2009 Gentoo Foundation
+
+SUMMARY="kBuild is a makefile framework for writing simple makefiles for complex tasks."
+HOMEPAGE="http://svn.netlabs.org/kbuild/wiki"
+
+#http://www.filewatcher.com/m/kBuild-0.1.9998-src.tar.gz.2604001-0.html
+DOWNLOADS="ftp://mirror.its.dal.ca/freebsd/distfiles/kBuild-0.1.9998-src.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+UPSTREAM_DOCUMENTATION="
+    ${HOMEPAGE}/Documentation [[ description = [ Official documentation ] ]]
+    ${HOMEPAGE}/ContributedDocumentation [[ description = [ Contributed documentation ] ]]
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+	"${FILES}/${PNV}-glibc-2.10-output.h.patch"
+	"${FILES}/${PNV}-glibc-2.10-output.c.patch"
+	"${FILES}/${PNV}-kash_Makefile.kmk.patch"
+	"${FILES}/${PNV}-kmk_Makefile.kmk.patch"
+)
+
+WORK="${WORKBASE}/${PNV/_/-}"
+
+kBuild_opts=(
+    AR=${AR}
+    TOOL_GCC3_AR=${AR}
+    TOOL_GCC3_CC=${CC}
+    TOOL_GCC3_LD=${CC}
+
+    MY_INST_MODE=0644
+    MY_INST_BIN_MODE=0755
+)
+
+src_prepare() {
+    default
+
+    # AM_CONFIG_HEADER is obsolete since automake-1.13 (See gentoo bug #467104)
+    edo pushd "${WORK}/src/sed"
+    edo sed 's@AM_CONFIG_HEADER@AC_CONFIG_HEADERS@' -i configure.ac
+    edo popd
+}
+
+src_compile() {
+    edo kBuild/env.sh --full emake -f bootstrap.gmk \
+        ${kBuild_opts[@]}
+    edo kBuild/env.sh kmk rebuild \
+        ${kBuild_opts[@]} BUILD_TYPE=release PATH_INS="${IMAGE}"
+}
+
+src_install() {
+    edo kBuild/env.sh kmk install \
+        ${kBuild_opts[@]} NIX_INSTALL_DIR="/usr/$(exhost --target)" PATH_INS="${IMAGE}"
+}
+

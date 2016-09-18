@@ -1,0 +1,21 @@
+diff --git a/src/kash/output.c b/src/kash/output.c.new
+index 39a2633..fef057a 100644
+--- a/src/kash/output.c
++++ b/src/kash/output.c.new
+@@ -226,6 +226,7 @@ out1fmt(shinstance *psh, const char *fmt, ...)
+ 	va_end(ap);
+ }
+ 
++#if 0
+ void
+ dprintf(shinstance *psh, const char *fmt, ...)
+ {
+@@ -236,7 +237,7 @@ dprintf(shinstance *psh, const char *fmt, ...)
+ 	va_end(ap);
+ 	flushout(psh->out2);
+ }
+-
++#endif
+ void
+ fmtstr(char *outbuf, size_t length, const char *fmt, ...)
+ {

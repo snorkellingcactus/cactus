@@ -1,0 +1,25 @@
+diff --git a/Makefile b/Makefile.new
+index f05cf6b..e4302c1 100644
+--- a/Makefile
++++ b/Makefile.new
+@@ -1,11 +1,7 @@
+-PREFIX ?= /usr/local
+ bindir = $(PREFIX)/bin
+ 
+ VERSION=0.9.71
+ 
+-CC=gcc
+-CPP=g++
+-
+ OPTIMIZE=-O3
+ #OPTIMIZE=-O0 -g
+ 
+@@ -32,8 +28,6 @@ check_dependencies:
+ 	which sed
+ 	which install
+ 	which pkg-config
+-	which $(CC)
+-	which $(CPP)
+ 	$(CC) -E testsndfile.c >/dev/null
+ 	@echo "All seems good "
+ 	@echo
