@@ -1,0 +1,12 @@
+function newicon()
+{
+	local s=48
+
+	[ $1 = '-s' ] && shift && s=$1 && shift
+
+	local DIR="${IMAGE}/usr/share/icons/hicolor/$s"'x'"$s/apps"
+
+	mkdir -p ${DIR}
+
+	cp "$1" ${DIR}/"$2"
+}

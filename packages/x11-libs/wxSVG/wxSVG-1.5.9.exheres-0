@@ -1,0 +1,25 @@
+SUMMARY="wxSVG is C++ library to create, manipulate and render SVG files."
+HOMEPAGE="http://wxsvg.sourceforge.net"
+DOWNLOADS="http://downloads.sourceforge.net/project/wxsvg/wxsvg/${PV}/wxsvg-${PV}.tar.bz2"
+PLATFORMS="~x86 ~amd64"
+LICENCES="wxWindows Library Licence, Version 3"
+SLOT="0"
+
+DEPENDENCIES="
+	media/ffmpeg[>=0.5]
+	x11-libs/wxGTK[>=2.6.3]
+	build: sys-devel/libtool[>=1.5.26]
+"
+MYOPTIONS="platform: x86 amd64"
+#MYOPTIONS libav
+
+DEFAULT_SRC_CONFIGURE_PARAMS+=(
+	--with-wx-config=wx-config-3.0-gtk2
+)
+
+src_unpack()
+{
+	default
+
+	WORK=${WORKBASE}/wxsvg-${PV}
+}

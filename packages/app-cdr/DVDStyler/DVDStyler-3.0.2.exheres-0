@@ -1,0 +1,61 @@
+SUMMARY="DVDStyler is a cross-platform free DVD authoring application for the creation of professional-looking DVDs"
+HOMEPAGE="http://www.dvdstyler.org/"
+SLOT="0"
+LICENCES="GPL"
+MYOPTIONS="
+	(
+		ecc [[ description = [ Enhance data survivability ] ]]
+		providers:
+			libav
+			ffmpeg
+	)
+"
+#providers: wx2 wx3
+PLATFORMS="~x86 ~amd64"
+
+DEPENDENCIES="
+	app-cdr/cdrtools[>=2.01]
+	media/dvdauthor[>=0.7.0]
+	media-gfx/exif[>=0.6.16]
+	media-video/xine-ui[>=0.99.1]
+	providers:ffmpeg? ( media/ffmpeg[>=0.10.0] )
+	providers:libav? ( media/libav[>=0.8.0] )
+	sys-devel/gettext[>=0.17]
+	x11-libs/wxGTK[>=2.8.7][gstreamer]
+	x11-libs/wxSVG[>=1.1.7]
+
+	ecc? ( app-cdr/dvdisaster )
+"
+
+#function tolower()
+#{
+#        echo "$1" | awk '{print tolower($0)}'
+#}
+
+#require sourceforge [ project=$( tolower ${PN} ) ]
+
+require sourceforge [ project=dvdstyler ]
+
+#wx-config-3.0.2-gtk3 = main window not shown
+#wx-config-2.8-gtk2 = build errors
+
+DEFAULT_SRC_CONFIGURE_PARAMS+=(
+	--with-wx-config=wx-config-3.0-gtk2
+)
+
+DEFAULT_SRC_COMPILE_PARAMS+=(
+	STRIP=$(	exhost --tool-prefix	)strip
+	AR=$(		exhost --tool-prefix	)ar
+	CXX=$(		exhost --tool-prefix	)g++
+	RANLIB=$(	exhost --tool-prefix	)ranlib
+)
+
+CXXFLAGS="${CXXFLAGS} -std=c++11"
+
+src_install()
+{
+	#TODO: doc i18n
+	default
+
+	doicon data/dvdstyler.png
+}

@@ -1,0 +1,89 @@
+# Copyright 2008, 2009, 2010 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'xine-ui-0.99.5.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+require sourceforge [ project=xine suffix=tar.xz ]
+require freedesktop-desktop freedesktop-mime gtk-icon-cache
+
+SUMMARY="Xine movie player"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="
+    (
+        providers:
+            jpeg
+            jpeg-turbo
+    )
+    aalib
+    caca [[ description = [ Support for colored ASCII video output ] ]]
+    curl
+    readline
+"
+
+DEPENDENCIES="
+    build:
+        sys-devel/gettext[>=0.18.3]
+        virtual/pkg-config
+        x11-proto/inputproto
+        x11-proto/xf86vidmodeproto
+        x11-proto/xineramaproto
+    build+run:
+        providers:jpeg? ( media-libs/jpeg )
+        providers:jpeg-turbo? ( media-libs/libjpeg-turbo )
+        media-libs/libpng:=[>=1.2.8]
+        media-libs/xine-lib[>=1.1.0][aalib?][caca?]
+        x11-libs/libICE
+        x11-libs/libSM
+        x11-libs/libX11
+        x11-libs/libXext
+        x11-libs/libXft
+        x11-libs/libXinerama
+        x11-libs/libXt
+        x11-libs/libXtst
+        x11-libs/libXrender
+        x11-libs/libXv
+        x11-libs/libXxf86vm
+        aalib? ( media-libs/aalib[>=1.2.0] )
+        caca? ( media-libs/libcaca[>=0.99_beta19] )
+        curl? ( net-misc/curl[>=7.10.2] )
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-nls
+    --enable-xft
+    --enable-xinerama
+    --disable-lirc
+    --disable-nvtvsimple
+    --disable-vdr-keys
+    --with-tar
+    --with-x
+    --without-fb
+)
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=(
+    aalib
+    caca
+    curl
+    readline
+)
+
+DEFAULT_SRC_COMPILE_PARAMS=( AR="${AR}" )
+
+DEFAULT_SRC_INSTALL_PARAMS=(
+    docsdir="/usr/share/doc/${PNVR}"
+)
+
+pkg_postinst() {
+    freedesktop-desktop_pkg_postinst
+    freedesktop-mime_pkg_postinst
+    gtk-icon-cache_pkg_postinst
+}
+
+pkg_postrm() {
+    freedesktop-desktop_pkg_postrm
+    freedesktop-mime_pkg_postrm
+    gtk-icon-cache_pkg_postrm
+}
+

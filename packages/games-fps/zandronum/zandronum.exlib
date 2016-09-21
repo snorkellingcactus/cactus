@@ -138,7 +138,7 @@ zan_src_install()
 		edo chmod 755 "${IMAGE}"/${Z_DIR}/${PN}-server
 
 		zan_dobin ${PNV}-server ${Z_DIR}/${PN}-server
-        fi
+	fi
 
 	if optionq client
         then

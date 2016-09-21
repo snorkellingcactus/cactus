@@ -1,0 +1,148 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'sublime-text-3114.ebuild', which is:
+# Copyright 1999-2010 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+# example file name on servers : "rainlendar2-lite_2.7.b91-1_i386.deb"
+
+TMPFILE=Rainlendar-Lite-$(ever range 1-2)
+
+$THIRD=$(ever range 3)
+
+[ ! -z "${THIRD}" ] && TMPFILE=${TMPFILE}.b${THIRD}
+
+unset THIRD
+
+FMT=.tar.bz2
+TO_UNPACK=${TMPFILE}${FMT}
+
+SUMMARY="Feature-Rich Desktop Calendar"
+HOMEPAGE="http://www.rainlendar.net"
+PLATFORMS="~amd64 ~x86"
+LICENCES="as-is"
+SLOT="0"
+
+#( lite pro )[[ number-selected = at-most-one ]]
+
+MYOPTIONS="
+	doc
+	platform:
+		x86
+		amd64
+"
+
+DOWNLOADS="
+	platform:x86?	( http://www.rainlendar.net/download/${TMPFILE}-i386${FMT}	-> ${TO_UNPACK} )
+	platform:amd64?	( http://www.rainlendar.net/download/${TMPFILE}-amd64${FMT}	-> ${TO_UNPACK} ) 
+	doc?			(	http://www.rainlendar.net/download/pdf/UserGuide.pdf
+					http://www.rainlendar.net/download/pdf/ApiReference.pdf
+					http://www.rainlendar.net/download/pdf/SkinReference.pdf )
+"
+
+DEPENDENCIES="
+		!app-misc/rainlendar-lite
+		platform:x86? ( x11-libs/gtk+:2[>=2.12][xinerama] )
+        net-misc/curl[>=7.16]
+        dev-libs/atk[>=1.20]
+        sys-libs/glibc[>=2.6.1]
+        x11-libs/cairo[>=1.4.10]
+        media-libs/fontconfig[>=2.4]
+        media-libs/freetype:2[>=2.3.5]
+        dev-libs/glib:2[>=2.14]
+        x11-libs/pango[>=1.16.2]
+		media-libs/libpng:1.2
+		dev-libs/expat
+		x11-libs/libX11
+		x11-libs/libXinerama
+"
+#app-text/tofrodos
+
+LINGUAS=" ar ast be bg br bs ca chr cs cv_RU da de_AU de de_DE2 el es et eu fi fil fr ga gl he hi hr hu id is it ja km ko l33t lt lv mk nb_NO nn_NO nl pl pt pt_BR ro ru sk sl sq sr sv ta th tr uk vi zh_CN zh_TW "
+
+MYOPTIONS="$MYOPTIONS
+        linguas:"
+
+for lingua in ${LINGUAS} ; do
+
+        MYOPTIONS="${MYOPTIONS} ${lingua}"
+        DEPENDENCIES="${DEPENDENCIES}
+                        linguas:${lingua}? ( app-arch/zip )
+        "
+done
+
+unset LINGUAS
+
+require desktop-utils gtk-icon-cache
+
+src_unpack() {
+
+	unpack ${TO_UNPACK}
+
+	unset TO_UNPACK
+
+	FOLDER_NAME=${PN}$(ever range 1)
+
+	WORK=${WORKBASE}/${FOLDER_NAME}
+}
+
+src_prepare() {
+
+	# Translation support :
+    #for r2lang in "${FETCHEDDIR}"/*.r2lang ; do
+    #    short=$(basename ${r2lang} .r2lang)
+	#	einfo "Installing translation: ${short}..."
+	#	# unzip to locale dir :
+	#	unzip -q "${r2lang}" -d "locale" || die "Failed to unzip translation !"
+    #done
+
+	# prepare the autostart entry
+	cat <<-EOF >rainlendar2.desktop
+		[Desktop Entry]
+		Type=Application
+		Name=Rainlendar2
+		Comment=${DESCRIPTION}
+		Exec=rainlendar2
+		Icon=rainlendar2
+		Categories=Office;Calendar;
+		StartupNotify=true
+		Terminal=false
+		Hidden=false
+	EOF
+
+}
+
+src_install() {
+
+	R_DIR=share/${FOLDER_NAME}
+	PREFIX=/usr/$(exhost --target)
+	PREFIX_BIN=${PREFIX}/bin
+	DEST=${PREFIX}/${R_DIR}
+
+	insinto ${DEST}
+	exeinto ${DEST}
+
+	doins -r locale plugins resources scripts skins lfs.so rainlendar2.htb
+	doexe ${FOLDER_NAME}
+
+	mkdir -p ${IMAGE}/${PREFIX_BIN}
+	dosym ${DEST}/${FOLDER_NAME} ${PREFIX_BIN}/${FOLDER_NAME}
+
+	dodoc Changes.txt
+	#optionq doc && dodoc ../doc/${FOLDER_NAME}/{copyright,license.txt} "${FETCHEDDIR}"/{UserGuide,{Api,Skin}Reference}.pdf
+
+	# install the menu and autostart entries
+	insinto /etc/xdg/autostart
+	doins "${WORK}"/${FOLDER_NAME}.desktop
+	doicon ../pixmaps/${FOLDER_NAME}.png
+
+    install_desktop_entry "Exec=${FOLDER_NAME}" "Name=Rainlendar2" "Categories=Office;Calendar;"
+}
+
+pkg_postinst() {
+	einfo "Some translations are incomplete, see homepage for details."
+	if [[ "${PN%pro}" != "${PN}" ]]; then
+    	einfo "Your license file for Rainendar2 Pro should"
+	    einfo "be copied to '~/.config/.${FOLDER_NAME}/'."
+    fi
+	einfo "An autostart entry should be available in your DE settings."
+}

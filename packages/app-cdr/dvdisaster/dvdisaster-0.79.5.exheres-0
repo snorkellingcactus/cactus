@@ -1,0 +1,57 @@
+SUMMARY="dvdisaster is a computer program aimed to enhance data survivability on optical discs."
+DOWNLOADS="http://dvdisaster.net/downloads/${PNV}.tar.bz2"
+HOMEPAGE="http://dvdisaster.net/en/index.html"
+SLOT="0"
+LICENCES="GPL-3+"
+PLATFORMS="~x86 ~amd64"
+
+#MYOPTIONS="nls"
+MYOPTIONS="documentation"
+DEPENDENCIES="
+	dev-libs/glib[>=2.32]
+	x11-libs/gdk-pixbuf
+	x11-libs/gtk+:2[>=2.6]
+"
+
+#Errors: message.pot does not exists
+#nls? ( dev-util/intltool )
+#nls? ( sys-devel/gettext )
+
+DEFAULT_SRC_CONFIGURE_PARAMS+=( --with-nls=no )
+
+require desktop-utils gtk-icon-cache newicon
+
+src_prepare()
+{	
+	default
+
+	#! optionq nls && DEFAULT_SRC_CONFIGURE_PARAMS+=( --with-nls=no )
+}
+src_install()
+{
+	if optionq documentation
+	then
+		make --no-print-directory -C documentation/user-manual manual.pdf
+		dodoc documentation/user-manual/manual.pdf
+		dodoc CHANGELOG COPYING CREDITS.en README* TODO *HOWTO
+		#dodoc CREDITS.de
+	fi
+
+	newicon contrib/${PN}48.png ${PN}.png
+	install_desktop_entry "Exec=${PN}" "Name=${PN}" 'Categories=System;Utility'
+
+	for res in 16 32 48 64; do
+		newicon -s ${res} contrib/${PN}${res}.png ${PN}.png
+	done
+
+	#	if optionq nls
+	#	then
+	#		for i in ?? ??_??;
+	#		do
+	#			insinto /usr/$(exhost --target)/locale/$i/LC_MESSAGES
+	#			doins $i/LC_MESSAGES/dvdisaster.mo
+	#		done
+	#	fi
+
+	dobin dvdisaster
+}

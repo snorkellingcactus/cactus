@@ -1,0 +1,67 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'sublime-text-3114.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+require gnome-2 desktop-utils gtk-icon-cache
+
+# get the major version from PV
+MV="${PV:0:1}"
+
+MY_PN="sublime_text_${MV}"
+MY_P="Sublime%20Text"
+
+WORK="${WORKBASE}/${MY_PN}"
+
+DESCRIPTION="Sophisticated text editor for code, markup and prose"
+HOMEPAGE="http://www.sublimetext.com"
+
+BASE_URI="https://download.sublimetext.com"
+DOWNLOADS="
+	platform:amd64?	( ${BASE_URI}/${MY_PN}_build_${PV}_x64.tar.bz2 )
+	platform:x86?	( ${BASE_URI}/${MY_PN}_build_${PV}_x32.tar.bz2 )
+"
+LICENCES="Sublime"
+SLOT="${MV}"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="
+	dbus
+	platform:
+		x86
+		amd64
+"
+#multislot
+
+DEPENDENCIES="
+	dbus? ( sys-apps/dbus )
+	media-libs/libpng[>=1.2.46]
+	x11-libs/gtk+:2[>=2.24.8]
+"
+
+src_install()
+{
+	DEST=/usr/share/$(exhost --target)/${MY_PN}
+
+	insinto ${DEST}
+	into ${DEST}
+	exeinto ${DEST}
+
+	doins -r "Icon"
+	doins -r "Packages"
+	doins "python3.3.zip"
+	doins "sublime.py"
+	doins "sublime_plugin.py"
+	doexe "sublime_text"
+	doexe "plugin_host"
+
+	mkdir -p ${IMAGE}/usr/$(exhost --target)/bin/
+	dosym "${DEST}/sublime_text" /usr/$(exhost --target)/bin/subl${MV}
+
+	local size
+	for size in 16 32 48 128 256 ; do
+		insinto /usr/share/icons/hicolor/${size}x${size}/apps
+		newins "Icon/${size}x${size}/sublime-text.png" sublime_text.png
+	done
+
+	install_desktop_entry "Name=Sublime Text ${MV}" "Exec=subl${MV} %F" "Categories=Development;TextEditor" "StartupNotify=true"
+}
