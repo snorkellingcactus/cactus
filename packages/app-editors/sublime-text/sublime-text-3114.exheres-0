@@ -40,7 +40,7 @@ DEPENDENCIES="
 
 src_install()
 {
-	DEST=/usr/share/$(exhost --target)/${MY_PN}
+	DEST=/usr/$(exhost --target)/share/${MY_PN}
 
 	insinto ${DEST}
 	into ${DEST}
