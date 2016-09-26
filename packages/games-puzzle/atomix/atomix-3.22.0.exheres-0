@@ -1,0 +1,19 @@
+HOMEPAGE='https://wiki.gnome.org/Apps/Atomix'
+SUMMARY='Puzzle game where you move atoms to build a molecule.'
+DESCRIPTION="You start the game with the map filled with walls and a few atoms, which you can move in any direction. However, the atoms won't stop until they hit a wall or another atom. You can see a preview of what molecule you have to build, and you have to do your best to find where to buil the molecule, and move the atoms there."
+DOWNLOADS="https://download.gnome.org/sources/${PN}/$(ever range 1-2)/${PNV}.tar.xz"
+SLOT='0'
+#LICENCES=''
+PLATFORMS="~x86 ~amd64"
+
+#TODO: MYOPTIONS="nls"
+
+DEPENDENCIES='
+	x11-libs/gdk-pixbuf:2.0[>=2.0.5]
+	dev-libs/glib:2[>=2.36.0]
+	x11-libs/gtk+:3[>=3.10.0]
+	
+	build:
+		sys-devel/gettext
+		dev-util/intltool
+'
