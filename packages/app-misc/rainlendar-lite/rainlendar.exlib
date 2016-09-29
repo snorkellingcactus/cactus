@@ -3,57 +3,112 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-# example file name on servers : "rainlendar2-lite_2.7.b91-1_i386.deb"
+# params: @int
+# values: 1, 2
+# example: 1 -> rainlendar ; 2 -> lite
+function rainlendar_split_pn()
+{
+    [ $1 = 1 ] && echo ${PN%-*} || echo ${PN##*-}
+}
 
-TMPFILE=Rainlendar-Lite-$(ever range 1-2)
+# params: @int
+# example: 1 -> Rainlendar ; 2 -> Lite
+function rainlendar_split_pn_upper()
+{
+	local MY_PN=$( rainlendar_split_pn $1 )
 
-$THIRD=$(ever range 3)
+	echo ${MY_PN^}
+}
 
-[ ! -z "${THIRD}" ] && TMPFILE=${TMPFILE}.b${THIRD}
+# params: @string
+# example: Rainlendar-Lite-2.9.b12-2-@string.tar.bz2
+function rainlendar_fmt_tmpfile()
+{
+	TMPFILE+=$1${FMT}
+}
 
-unset THIRD
+# params: @string
+# values: i386, amd64
+function rainlendar_what_to_unpack()
+{
+	rainlendar_fmt_tmpfile $(
+		( optionq platform:amd64 && echo 'amd64' ) || ( optionq platform:x86 && echo 'i386' )
+	)
+
+	echo ${TMPFILE}
+}
+
+# params: @string
+# values: i386, amd64
+function rainlendar_fmt_url()
+{
+	rainlendar_fmt_tmpfile $1
+
+	echo '(' ${URL_BASE}${TMPFILE} '->' ${TMPFILE} ')'
+}
+
+TMPFILE=$(
+	rainlendar_split_pn_upper 1
+)-$(
+	rainlendar_split_pn_upper 2
+)-$(
+	ever range 1-2
+)
 
 FMT=.tar.bz2
-TO_UNPACK=${TMPFILE}${FMT}
 
-SUMMARY="Feature-Rich Desktop Calendar"
-HOMEPAGE="http://www.rainlendar.net"
-PLATFORMS="~amd64 ~x86"
-LICENCES="as-is"
-SLOT="0"
+#Example: 2.9.12.2 -> 2.9.b12-2
+THIRD=$(	ever range 3 )
+FOURTH=$(	ever range 4 )
 
-#( lite pro )[[ number-selected = at-most-one ]]
+[ ! -z "${THIRD}"	] && TMPFILE+=.b${THIRD}
+[ ! -z "${FOURTH}"	] && TMPFILE+=-${FOURTH}
 
-MYOPTIONS="
+unset THIRD FOURTH
+
+TMPFILE+=-
+
+SUMMARY='Feature-Rich Desktop Calendar.'
+HOMEPAGE='http://www.rainlendar.net'
+PLATFORMS='~x86 ~amd64'
+LICENCES='as-is'
+SLOT='0'
+
+MYOPTIONS='
 	doc
-	platform:
-		x86
-		amd64
-"
+	(
+		platform:
+			x86
+			amd64
+	)
+'
 
+#doc? (
+#		http://www.rainlendar.net/download/pdf/UserGuide.pdf
+# 		http://www.rainlendar.net/download/pdf/ApiReference.pdf
+#		http://www.rainlendar.net/download/pdf/SkinReference.pdf
+#	)
+
+URL_BASE='http://www.rainlendar.net/download/'
 DOWNLOADS="
-	platform:x86?	( http://www.rainlendar.net/download/${TMPFILE}-i386${FMT}	-> ${TO_UNPACK} )
-	platform:amd64?	( http://www.rainlendar.net/download/${TMPFILE}-amd64${FMT}	-> ${TO_UNPACK} ) 
-	doc?			(	http://www.rainlendar.net/download/pdf/UserGuide.pdf
-					http://www.rainlendar.net/download/pdf/ApiReference.pdf
-					http://www.rainlendar.net/download/pdf/SkinReference.pdf )
-"
+	platform:amd64?	$( rainlendar_fmt_url amd64	)
 
+	platform:x86?	$( rainlendar_fmt_url i386	)
+"
+#platform:x86? ( x11-libs/gtk+:2[>=2.12][xinerama] )
 DEPENDENCIES="
-		!app-misc/rainlendar-lite
-		platform:x86? ( x11-libs/gtk+:2[>=2.12][xinerama] )
+		dev-libs/atk[>=1.20]
+		dev-libs/expat
+		dev-libs/glib:2[>=2.14]
         net-misc/curl[>=7.16]
-        dev-libs/atk[>=1.20]
-        sys-libs/glibc[>=2.6.1]
-        x11-libs/cairo[>=1.4.10]
         media-libs/fontconfig[>=2.4]
         media-libs/freetype:2[>=2.3.5]
-        dev-libs/glib:2[>=2.14]
-        x11-libs/pango[>=1.16.2]
-		media-libs/libpng:1.2
-		dev-libs/expat
-		x11-libs/libX11
+        media-libs/libpng:1.2
+        sys-libs/glibc[>=2.6.1]
+        x11-libs/cairo[>=1.4.10]
+        x11-libs/libX11
 		x11-libs/libXinerama
+        x11-libs/pango[>=1.16.2]
 "
 #app-text/tofrodos
 
@@ -76,18 +131,18 @@ require desktop-utils gtk-icon-cache
 
 src_unpack() {
 
-	unpack ${TO_UNPACK}
+	unpack $( rainlendar_what_to_unpack )
 
-	unset TO_UNPACK
+	unset TMPFILE
 
-	FOLDER_NAME=${PN}$(ever range 1)
+	FOLDER_NAME=$( rainlendar_split_pn 1 )$( ever range 1 )
 
 	WORK=${WORKBASE}/${FOLDER_NAME}
 }
 
 src_prepare() {
 
-	# Translation support :
+	# Translation support
     #for r2lang in "${FETCHEDDIR}"/*.r2lang ; do
     #    short=$(basename ${r2lang} .r2lang)
 	#	einfo "Installing translation: ${short}..."
@@ -95,7 +150,7 @@ src_prepare() {
 	#	unzip -q "${r2lang}" -d "locale" || die "Failed to unzip translation !"
     #done
 
-	# prepare the autostart entry
+	# Autostart entry
 	cat <<-EOF >rainlendar2.desktop
 		[Desktop Entry]
 		Type=Application
@@ -111,6 +166,7 @@ src_prepare() {
 
 }
 
+#TODO: Remove unused languages.
 src_install() {
 
 	R_DIR=share/${FOLDER_NAME}
@@ -140,9 +196,11 @@ src_install() {
 
 pkg_postinst() {
 	einfo "Some translations are incomplete, see homepage for details."
-	if [[ "${PN%pro}" != "${PN}" ]]; then
+
+	if [[ ${VERSION} = Pro ]]; then
     	einfo "Your license file for Rainendar2 Pro should"
 	    einfo "be copied to '~/.config/.${FOLDER_NAME}/'."
     fi
+
 	einfo "An autostart entry should be available in your DE settings."
 }
