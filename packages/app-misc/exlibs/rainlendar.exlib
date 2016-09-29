@@ -3,21 +3,37 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
+SUMMARY='Feature-Rich Desktop Calendar.'
+HOMEPAGE='http://www.rainlendar.net'
+PLATFORMS='~x86 ~amd64'
+LICENCES='as-is'
+SLOT='0'
+
 # params: @int
 # values: 1, 2
-# example: 1 -> rainlendar ; 2 -> lite
+# summary: Return side @int of ${PN} splitted by "-"
+# example:
+#	for PN = "rainlendar-lite":
+#	1 -> rainlendar ; 2 -> lite
 function rainlendar_split_pn()
 {
     [ $1 = 1 ] && echo ${PN%-*} || echo ${PN##*-}
+}
+
+# params: @str
+# example: hello -> Hello
+function rainlendar_to_upper()
+{
+	local STR=$1
+
+	echo ${STR^}
 }
 
 # params: @int
 # example: 1 -> Rainlendar ; 2 -> Lite
 function rainlendar_split_pn_upper()
 {
-	local MY_PN=$( rainlendar_split_pn $1 )
-
-	echo ${MY_PN^}
+	rainlendar_to_upper $( rainlendar_split_pn $1 )
 }
 
 # params: @string
@@ -47,15 +63,10 @@ function rainlendar_fmt_url()
 	echo '(' ${URL_BASE}${TMPFILE} '->' ${TMPFILE} ')'
 }
 
-TMPFILE=$(
-	rainlendar_split_pn_upper 1
-)-$(
-	rainlendar_split_pn_upper 2
-)-$(
-	ever range 1-2
-)
+MY_V=$(		rainlendar_split_pn_upper	2	)
+MY_PN=$(	rainlendar_split_pn			1	)
 
-FMT=.tar.bz2
+TMPFILE=$( rainlendar_to_upper $MY_PN )-$MY_V-$( ever range 1-2 )
 
 #Example: 2.9.12.2 -> 2.9.b12-2
 THIRD=$(	ever range 3 )
@@ -67,12 +78,6 @@ FOURTH=$(	ever range 4 )
 unset THIRD FOURTH
 
 TMPFILE+=-
-
-SUMMARY='Feature-Rich Desktop Calendar.'
-HOMEPAGE='http://www.rainlendar.net'
-PLATFORMS='~x86 ~amd64'
-LICENCES='as-is'
-SLOT='0'
 
 MYOPTIONS='
 	doc
@@ -88,7 +93,7 @@ MYOPTIONS='
 # 		http://www.rainlendar.net/download/pdf/ApiReference.pdf
 #		http://www.rainlendar.net/download/pdf/SkinReference.pdf
 #	)
-
+FMT=.tar.bz2
 URL_BASE='http://www.rainlendar.net/download/'
 DOWNLOADS="
 	platform:amd64?	$( rainlendar_fmt_url amd64	)
@@ -135,7 +140,7 @@ src_unpack() {
 
 	unset TMPFILE
 
-	FOLDER_NAME=$( rainlendar_split_pn 1 )$( ever range 1 )
+	FOLDER_NAME=$MY_PN$( ever range 1 )
 
 	WORK=${WORKBASE}/${FOLDER_NAME}
 }
@@ -189,7 +194,7 @@ src_install() {
 	# install the menu and autostart entries
 	insinto /etc/xdg/autostart
 	doins "${WORK}"/${FOLDER_NAME}.desktop
-	doicon ../pixmaps/${FOLDER_NAME}.png
+	#doicon ../pixmaps/${FOLDER_NAME}.png
 
     install_desktop_entry "Exec=${FOLDER_NAME}" "Name=Rainlendar2" "Categories=Office;Calendar;"
 }
@@ -197,7 +202,7 @@ src_install() {
 pkg_postinst() {
 	einfo "Some translations are incomplete, see homepage for details."
 
-	if [[ ${VERSION} = Pro ]]; then
+	if [[ ${MY_V} = Pro ]]; then
     	einfo "Your license file for Rainendar2 Pro should"
 	    einfo "be copied to '~/.config/.${FOLDER_NAME}/'."
     fi
