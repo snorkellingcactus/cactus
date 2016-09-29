@@ -1,0 +1,6 @@
+require sayonara
+
+DEPENDENCIES+='
+	run:
+		media-plugins/gst-plugins-bad:1.0[gstreamer_plugins:soundtouch]
+'
