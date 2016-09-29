@@ -1,6 +1,9 @@
-require sayonara
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the Gnu General Public License v2
 
 DEPENDENCIES+='
 	run:
 		media-plugins/gst-plugins-bad:1.0[gstreamer_plugins:soundtouch]
 '
+
+require sayonara

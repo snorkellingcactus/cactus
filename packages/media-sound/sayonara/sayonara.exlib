@@ -1,4 +1,4 @@
-# Copyright 2009 Adriaan Leijnse <adriaan@leijnse.net>
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
 
 SUMMARY='Sayonara is a small, clear and fast audio player for Linux written in C++'
@@ -7,9 +7,9 @@ HOMEPAGE='https://sayonara-player.com'
 LICENCES='GPL-2'
 SLOT='0'
 PLATFORMS='~x86 ~amd64'
-MYOPTIONS='mtp lame ugly'
+MYOPTIONS+='mtp lame ugly'
 
-DEPENDENCIES='
+DEPENDENCIES+='
     build:
 		x11-libs/qttools:5
     build+run:

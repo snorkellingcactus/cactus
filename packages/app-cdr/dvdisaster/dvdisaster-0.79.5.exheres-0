@@ -1,3 +1,6 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the Gnu General Public License v2
+
 SUMMARY="dvdisaster is a computer program aimed to enhance data survivability on optical discs."
 DOWNLOADS="http://dvdisaster.net/downloads/${PNV}.tar.bz2"
 HOMEPAGE="http://dvdisaster.net/en/index.html"
