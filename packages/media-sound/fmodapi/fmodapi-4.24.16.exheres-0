@@ -2,13 +2,13 @@
 # Based in part upon 'fmod-4.38.02.ebuild', which is:
 # Copyright 1999-2012 Gentoo Foundation
 
-SUMMARY="music and sound effects library, and a sound processing system"
-HOMEPAGE="http://www.fmod.org"
+SUMMARY='music and sound effects library, and a sound processing system'
+HOMEPAGE='http://www.fmod.org'
 
-#MIRROR="http://ponce.cc/slackware/sources/repo/"
+#MIRROR='http://ponce.cc/slackware/sources/repo/'
 #Require registration:
-#MIRROR="http://www.fmod.org/download/fmodex/api/Linux/"
-MIRROR="http://web.archive.org/web/20151111191152/http://doomgod.com/ports/fmod/"
+#MIRROR='http://www.fmod.org/download/fmodex/api/Linux/'
+MIRROR='http://web.archive.org/web/20151111191152/http://doomgod.com/ports/fmod/'
 
 PV_NO_DOTS=${PNV//[.|-]/}linux
 
@@ -34,14 +34,10 @@ src_unpack()
 {
 	default
 
-	fbits=''
-
 	optionq platform:amd64 && fbits='64'
 
 	WORK="${WORKBASE}/${PV_NO_DOTS}${fbits}"
 }
-
-src_compile() { :; }
 
 src_install() {
 	if option libraries

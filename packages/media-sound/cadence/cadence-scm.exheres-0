@@ -1,0 +1,40 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the Gnu General Public License v2
+
+SCM_REPOSITORY='https://github.com/falkTX/Cadence.git'
+
+SUMMARY='Cadence is a set of tools useful for audio production.'
+HOMEPAGE='http://kxstudio.linuxaudio.org/Applications:Cadence'
+
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='~amd64'
+
+#TODO: rev jackdbus
+DEPENDENCIES="
+	build+run:
+		dev-python/PyQt4[python_abis:*?][dbus]
+		media-sound/jack-audio-connection-kit[dbus]
+		x11-libs/qt:4
+	recommendation:
+		media-sound/a2jmidid
+		media-sound/jack_capture
+	suggestion:
+		media-sound/pulseaudio[jack]
+"
+
+require scm-git python [ blacklist="2 4" ]
+
+BUGS_TO="snorkellingcactus@gmail.com"
+
+src_compile()
+{
+	edo make -j${EXJOBS} CC=${CC} AR=${AR} CXX=${CXX} STRIP=$( exhost --target )-strip
+}
+
+src_install()
+{
+	edo make install DESTDIR="${IMAGE}" PREFIX=/usr/$( exhost --target )/
+
+	[ -d "${IMAGE}"/bin ] && mv "${IMAGE}"/bin "${IMAGE}"/usr/$( exhost --target )
+}
