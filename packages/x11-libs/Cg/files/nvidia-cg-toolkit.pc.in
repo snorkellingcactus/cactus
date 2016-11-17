@@ -1,0 +1,9 @@
+prefix=/usr
+libdir=${prefix}/EXHERBO_LIBDIR
+includedir=${prefix}/include
+Name: nvidia-cg-toolkit
+Description: DESCRIPTION
+Version: VERSION
+URL: HOMEPAGE
+Libs: -L${libdir} -lCg
+Cflags: -I${includedir}/

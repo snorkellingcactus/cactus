@@ -1,0 +1,29 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'stuntrally-tracks-9999.ebuild', which is:
+# Copyright 1999-2012 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+require cmake
+
+SUMMARY="A set of tracks for ${CATEGORY}/${PN//-tracks}"
+HOMEPAGE='http://code.google.com/p/vdrift-ogre/'
+SLOT='0'
+LICENCES='GPL3'
+
+PLATFORMS='x86 amd64'
+DOWNLOADS="https://github.com/stuntrally/tracks/archive/master.zip -> ${PNV}.zip"
+
+WORK="${WORKBASE}"/tracks-master
+
+src_configure() {
+
+	CMAKE_SRC_CONFIGURE_PARAMS+=(
+		-DSHARE_INSTALL="/usr/$(exhost --target)/share/games/stuntrally"
+	)
+	
+	einfo ${PWD}
+
+	mkdir -p "${WORKBASE}"/build
+	
+	cd "${WORKBASE}"/build && cmake "${WORK}" ${CMAKE_SRC_CONFIGURE_PARAMS}
+}

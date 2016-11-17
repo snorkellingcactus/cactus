@@ -1,0 +1,42 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'rakarrack-9999.ebuild', which is:
+# Copyright 1999-2013 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+DESCRIPTION='A richly featured multi-effects processor emulating a uitar effects pedalboard'
+HOMEPAGE='http://rakarrack.sourceforge.net/'
+SCM_REPOSITORY="git://${PN}.git.sourceforge.net/gitroot/${PN}/${PN}"
+DOWNLOADS="mirror://sourceforge/rakarrack/${PNV}.tar.bz2"
+RESTRICT="mirror"
+
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='x86 amd64'
+MYOPTIONS='altivec jacksession sse sse2'
+
+#require scm-git autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.15 ] ]
+require flag-o-matic
+
+DEPENDENCIES='
+	x11-libs/fltk:0
+	x11-libs/libXpm
+	sys-sound/alsa-lib[>=0.9]
+	media-libs/libsamplerate
+	media-libs/libsndfile
+	sys-sound/alsa-utils[>=0.9]
+	media-sound/jack-audio-connection-kit[>=0.100.0]
+	media-libs/lv2
+'
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=(
+	altivec
+	'jacksession jack-session'
+	sse
+	sse2
+)
+
+src_configure() {
+	#append-ldflags "-L$(dirname $(fltk-config --libs))"
+	#append-flags "-I/usr/include/fltk"
+	
+	default
+}

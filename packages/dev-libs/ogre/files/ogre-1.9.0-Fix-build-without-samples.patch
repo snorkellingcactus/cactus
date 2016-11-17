@@ -1,0 +1,19 @@
+Source: written by maerwald
+Upstream: Pull request: https://bitbucket.org/sinbad/ogre/pull-requests/661/fix-compile-without-samples/diff
+Reason: Fix build when OIS is not on the system.
+
+--- ogre-1.9.0/Samples/CMakeLists.txt
++++ ogre-1.9.0/Samples/CMakeLists.txt
+@@ -4,11 +4,10 @@
+   message(STATUS "Could not find dependency: OIS")
+   message(STATUS "Skipping samples build")
+   set(OGRE_BUILD_SAMPLES 0)
+- else()
+-	include_directories(${OIS_INCLUDE_DIR})
+ endif()
+ 
+ if (OGRE_BUILD_SAMPLES)
++  include_directories(${OIS_INCLUDE_DIRS})
+   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
+ 
+   # Make sure all plugins are built

@@ -1,0 +1,52 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# based in part in "bullet-2.83.5.exheres-0" which is
+# Copyright 2009, 2010 Ingmar Vanhassel
+# and "bullet-2.85.ebuild" which is
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+
+# 2.83 was a pre-release, the 2.83.4 tarball is the real 2.83 release
+require github [ user=bulletphysics pn=bullet3 tag=${PV} ] cmake [ api=2 ]
+
+SUMMARY='A professional free 3D game multiphysics library'
+HOMEPAGE+='http://www.bulletphysics.com/'
+
+LICENCES='ZLIB'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='bullet3 extras double-precision'
+
+DEPENDENCIES='
+    build+run:
+        x11-dri/mesa
+        x11-dri/freeglut
+'
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+    -DBUILD_CPU_DEMOS=OFF
+    -DBUILD_OPENGL3_DEMOS=OFF
+    -DBUILD_BULLET2_DEMOS=OFF
+    -DUSE_GRAPHICAL_BENCHMARK=OFF
+    -DINSTALL_LIBS=ON
+    -DINSTALL_EXTRA_LIBS=ON
+    -DBUILD_UNIT_TESTS=OFF
+)
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}"/${PNV}-soversion.patch )
+
+src_configure()
+{
+	CMAKE_SRC_CONFIGURE_PARAMS+=(
+		-DBUILD_EXTRAS=$( option extras ON OFF )
+		-DBUILD_BULLET3=$( option bullet3 ON OFF )
+		-DUSE_DOUBLE_PRECISION=$( option double-precision ON OFF )
+	)
+
+	cmake_src_configure
+}
+src_install()
+{
+	default
+	rm -r ${IMAGE}/usr/$( exhost --target )/include/bullet/BulletInverseDynamics/details
+}
