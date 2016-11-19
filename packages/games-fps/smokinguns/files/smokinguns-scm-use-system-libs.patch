@@ -1,0 +1,12 @@
+diff --git a/Makefile b/Makefile.new
+index 0cbcb83..d80d0e5 100644
+--- a/Makefile
++++ b/Makefile.new
+@@ -1012,6 +1012,7 @@ ifeq ($(USE_CODEC_OPUS),1)
+     CLIENT_CFLAGS += -I$(OPUSFILEDIR)/include
+   else
+     CLIENT_LIBS += -lopusfile -lopus
++    CLIENT_CFLAGS += $(shell pkg-config --silence-errors --cflags opus)
+   endif
+   NEED_OGG=1
+ endif

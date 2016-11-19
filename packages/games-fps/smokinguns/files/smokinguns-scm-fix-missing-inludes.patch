@@ -1,0 +1,37 @@
+diff --git a/code/game/ai_dmnet.c b/code/game/ai_dmnet.c
+index 8a0fa03..993464e 100644
+--- a/code/game/ai_dmnet.c
++++ b/code/game/ai_dmnet.c
+@@ -54,7 +54,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ #include "inv.h"			//indexes into the inventory
+ #include "syn.h"			//synonyms
+ #include "match.h"			//string matching types and vars
+-
+ // for the voice chats
+ #include "../../ui/menudef.h"
+ 
+diff --git a/code/game/ai_dmq3.h b/code/game/ai_dmq3.h
+index a27e4af..f787c9a 100644
+--- a/code/game/ai_dmq3.h
++++ b/code/game/ai_dmq3.h
+@@ -115,6 +115,7 @@ int BotTeamFlagCarrierVisible(bot_state_t *bs);
+ //returns visible enemy flag carrier if available
+ int BotEnemyFlagCarrierVisible(bot_state_t *bs);
+ //get the number of visible teammates and enemies
++int BotBRCarryingMoneyBag(bot_state_t *bs);
+ void BotVisibleTeamMatesAndEnemies(bot_state_t *bs, int *teammates, int *enemies, float range);
+ //returns true if within the field of vision for the given angles
+ #ifndef SMOKINGUNS
+diff --git a/code/qcommon/common.c b/code/qcommon/common.c
+index 285a384..1a918ae 100644
+--- a/code/qcommon/common.c
++++ b/code/qcommon/common.c
+@@ -31,6 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ #else
+ #include <winsock.h>
+ #endif
++#include "../asm/ftola.c"
++#include "../asm/snapvector.c"
+ 
+ int demo_protocols[] =
+ { 67, 66, 0 };
