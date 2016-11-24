@@ -1,0 +1,62 @@
+# Copyright 2013-2015 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Copyright 2013-2015 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require php flag-o-matic
+
+PLATFORMS="~amd64"
+
+LIB_PHP_STR=libphp$( ever major )
+LIB_PHP_STR_SO=${LIB_PHP_STR}.so
+LIB_PHP_STR_A=${LIB_PHP_STR}.a
+
+MYOPTIONS+='
+	'${LIB_PHP_STR_SO}' [[
+		description = [
+			Use a hack to build '${LIB_PHP_STR_SO}'. This doubles the compilation time
+		]
+    ]]
+    '${LIB_PHP_STR_A}' [[
+		description = [
+			Build and install '${LIB_PHP_STR_A}'.
+		]
+    ]]
+'
+DEFAULT_SRC_CONFIGURE_OPTIONS+=(
+	"${LIB_PHP_STR_A} --enable-embed=static"
+	"${LIB_PHP_STR_A} --enable-static=zlib"
+)
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+	"${FILES}"/${PNV}_configure_invalid_option.patch
+)
+
+src_configure()
+{
+	( optionq ${LIB_PHP_STR_SO} || optionq ${LIB_PHP_STR_A} ) &&
+	append-flags -fPIC
+
+	default
+}
+
+src_compile()
+{
+	default
+
+	if optionq ${LIB_PHP_STR_SO}
+	then
+		local MAKE_LIB_COMMAND='make libs/'${LIB_PHP_STR}'.bundle'
+
+		${MAKE_LIB_COMMAND} || LD_COMMAND=$( ${MAKE_LIB_COMMAND} )
+
+		eval ${LD_COMMAND/$CC/$CC -shared -fPIC}
+	fi
+}
+
+src_install(){
+	php_src_install
+
+	optionq ${LIB_PHP_STR_SO}	&& dolib libs/${LIB_PHP_STR_SO}
+	optionq ${LIB_PHP_STR_A}	&& dolib libs/${LIB_PHP_STR_A}
+}

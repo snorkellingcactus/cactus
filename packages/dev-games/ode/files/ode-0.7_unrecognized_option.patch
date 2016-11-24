@@ -1,0 +1,13 @@
+diff --git a/configure b/configure.new
+index 55e2b03..2a4f5db 100755
+--- a/configure
++++ b/configure.new
+@@ -626,7 +626,7 @@ do
+ 
+   -*) { echo "$as_me: error: unrecognized option: $ac_option
+ Try \`$0 --help' for more information." >&2
+-   { (exit 1); exit 1; }; }
++   }
+     ;;
+ 
+   *=*)

@@ -1,4 +1,5 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
 
 myexparam	MAKE_PREFIX=.
 myexparam	REND_SUFFIX=opengl2
@@ -18,6 +19,14 @@ export_exlib_phases src_prepare src_compile src_install
 MYOPTIONS='
     mumble [[
 		description = [ Use Mumble instead of the built-in Speex-based VoIP ]
+    ]]
+    fb [[ description = [
+    		Framebuffer and GLSL support for things like rotoscope effect
+    	]
+    ]]
+    smp [[ description = [
+    		Separate game logic in a thread and renderer stuffs in another ( most for old video cards ). Supported only on the client.
+    	]
     ]]
     ( providers: ijg-jpeg jpeg-turbo ) [[ number-selected = exactly-one ]]
     (
@@ -56,7 +65,7 @@ DEPENDENCIES="
         providers:jpeg-turbo? ( media-libs/libjpeg-turbo )
 "
 
-DEFAULT_SRC_COMPILE_PARAMS=(
+DEFAULT_SRC_COMPILE_PARAMS+=(
     BUILD_RENDERER_OPENGL2=1    # build newer renderer
     BUILD_STANDALONE=1
     BUILD_BASEGAME=0            # the following four variables control building of non-essential
@@ -113,12 +122,14 @@ quake3_src_compile(){
 	if optionq server || optionq engine
 	then
 		DEFAULT_SRC_COMPILE_PARAMS+=(
-			BUILD_SERVER=	$( option server	1 0	)
-			BUILD_CLIENT=	$( option engine	1 0	)
-			USE_MUMBLE=		$( option mumble	1 0	)
-#			USE_VOIP=		$( option voip		1 0	)
-            CLIENTBIN=		${PN}${CLI_BIN_SUFFIX}
-            SERVERBIN=		${PN}${SRV_BIN_SUFFIX}
+			BUILD_SERVER=$(					option server	1 0	)
+			BUILD_CLIENT=$(					option engine	1 0	)
+			BUILD_CLIENT_SMP=$( 			option smp		1 0	)
+			FRAMEBUFFER_AND_GLSL_SUPPORT=$( option fb		1 0	)
+			USE_MUMBLE=$(					option mumble	1 0	)
+#			USE_VOIP=$(						option voip		1 0	)
+            CLIENTBIN=${PN}${CLI_BIN_SUFFIX}
+            SERVERBIN=${PN}${SRV_BIN_SUFFIX}
 		)
 
 		ARCH='i686'

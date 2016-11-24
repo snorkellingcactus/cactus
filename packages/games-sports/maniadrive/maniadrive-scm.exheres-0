@@ -1,0 +1,60 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY='svn://raydium.org/raydium/'
+require scm-svn
+
+DATA_FILE_NAME=ManiaDrive-1.2-data
+DATA_FILE=${DATA_FILE_NAME}.tar.gz
+
+DOWNLOADS="
+	 http://downloads.sourceforge.net/project/${PN}/${PN}/1.2/${DATA_FILE}
+"
+
+SUMMARY='Free trackmania clone'
+DESCRIPTION='Arcade car game on acrobatic tracks, with a quick and nervous gameplay (tracks almost never exceed one minute), and features a network mode, as the original.'
+HOMEPAGE='http://maniadrive.raydium.org/'
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='x86 amd64'
+
+# TODO: v4l kernel einfo, v4l-utils required?
+# 		providers jpeg
+#		png
+DEPENDENCIES='
+		dev-games/raydium
+'
+
+src_prepare()
+{
+	unpack ${DATA_FILE}
+
+	rm configure Makefile
+}
+src_compile()
+{
+	PKG_CONFIG=$( exhost --target )-pkg-config
+	TGT_DIR=/usr/$( exhost --target )
+	PHP_INC_DIR=${TGT_DIR}/include/php-5.6
+
+	#TODO GLIBC -lm alternative for musl
+	edo ${CC} mania_drive.c ${CFLAGS} -o ${PN} $(${PHP_CONFIG} --libs) $(${PKG_CONFIG} --libs gl) $(${PKG_CONFIG} --libs glew) $(${PKG_CONFIG} --libs xinerama) $(${PKG_CONFIG} --libs libjpeg) $(${PKG_CONFIG} --libs freealut) $(${PKG_CONFIG} --libs vorbisfile ) $(${PKG_CONFIG} --libs libv4lconvert) $(${PKG_CONFIG} --libs xext) $(${PKG_CONFIG} --libs x11) $(${PKG_CONFIG} --libs ode) -lphp5 -lraydium -lm -I${PHP_INC_DIR} -I${PHP_INC_DIR}/main -I${PHP_INC_DIR}/TSRM -I${PHP_INC_DIR}/Zend -I${PHP_INC_DIR}/ext -I${PHP_INC_DIR}/ext/date/lib -L${TGT_DIR}/lib
+}
+src_install()
+{
+	INTO_TGT=${TGT_DIR}/share/games/${PN}
+	DATA_DIR=/usr/share/games/${PN}
+
+	exeinto ${INTO_TGT}
+
+	doexe ${PN}
+
+	echo '#!/bin/sh' > ${PN}
+	echo "${INTO_TGT}/${PN} --path ${DATA_DIR}/game --rayphp /usr/share/rayphp" >> ${PN}
+
+	dobin ${PN}
+
+	insinto ${DATA_DIR}
+
+	doins -r ${DATA_FILE_NAME}/*
+}

@@ -1,0 +1,99 @@
+# Copyright 2013-2015 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require php flag-o-matic
+
+PLATFORMS="~amd64"
+
+LIB_PHP_STR=libphp$( ever major )
+LIB_PHP_STR_SO=${LIB_PHP_STR}.so
+
+MYOPTIONS+='
+	shared-lib [[
+		description = [
+			Use a hack to build '${LIB_PHP_STR_SO}'. This doubles the compilation time
+		]
+    ]]
+'
+
+src_prepare() {
+	php_src_prepare
+
+	if optionq shared-lib
+	then
+
+		WORK_COPY="${WORKBASE}"/WORK_COPY
+
+		einfo "Copying ${WORK} to ${WORK_COPY}"
+
+		cp -r "${WORK}" "${WORK_COPY}"
+
+	fi
+}
+src_configure() {
+	default
+
+	if optionq shared-lib
+	then
+
+		cd "${WORK_COPY}"
+
+		append-flags -fPIC
+
+		default
+
+		cd "${WORK}"
+
+	fi
+}
+
+copy_objects() {
+	LD_OUT=$( (eval $LD_COMMAND) 2>&1 )
+
+	if [ $? -eq 1 ]
+	then
+		for o in $LD_OUT
+		do
+			if	echo $o | grep '\.o'
+				then
+					local OBJ=${o/\:/}
+
+					cp "${WORK_COPY}"/${OBJ} "${WORK}"/${OBJ}
+				fi
+		done
+
+		copy_objects
+	fi
+}
+
+src_compile() {
+	default
+
+	if optionq shared-lib
+	then
+
+		MAKE_LIB_COMMAND='make libs/'${LIB_PHP_STR}'.bundle'
+
+		${MAKE_LIB_COMMAND} || LD_COMMAND=$( ${MAKE_LIB_COMMAND} )
+
+		LD_COMMAND=${LD_COMMAND/$CC/$CC -shared -fPIC}
+
+		cd "${WORK_COPY}"
+
+		default
+
+		${MAKE_LIB_COMMAND} || unset MAKE_LIB_COMMAND
+
+		cd "${WORK}"
+
+		copy_objects
+
+		unset WORK_COPY
+	fi
+}
+
+src_install(){
+	php_src_install
+
+	optionq shared-lib && dolib libs/${LIB_PHP_STR_SO}
+}

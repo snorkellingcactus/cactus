@@ -1,0 +1,82 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY='svn://raydium.org/raydium/'
+require scm-svn
+
+SUMMARY='Raydium is a game engine. It provides a set of functions wich allow quick and flexible games creation.'
+HOMEPAGE='http://raydium.org/'
+SLOT='0'
+PLATFORMS='x86 amd64'
+LICENCES='GPL-2'
+
+DEPENDENCIES='
+		media-libs/glew
+		media-libs/libogg
+		media-libs/libvorbis
+		media-libs/openal
+		media-libs/v4l-utils
+		x11-dri/glu
+        x11-dri/mesa
+        x11-libs/libX11
+        x11-libs/libXinerama
+        dev-games/ode
+	build:
+		sys-devel/flex
+		dev-lang/php[<=7]
+'
+
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+	--disable-x
+)
+
+src_prepare() {
+	default
+
+	sed -i -r 's/lex \-\-version/flex \-\-version/g'  configure
+	sed -i -r 's/comp\=\"gcc\"/comp\=\"'$( exhost --target )'-gcc\"/g' configure
+	sed -i -r 's/\"g\+\+\"/\"'$( exhost --target )'-g\+\+\"/g' configure
+
+	local ODE_SRC=raydium/ode/ode/src/
+	local PHP5_LIBS=raydium/php/libs/
+	local PHP5_CONFIG=php-config
+	local PKG_CONFIG=$(exhost --target)-pkg-config
+
+	mkdir -p ${ODE_SRC}
+	ln -s /usr/$( exhost --target )/lib/libode.a  ${ODE_SRC}
+
+	mkdir -p ${PHP5_LIBS}
+	#ln -s /usr/$( exhost --target )/lib/libphp5.a  ${PHP5_LIBS}
+	touch ${PHP5_LIBS}/libphp5.a
+
+	local PHP5_INCLUDES=$( ${PHP5_CONFIG} --include-dir )
+	PHP5_INCLUDES=${PHP5_INCLUDES//\//\\\/}
+	PHP5_INCLUDES=${PHP5_INCLUDES//\./\\\.}
+	PHP5_INCLUDES=${PHP5_INCLUDES//\-/\\\-}
+	PHP5_INCLUDES=${PHP5_INCLUDES//\_/\\\_}
+
+	edo sed -i -r 's/\-Iraydium\/php\//\-I'${PHP5_INCLUDES}'\//g' Makefile
+	edo sed -i -r 's/COMPILE_OPTIONS \=/COMPILE_OPTIONS \= '$( ${PKG_CONFIG} --cflags ode)'/g' Makefile
+	edo sed -i -r 's/OTHER\_LIBS \=/\#OTHER\_LIBS \=/g' Makefile
+}
+src_compile()
+{
+	emake CC=${CC} AR=${AR} RANLIB=${RANLIB}
+}
+#TODO: Remove or fiz raydium-config
+src_install() {
+	local IMAGE_PREFIX="${IMAGE}"/usr/$( exhost --target )/
+
+	echo "
+		PREFIX=${IMAGE}/usr
+		BINS=${IMAGE_PREFIX}/bin
+		LIBS=${IMAGE_PREFIX}/lib
+		INCLUDES=${IMAGE_PREFIX}/include
+		SHARE=${IMAGE}/usr/share
+	" > configure.conf
+
+	default
+
+	rm -r ${IMAGE_PREFIX}/include/raydium/{ode,php}
+}
