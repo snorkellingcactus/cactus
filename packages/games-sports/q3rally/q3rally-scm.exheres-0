@@ -1,4 +1,5 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
 
 SCM_SVN_RAW_URI=1
 SCM_REPOSITORY='svn://svn.code.sf.net/p/q3rallysa/code/'

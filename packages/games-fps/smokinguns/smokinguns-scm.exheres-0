@@ -7,7 +7,7 @@
 FILE_NAME=ioq3-synchro
 DOWNLOAD="https://github.com/smokin-guns/SmokinGuns/archive/${FILE_NAME}.zip"
 DOWNLOADS="
-	game?	( $DOWNLOAD )
+	engine?	( $DOWNLOAD )
 	server?	( $DOWNLOAD )
 	data?	( http://www.smokin-guns.org/downloads/Smokin_Guns_1.1.zip )
 "
@@ -26,4 +26,5 @@ DEFAULT_SRC_PREPARE_PATCHES=(
 )
 
 DATA="${WORKBASE}/Smokin' Guns 1.1/"
+
 require quake3 [ BASEQ3_PATH=[ "${DATA}/baseq3" "${DATA}/${PN}" ] ]
