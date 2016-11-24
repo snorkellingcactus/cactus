@@ -27,7 +27,7 @@ DEPENDENCIES='
         x11-dri/mesa
         x11-libs/libX11
         x11-libs/libXinerama
-        dev-games/ode[=0.7]
+        dev-games/ode[<=0.9]
 	build:
 		'${DEP_PHP}'[libphp5.so]
 		sys-devel/flex
@@ -42,8 +42,6 @@ DEFAULT_SRC_CONFIGURE_PARAMS=(
 function escape()
 {
 	sed -e 's/\\/\\\\/g' -e 's/\//\\\//g'
-
-	#-e 's/\$/\\\$/g' -e 's/(/\\(/g' -e 's/)/\\)/g' -e 's/"/\\"/g'
 }
 
 src_prepare() {
