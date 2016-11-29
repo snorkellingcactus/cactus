@@ -5,63 +5,60 @@
 
 require gnome-2 desktop-utils gtk-icon-cache
 
-# get the major version from PV
-MV="${PV:0:1}"
+SLOT="${PV:0:1}"
+MY_PN="sublime_text_${SLOT}"
 
-MY_PN="sublime_text_${MV}"
-MY_P="Sublime%20Text"
+DESCRIPTION='Sophisticated text editor for code, markup and prose'
+HOMEPAGE='http://www.sublimetext.com'
 
-WORK="${WORKBASE}/${MY_PN}"
+BASE_URI="https://download.sublimetext.com/${MY_PN}_build_${PV}_x"
 
-DESCRIPTION="Sophisticated text editor for code, markup and prose"
-HOMEPAGE="http://www.sublimetext.com"
-
-BASE_URI="https://download.sublimetext.com"
 DOWNLOADS="
-	platform:amd64?	( ${BASE_URI}/${MY_PN}_build_${PV}_x64.tar.bz2 )
-	platform:x86?	( ${BASE_URI}/${MY_PN}_build_${PV}_x32.tar.bz2 )
+	platform:amd64?	( ${BASE_URI}64.tar.bz2 )
+	platform:x86?	( ${BASE_URI}32.tar.bz2 )
 "
-LICENCES="Sublime"
-SLOT="${MV}"
-PLATFORMS="~amd64 ~x86"
-MYOPTIONS="
+LICENCES='Sublime'
+PLATFORMS='~amd64 ~x86'
+
+MYOPTIONS='
 	dbus
 	platform:
 		x86
 		amd64
-"
-#multislot
+'
 
-DEPENDENCIES="
+DEPENDENCIES='
 	dbus? ( sys-apps/dbus )
 	media-libs/libpng[>=1.2.46]
 	x11-libs/gtk+:2[>=2.24.8]
-"
+'
+
+WORK="${WORKBASE}/${MY_PN}"
 
 src_install()
 {
-	DEST=/usr/$(exhost --target)/share/${MY_PN}
+	local TGT=/usr/$(exhost --target)
+	local BINDIR=${TGT}/bin
+	local DEST=${TGT}/share/${MY_PN}
+	local BIN=${DEST}/sublime_text
+	local SLOT_BIN=${BINDIR}/subl${SLOT}
 
 	insinto ${DEST}
 	into ${DEST}
 	exeinto ${DEST}
 
-	doins -r "Icon"
-	doins -r "Packages"
-	doins "python3.3.zip"
-	doins "sublime.py"
-	doins "sublime_plugin.py"
-	doexe "sublime_text"
-	doexe "plugin_host"
+	doins -r Icon Packages python3.3.zip sublime.py sublime_plugin.py sublime_text plugin_host
 
-	mkdir -p ${IMAGE}/usr/$(exhost --target)/bin/
-	dosym "${DEST}/sublime_text" /usr/$(exhost --target)/bin/subl${MV}
+	mkdir -p "${IMAGE}${BINDIR}"
+	dosym "${BIN}" "${SLOT_BIN}"
+
+	chmod 755 "${IMAGE}${BIN}"
 
 	local size
 	for size in 16 32 48 128 256 ; do
 		insinto /usr/share/icons/hicolor/${size}x${size}/apps
-		newins "Icon/${size}x${size}/sublime-text.png" sublime_text.png
+		newins "Icon/${size}x${size}/${PN}.png" ${PN}.png
 	done
 
-	install_desktop_entry "Name=Sublime Text ${MV}" "Exec=subl${MV} %F" "Categories=Development;TextEditor" "StartupNotify=true"
+	install_desktop_entry "Name=Sublime Text ${SLOT}" "Exec=subl${SLOT} %F" "Categories=Development;TextEditor" "StartupNotify=true"
 }

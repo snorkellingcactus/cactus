@@ -8,7 +8,6 @@ require distutils
 SUMMARY='A hierarchical note taking application'
 HOMEPAGE='http://www.giuspen.com/cherrytree'
 LICENCES='GPL-3'
-
 SLOT='0'
 DOWNLOADS="https://github.com/giuspen/${PN}/archive/${PV}.tar.gz -> ${PN}.tar.gz"
 
@@ -17,13 +16,20 @@ PLATFORMS='~amd64 ~x86'
 #TODO
 MYOPTIONS='nls'
 
-DEPENDENCIES="
+DEPENDENCIES='
 	dev-python/dbus-python
 	dev-python/pyenchant
 	dev-python/pygtksourceview:2
 	gnome-bindings/pygtk:2[>=2.16]
 	nls? ( sys-devel/gettext )
 	x11-libs/libX11
-"
+'
+
+src_install()
+{
+	distutils_src_install
+
+	python_bytecompile /usr/share/cherrytree/modules/
+}
 
 #PLOCALES='cs de es fr hy it ja lt nl pl pt_BR ru sl tr uk zh_CN'

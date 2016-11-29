@@ -3,11 +3,10 @@
 # Based in part upon 'zandronum-2.0.ebuild' from Gentoo, which is:
 #     Copyright 1999-2015 Gentoo Foundation
 
-SUMMARY="Doom 2 source port and Skulltag successor"
-HOMEPAGE="https://zandronum.com"
-SCM_REPOSITORY="https://bitbucket.org/Torr_Samaho/zandronum"
-PLATFORMS="~x86 ~amd64"
-LICENCES="GPL-3" Sleepycat New BSD License
+SUMMARY='Doom 2 source port and Skulltag successor'
+HOMEPAGE='https://zandronum.com'
+PLATFORMS='~x86 ~amd64'
+LICENCES='GPL-3 Sleepycat New BSD License'
 
 MYOPTIONS="
 	asm
@@ -17,7 +16,7 @@ MYOPTIONS="
 	sound
 	(
 		providers:
-			jpeg
+			ijg-jpeg
 			jpeg-turbo
 	) [[ number-selected = exactly-one ]]
 	platform:
@@ -25,10 +24,23 @@ MYOPTIONS="
 		amd64
 "
 
+require cmake [ api=2 ]
+
+if ever is_scm
+then
+	SCM_REPOSITORY="https://bitbucket.org/Torr_Samaho/zandronum"
+
+	require scm-hg
+else
+	DOWNLOADS="https://bitbucket.org/Torr_Samaho/zandronum/get/ZA_${PV}.tar.bz2"
+fi
+
+export_exlib_phases src_unpack src_prepare src_configure src_compile src_install
+
 #TODO jpeg-turbo? jpeg?, Xcursor, python>3, opengl, GME (Game-Music-Emu), fluidsynth, timidity++ compile: bzip2, pkgconfig SDL1.2 or SDL2
 #libgme https://bitbucket.org/mpyne/game-music-emu/src
 
-DEPENDENCIES="
+DEPENDENCIES='
 	app-arch/bzip2
 	dev-db/sqlite[>=3.14.1]
 	media-libs/libjpeg-turbo
@@ -40,132 +52,104 @@ DEPENDENCIES="
 	asm? ( dev-lang/nasm )
 	gtk? ( x11-libs/gtk+:2 )
 	sound? ( media-libs/openal media-sound/fluidsynth )
-"
+
+	providers:ijg-jpeg?		( media-libs/jpeg:=			)
+	providers:jpeg-turbo?	( media-libs/libjpeg-turbo	)
+'
+TOOL_PFX=/usr/$( exhost --target )/bin/$( exhost --tool-prefix )
 
 CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DCMAKE_BUILD_TYPE=Release
-	-DFMOD_LIBRARY=/usr/$( exhost --target )/lib/libfmodex.so
-	-DCMAKE_LINKER:FILEPATH=$(	which	$( exhost --tool-prefix)ld		)
-	-DCMAKE_OBJCOPY:FILEPATH=$(	which	$( exhost --tool-prefix)objcopy	)
-	-DCMAKE_OBJDUMP:FILEPATH=$(	which	$( exhost --tool-prefix)objdump	)
-	-DCMAKE_STRIP:FILEPATH=$(	which	$( exhost --tool-prefix)strip	)
+	-DFMOD_LIBRARY:FILEPATH=/usr/$( exhost --target )/lib/libfmodex.so
+	-DCMAKE_LINKER:FILEPATH=${TOOL_PFX}ld
+	-DCMAKE_OBJCOPY:FILEPATH=${TOOL_PFX}objcopy
+	-DCMAKE_OBJDUMP:FILEPATH=${TOOL_PFX}objdump
+	-DCMAKE_STRIP:FILEPATH=${TOOL_PFX}strip
+	-Wno-dev
 )
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+	'!gtk NO_GTK'
+	'!sound NO_SOUND'
+	'!gl NO_GL'
+	'!asm NO_ASM'
+)
+function zan_abstract(){
+	local CMD="${1}"
 
-require cmake [ api=2 ] scm-hg
+	shift
 
-zan_src_unpack()
+	for i in "$@"
+	do
+		if optionq ${i}
+		then
+			[ ! -d ${i} ] && mkdir ${i}
+
+			pushd ${i}
+				${CMD}
+			popd
+		fi
+	done
+}
+function zan_dobin()
 {
-	cmake_src_unpack
+	echo '#!/bin/sh' > ${1} &&
+	echo >> ${1} &&
+	echo "exec ${2} \"\$@\"" >> ${1}
+
+	dobin ${1}
+}
+zandronum_src_unpack()
+{
+	default
+
+	WORK="${WORKBASE}"/${PNV}
+
+	ever is_scm || edo mv "${WORKBASE}"/Torr_Samaho-zandronum-* "${WORK}"
+}
+zandronum_src_prepare()
+{
+	cmake_src_prepare
+
 	#https://gitweb.gentoo.org/user/haarp.git/commit/?id=e2ce2d2e6c39cafd731cb7a6dc8391b456835058
 	# Use the dynamically-linked system-sqlite instead
-        sed -i -e "/add_subdirectory( sqlite )/d" "${WORKBASE}"/${PNV}/CMakeLists.txt
-	sed -i -e "/..\/sqlite\//d" "${WORKBASE}"/${PNV}/src/CMakeLists.txt
+	edo sed -i -e "/add_subdirectory( sqlite )/d" -e "/..\/sqlite\//d" src/CMakeLists.txt CMakeLists.txt
 }
 
-zan_src_configure()
+zandronum_src_configure()
 {
-	if ! optionq gtk ; then
-		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_GTK=ON )
-	fi
-	if ! optionq sound ; then
-		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_SOUND=ON )
-	fi
-	if ! optionq gl ; then
-		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_GL=ON )
-	fi
-	if ! optionq asm ; then
-		CMAKE_SRC_CONFIGURE_PARAMS+=( -DNO_ASM=ON )
-	fi
+	local ZAN_CNF="zan_abstract cmake_src_configure"
 
-	if optionq client
-        then
+	${ZAN_CNF} client
 
-		mkdir "${WORK}"/client
+	CMAKE_SRC_CONFIGURE_PARAMS+=( -DSERVERONLY=ON )
 
-	        pushd "${WORK}"/client
-		        cmake_src_configure
-	        popd
-	fi
-
-	if optionq server
-        then
-		CMAKE_SRC_CONFIGURE_PARAMS+=( -DSERVERONLY=ON )
-
-		mkdir ${WORK}/server
-
-                pushd "${WORK}"/server
-                        cmake_src_configure
-                popd
-        fi
+	${ZAN_CNF} server
+}
+zandronum_src_compile()
+{
+	zan_abstract emake client server
 }
 
-zan_src_compile()
+zandronum_src_install()
 {
-	if optionq client
-        then
-		pushd "${WORK}"/client
-			emake
-		popd
-	fi
-
-	if optionq server
-	then		
-		pushd "${WORK}"/server
-			emake
-		popd
-        fi
-}
-
-zan_dobin()
-{
-	echo '#!/bin/sh' > $1 &&
-        echo >> $1 &&
-        echo "exec $2 \"\$@\"" >> $1
-
-	dobin $1
-}
-
-zan_src_install()
-{
-	Z_DIR=/usr/$(exhost --target)/share/games/${PNV}
+	local Z_DIR=/usr/$(exhost --target)/share/games/${PNV}
 
 	insinto ${Z_DIR}
+	exeinto ${Z_DIR}
 
 	if optionq server  
 	then
-		doins "${WORK}"/server/${PN}-server
-
-		edo chmod 755 "${IMAGE}"/${Z_DIR}/${PN}-server
+		doexe server/${PN}-server
 
 		zan_dobin ${PNV}-server ${Z_DIR}/${PN}-server
 	fi
 
 	if optionq client
-        then
-		doins "${WORK}"/client/${PN}
-                doins "${WORK}"/client/output_sdl/liboutput_sdl.so
-                doins "${WORK}"/client/*.pk3
+	then
+		doexe client/${PN} client/output_sdl/liboutput_sdl.so
+
+		doins client/*.pk3
 
 		zan_dobin ${PNV} ${Z_DIR}/${PN}
-
-		edo chmod 755 "${IMAGE}"/${Z_DIR}/${PN}
-		edo chmod 755 "${IMAGE}"/${Z_DIR}/liboutput_sdl.so
 	fi
-}
-
-src_unpack()
-{
-	zan_src_unpack
-}
-src_configure()
-{
-	zan_src_configure
-}
-src_compile()
-{
-	zan_src_compile
-}
-src_install()
-{
-	zan_src_install
 }

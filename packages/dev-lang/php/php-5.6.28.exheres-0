@@ -7,93 +7,52 @@ PLATFORMS="~amd64"
 
 LIB_PHP_STR=libphp$( ever major )
 LIB_PHP_STR_SO=${LIB_PHP_STR}.so
+LIB_PHP_STR_A=${LIB_PHP_STR}.a
 
 MYOPTIONS+='
-	shared-lib [[
+	'${LIB_PHP_STR_SO}' [[
 		description = [
 			Use a hack to build '${LIB_PHP_STR_SO}'. This doubles the compilation time
 		]
     ]]
+    '${LIB_PHP_STR_A}' [[
+		description = [
+			Build and install '${LIB_PHP_STR_A}'.
+		]
+    ]]
 '
+DEFAULT_SRC_CONFIGURE_OPTIONS+=(
+	"${LIB_PHP_STR_A} --enable-embed=static"
+	"${LIB_PHP_STR_A} --enable-static=zlib"
+)
 
-src_prepare() {
-	php_src_prepare
+src_configure()
+{
+	( optionq ${LIB_PHP_STR_SO} || optionq ${LIB_PHP_STR_A} ) &&
+	append-flags -fPIC
 
-	if optionq shared-lib
-	then
-
-		WORK_COPY="${WORKBASE}"/WORK_COPY
-
-		einfo "Copying ${WORK} to ${WORK_COPY}"
-
-		cp -r "${WORK}" "${WORK_COPY}"
-
-	fi
+	default
 }
-src_configure() {
+
+src_compile()
+{
 	default
 
-	if optionq shared-lib
+	if optionq ${LIB_PHP_STR_SO}
 	then
-
-		cd "${WORK_COPY}"
-
-		append-flags -fPIC
-
-		default
-
-		cd "${WORK}"
-
-	fi
-}
-
-copy_objects() {
-	LD_OUT=$( (eval $LD_COMMAND) 2>&1 )
-
-	if [ $? -eq 1 ]
-	then
-		for o in $LD_OUT
-		do
-			if	echo $o | grep '\.o'
-				then
-					local OBJ=${o/\:/}
-
-					cp "${WORK_COPY}"/${OBJ} "${WORK}"/${OBJ}
-				fi
-		done
-
-		copy_objects
-	fi
-}
-
-src_compile() {
-	default
-
-	if optionq shared-lib
-	then
-
-		MAKE_LIB_COMMAND='make libs/'${LIB_PHP_STR}'.bundle'
+		local MAKE_LIB_COMMAND='make libs/'${LIB_PHP_STR}'.bundle'
 
 		${MAKE_LIB_COMMAND} || LD_COMMAND=$( ${MAKE_LIB_COMMAND} )
 
-		LD_COMMAND=${LD_COMMAND/$CC/$CC -shared -fPIC}
+		local LD_COMMAND=${LD_COMMAND/$CC/$CC -shared -fPIC}
 
-		cd "${WORK_COPY}"
-
-		default
-
-		${MAKE_LIB_COMMAND} || unset MAKE_LIB_COMMAND
-
-		cd "${WORK}"
-
-		copy_objects
-
-		unset WORK_COPY
+		eval $LD_COMMAND
 	fi
 }
 
 src_install(){
 	php_src_install
 
-	optionq shared-lib && dolib libs/${LIB_PHP_STR_SO}
+	optionq ${LIB_PHP_STR_SO}	&& dolib libs/${LIB_PHP_STR_SO}
+	optionq ${LIB_PHP_STR_A}	&& dolib libs/${LIB_PHP_STR_A}
 }

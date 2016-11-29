@@ -1,12 +1,25 @@
+#TODO: Make it more clean!
 function newicon()
 {
 	local s=48
 
-	[ $1 = '-s' ] && shift && s=$1 && shift
+	[ ${1} = '-s' ] && shift && local s=${1} && shift
 
-	local DIR="${IMAGE}/usr/share/icons/hicolor/$s"'x'"$s/apps"
+	local DIR="${IMAGE}/usr/share/icons/hicolor/${s}"'x'"${s}/apps"
 
-	mkdir -p ${DIR}
+	mkdir -p "${DIR}"
 
-	cp "$1" ${DIR}/"$2"
+	cp "${1}" "${DIR}/${2}"
+}
+function doicon()
+{
+	[ ${1} = '-s' ] && shift && local s="-s ${1}" && shift
+
+	CMDBASE="newicon ${s}"
+
+	for i in "$@"
+	do
+		CMD="CMDBASE ${i} ${i}"
+		${CMD}
+	done
 }
