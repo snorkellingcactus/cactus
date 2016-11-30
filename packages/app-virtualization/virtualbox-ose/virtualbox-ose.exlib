@@ -1,0 +1,326 @@
+# Copyright 2009-2016 Pierre Lejeune <superheron@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+require freedesktop-desktop udev-rules
+require python [ blacklist=3 with_opt=true ]
+
+export_exlib_phases pkg_pretend src_unpack src_prepare src_configure src_compile src_test src_install pkg_postinst
+
+SUMMARY="A family of powerful x86 virtualization products"
+DESCRIPTION="
+VirtualBox is a powerful x86 virtualization product for enterprise as well as
+home use. Not only is VirtualBox an extremely feature rich, high performance
+product for enterprise customers, it is also the only professional solution
+that is freely available as Open Source Software under the terms of the GNU
+General Public License (GPL).
+"
+
+HOMEPAGE="http://www.virtualbox.org"
+MY_PNV="VirtualBox-${PV}"
+EXT_PN="Oracle_VM_VirtualBox_Extension_Pack"
+VBOX_DOWNLOADS_ROOT="http://download.virtualbox.org/${PN%-ose}/${PV}"
+DOWNLOADS="
+    ${VBOX_DOWNLOADS_ROOT}/${MY_PNV}.tar.bz2
+    additions? ( ${VBOX_DOWNLOADS_ROOT}/VBoxGuestAdditions_${PV}.iso )
+    extensions? ( ${VBOX_DOWNLOADS_ROOT}/${EXT_PN}-${PV}.vbox-extpack -> ${EXT_PN}-${PV}.tar.gz )
+"
+
+LICENCES="CDDL-1.0 GPL-2 additions? ( PUEL ) extensions? ( PUEL )"
+SLOT="0"
+MYOPTIONS="X alsa dbus devmapper opengl pulseaudio truetype vnc vpx
+    additions [[ description = [ Installs Guest Additions ISO ] ]]
+    extensions [[ description = [ Install Extension Pack (binary) ] ]]
+    system-kbuild [[ description = [ Use system kBuild instead of bundled copy ] ]]
+    webservice [[ description = [ Builds VBoxWebSrv ] ]]
+    wine [[ description = [ Builds wine support ] ]]
+
+    ( opengl truetype ) [[ requires = X ]]
+    ( providers: libressl openssl ) [[ number-selected = exactly-one ]]
+"
+
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+        system-kbuild? ( dev-util/kBuild[>=0.1.999] )
+    build+run:
+        !app-virtualization/virtualbox-bin
+        app-arch/makeself
+        dev-lang/yasm[>=0.5.1]
+        dev-libs/libIDL:2
+        dev-libs/libxml2:2.0[>=2.6.26]
+        dev-libs/libxslt[>=1.1.17]
+        group/usb
+        group/vboxusers
+        media-libs/libpng:=[>=1.2.5]
+        net-misc/curl[>=7.19.1]
+        sys-libs/libcap
+        sys-libs/pam
+        sys-libs/zlib[>=1.2.1]
+        sys-power/iasl
+        || (
+            app-cdr/genisoimage
+            app-cdr/cdrtools
+            app-cdr/cdrkit
+        )
+        X? (
+            media-libs/SDL:0[>=1.2.7][X]
+            x11-libs/libX11
+            x11-libs/libXcursor
+            x11-libs/libXext
+            x11-libs/libXinerama
+            x11-libs/libXmu
+            x11-libs/libXrandr
+            x11-libs/qt:4[>=4.8.0][opengl?][xinerama(+)]
+            opengl? (
+                x11-dri/mesa
+                x11-libs/libXmu
+            )
+            truetype? ( media-libs/SDL_ttf:0[>=2.0.6] )
+        )
+        alsa? ( sys-sound/alsa-lib[>=1.0.6] )
+        dbus? ( sys-apps/dbus )
+        devmapper? ( sys-fs/lvm2 )
+        providers:libressl? ( dev-libs/libressl:= )
+        providers:openssl? ( dev-libs/openssl )
+        pulseaudio? ( media-sound/pulseaudio[>=0.9.0] )
+        vnc? ( net-libs/libvncserver[>=0.9.7] )
+        vpx? ( media-libs/libvpx[>=0.9.5] )
+        webservice? ( net-libs/gsoap[>=2.7.9f] )
+        wine? ( app-emulation/wine )
+"
+
+UPSTREAM_CHANGELOG="${HOMEPAGE}/wiki/Changelog"
+UPSTREAM_DOCUMENTATION="${HOMEPAGE}/manual/UserManual.html"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}/wiki/News"
+
+WORK="${WORKBASE}/${MY_PNV}"
+
+is_on_x86_64_target_without_i686_gcc() {
+    case "$(exhost --target)" in
+        x86_64-pc-linux-gnu)
+            [ -d "/usr/$(exhost --target)/i686-pc-linux-gnu" ] && return 1 || return 0
+            ;;
+        i686-pc-linux-gnu)
+            return 1
+            ;;
+    esac
+}
+
+virtualbox-ose_pkg_pretend() {
+    if is_on_x86_64_target_without_i686_gcc; then
+        ewarn 'You do not have a 32-bits glibc.'
+        ewarn 'You will *only* be able to run 64-bits guests.'
+        ewarn 'Please install 32-bits cross-toolchain if you also want to run 32-bits guests.'
+    fi
+}
+
+virtualbox-ose_src_unpack() {
+    unpack ${MY_PNV}.tar.bz2
+    if optionq extensions; then
+        edo mkdir "${WORK}"/${EXT_PN}
+        edo pushd "${WORK}"/${EXT_PN}
+        unpack ${EXT_PN}-${PV}.tar.gz
+        edo popd
+    fi
+}
+
+virtualbox-ose_src_prepare() {
+    default
+
+    # remove bundled kBuild and use the system one instead as requested
+    optionq system-kbuild && edo rm -r kBuild
+
+    edo sed -e "s/pkg-config/${PKG_CONFIG}/" \
+            -e "s/\$CC -m32/\$CC32/" \
+            -e "s/CC32=\"\"/CC32=\"i686-pc-linux-gnu-gcc\"/" \
+            -e "s/CXX32=\"\"/CXX32=\"i686-pc-linux-gnu-g++\"/" \
+            -i configure
+
+    edo sed -e "s/\$(QUIET)ld/\$(QUIET)\$(TOOL_\$(VBOX_GCC32_TOOL)_LD_SYSMOD)/" \
+            -i src/VBox/Devices/PC/ipxe/Makefile.kmk
+
+    edo sed -e "s/\tobjcopy/\t\$(TOOL_\$(VBOX_GCC_TOOL)_OBJCOPY)/" \
+            -i src/VBox/Additions/x11/vboxmouse/Makefile.kmk \
+            -i src/VBox/Additions/x11/vboxvideo/Makefile.kmk
+
+    edo sed -e "s/readelf/$(exhost --target)-readelf/" \
+            -i Config.kmk \
+            -i src/VBox/Additions/common/VBoxGuest/linux/Makefile \
+            -i src/VBox/HostDrivers/Support/linux/Makefile \
+            -i src/VBox/Runtime/Makefile.kmk
+
+    edo sed -e "s/\$(QUIET)nm/\$(QUIET)$(exhost --target)-nm/" \
+            -i src/VBox/Runtime/Makefile.kmk
+
+    # Disable -Werror for gcc-4.5 builds
+    # See http://www.virtualbox.org/ticket/6715
+    echo 'VBOX_WITH_WARNINGS_AS_ERRORS :=' >> "${WORK}/LocalConfig.kmk"
+    # https://forums.virtualbox.org/viewtopic.php?f=15&t=57828
+    echo 'VBOX_WITH_TESTCASES :=' >> "${WORK}/LocalConfig.kmk"
+    echo 'VBOX_WITH_TESTSUITE :=' >> "${WORK}/LocalConfig.kmk"
+
+    # Set some default paths
+    echo 'VBOX_WITH_ORIGIN :=' >> "${WORK}/LocalConfig.kmk"
+    echo "VBOX_PATH_APP_PRIVATE_ARCH := /usr/$(exhost --target)/lib/VirtualBox" >> "${WORK}/LocalConfig.kmk"
+    echo 'VBOX_PATH_SHARED_LIBS := $(VBOX_PATH_APP_PRIVATE_ARCH)' >> "${WORK}/LocalConfig.kmk"
+    echo 'VBOX_WITH_RUNPATH := $(VBOX_PATH_APP_PRIVATE_ARCH)' >> "${WORK}/LocalConfig.kmk"
+    echo "VBOX_PATH_APP_PRIVATE := /usr/share/${PN}" >> "${WORK}/LocalConfig.kmk"
+    echo "VBOX_PATH_PACKAGE_DOCS := /usr/share/doc/${PNVR}" >> "${WORK}/LocalConfig.kmk"
+    echo 'VBOX_PATH_APP_DOCS = $(VBOX_PATH_PACKAGE_DOCS)' >> "${WORK}/LocalConfig.kmk"
+
+    # Set some toolchain programs
+    echo "TOOL_GCC3_AR := ${AR}" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX3_AR := ${AR}" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX32_AR := i686-pc-linux-gnu-ar" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GCC3_LD := ${CC}" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GCC3_LD_SYSMOD := ${LD}" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX3_LD := ${CXX}" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX3_LD_SYSMOD := ${LD}" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX32_LD := i686-pc-linux-gnu-g++" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX32_LD_SYSMOD := i686-pc-linux-gnu-ld" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX3_OBJCOPY := $(exhost --target)-objcopy" >> "${WORK}/LocalConfig.kmk"
+    echo "TOOL_GXX32_OBJCOPY := i686-pc-linux-gnu-objcopy" >> "${WORK}/LocalConfig.kmk"
+}
+
+virtualbox-ose_src_configure() {
+    local myconf="--with-gcc=${CC} --with-g++=${CXX}"
+    if optionq X; then
+        optionq opengl || myconf="${myconf} --disable-opengl"
+        optionq truetype || myconf="${myconf} --disable-sdl-ttf"
+    else
+        myconf="${myconf} --build-headless"
+    fi
+    optionq alsa || myconf="${myconf} --disable-alsa"
+    optionq dbus || myconf="${myconf} --disable-dbus"
+    optionq devmapper || myconf="${myconf} --disable-devmapper"
+    optionq pulseaudio || myconf="${myconf} --disable-pulse"
+    optionq python || myconf="${myconf} --disable-python"
+    optionq vnc && myconf="${myconf} --enable-vnc"
+    optionq vpx || myconf="${myconf} --disable-libvpx"
+    optionq webservice && myconf="${myconf} --enable-webservice"
+    optionq wine && myconf="${myconf} --setup-wine"
+    if is_on_x86_64_target_without_i686_gcc; then
+        # This is needed to build on a non-multilib system
+        myconf="${myconf} --disable-vmmraw"
+    fi
+    # Those could become options
+    # doc: Needs pdflatex
+    # java: Needs detection in configure script
+    myconf="${myconf} --disable-docs --disable-java"
+    esandbox allow_net unix:/tmp/.wine-*/server-*/socket
+    # divert configure's wine checks away from the current user's home
+    export WINEPREFIX="${TEMP}"
+    export XDG_CACHE_HOME="${TEMP}/.cache/"
+    unset DISPLAY
+    # Call configure script directly as it is not a GNU one
+    edo ./configure --disable-kmods ${myconf}
+    esandbox disallow_net unix:/tmp/.wine-*/server-*/socket
+}
+
+virtualbox-ose_src_compile() {
+    edo source env.sh
+    edo kmk -j${EXJOBS:-1} all VBOX_NM="${NM} -p"
+}
+
+virtualbox-ose_src_test() {
+    edo source env.sh
+    edo kmk -j1 test
+}
+
+virtualbox-ose_src_install() {
+    local installdir= outdir=
+    edo source env.sh
+    installdir="/usr/$(exhost --target)/lib/VirtualBox"
+    outdir="${WORK}/out/${BUILD_TARGET}.${BUILD_TARGET_ARCH}/release"
+
+    insinto /etc/vbox
+    hereins vbox.cfg <<EOF
+# VirtualBox installation directory
+INSTALL_DIR='${installdir}'
+# VirtualBox version
+INSTALL_VER='${PV}'
+EOF
+
+    insinto /usr/share/applications
+    doins "${outdir}"/bin/virtualbox.desktop
+
+    insinto /usr/share/pixmaps
+    doins "${outdir}"/bin/VBox.png
+
+    insinto /usr/share/"${PN}"
+    doins -r "${outdir}"/bin/nls
+
+    # Move kernel modules files
+    insinto /usr/src/${PNV}
+    doins -r "${outdir}"/bin/src/*
+
+    dodir "${installdir}" /usr/$(exhost --target)/bin
+    insinto "${installdir}"
+    doins -r "${outdir}"/bin/components
+
+    edo mv "${outdir}"/bin/{*.r0,*.rc,*.so,VBox.sh,VBoxExtPackHelperApp,VBoxXPCOMIPCD,VBoxNetAdpCtl,VBoxNetDHCP,VBoxNetNAT,VBoxSVC,VBoxCreateUSBNode.sh} "${IMAGE}"/"${installdir}"
+#    if ! is_on_x86_64_target_without_i686_gcc; then
+#        edo mv "${outdir}"/bin/*.gc "${IMAGE}"/"${installdir}"
+#    fi
+    for links in {VBoxHeadless,VBoxManage,VBoxSDL,VirtualBox};
+    do
+        edo mv "${outdir}"/bin/"${links}" "${IMAGE}"/"${installdir}"
+        dosym "${installdir}"/VBox.sh /usr/$(exhost --target)/bin/"${links}"
+    done
+    edo mv "${outdir}"/bin/VBoxTunctl "${IMAGE}"/"${installdir}"
+    edo dosym "${installdir}"/VBoxTunctl /usr/$(exhost --target)/bin/VBoxTunctl
+
+    if optionq opengl; then
+        edo mv "${outdir}"/bin/VBoxTestOGL "${IMAGE}"/"${installdir}"
+        edo dosym "${installdir}"/VBoxTestOGL /usr/$(exhost --target)/bin/VBoxTestOGL
+    fi
+
+    if optionq webservice; then
+        edo mv "${outdir}"/bin/vboxwebsrv "${IMAGE}"/"${installdir}"
+        edo dosym "${installdir}"/VBox.sh /usr/$(exhost --target)/bin/vboxwebsrv
+    fi
+
+    # VirtualBox needs to be setuid
+    edo chmod 4711 "${IMAGE}/${installdir}"/{VirtualBox,VBoxHeadless,VBoxNetAdpCtl,VBoxNetDHCP,VBoxNetNAT,VBoxSDL}
+
+    insinto "${UDEVRULESDIR}"
+    hereins 10-vboxdrv.rules <<EOF
+KERNEL=="vboxdrv", NAME="vboxdrv", OWNER="root", GROUP="vboxusers", MODE="0660"
+KERNEL=="vboxnetctl", NAME="vboxnetctl", OWNER="root", GROUP="vboxusers", MODE="0660"
+SUBSYSTEM=="usb_device", ACTION=="add", RUN+="${installdir}/VBoxCreateUSBNode.sh \$major \$minor \$attr{bDeviceClass} usb"
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", RUN+="${installdir}/VBoxCreateUSBNode.sh \$major \$minor \$attr{bDeviceClass} usb"
+SUBSYSTEM=="usb_device", ACTION=="remove", RUN+="${installdir}/VBoxCreateUSBNode.sh --remove \$major \$minor"
+SUBSYSTEM=="usb", ACTION=="remove", ENV{DEVTYPE}=="usb_device", RUN+="${installdir}/VBoxCreateUSBNode.sh --remove \$major \$minor"
+EOF
+
+    # Install guest additions if required
+    if optionq additions; then
+        insinto /usr/share/${PN}
+        newins "${FETCHEDDIR}"/VBoxGuestAdditions_${PV}.iso VBoxGuestAdditions.iso
+    fi
+
+    if optionq extensions; then
+        edo pushd "${WORK}"/${EXT_PN}
+        insinto "${installdir}"/ExtensionPacks/${EXT_PN}
+        doins ExtPack* PXE-Intel.rom
+        doins -r ${BUILD_TARGET}.${BUILD_TARGET_ARCH}
+        edo popd
+    fi
+}
+
+virtualbox-ose_pkg_postinst() {
+    ewarn "This exheres does not build the kernel modules for VirtualBox, you will have to do this"
+    ewarn "on your own. The source code has been installed to /usr/src/${PNV}"
+
+    for rule in {10-vboxdrv.rules,60-virtualbox.rules};
+    do
+        if [[ -f /etc/udev/rules.d/"${rule}" ]]; then
+            ewarn "Old rules file /etc/udev/rules.d/${rule} found."
+            ewarn "You should remove this file."
+        fi
+    done
+
+    elog "In order to expose USB devices to VirtualBox guests, your user must be a member of"
+    elog "the 'usb' group."
+}
+
