@@ -1,0 +1,4 @@
+function escape()
+{
+	sed -e 's/\\/\\\\/g' -e 's/\//\\\//g'
+}

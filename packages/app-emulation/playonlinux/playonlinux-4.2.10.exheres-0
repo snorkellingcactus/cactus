@@ -1,0 +1,110 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'kbuild-0.1.5-r1.ebuild', which is:
+#     Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+require python [ blacklist='3' ]
+require newicon
+
+MY_PN='PlayOnLinux'
+
+DESCRIPTION='Set of scripts to easily install and use Windows games and software'
+HOMEPAGE='http://playonlinux.com/'
+DOWNLOADS="http://www.playonlinux.com/script_files/${MY_PN}/${PV}/${MY_PN}_${PV}.tar.gz"
+
+LICENCES='GPL-3'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='winbind'
+
+DEPENDENCIES='
+	run:
+		app-admin/sudo
+		app-arch/cabextract
+		app-arch/p7zip
+		app-arch/unzip
+		app-crypt/gnupg
+		app-emulation/wine
+		dev-python/wxPython:2.8
+		(
+			media-gfx/ImageMagick
+			media-gfx/graphicsmagick[imagemagick]
+		) [[ number-selected = exactly-one ]]
+		net-misc/wget
+		(
+			net-misc/netcat
+			net-misc/netcat6
+		) [[ number-selected = exactly-one ]]
+		x11-dri/mesa-demos
+		x11-apps/xterm
+		media-gfx/icoutils
+		winbind? ( net-fs/samba[winbind] )
+'
+#mesa-demos=mesa-progs?
+
+#WORK=${WORKBASE}/${PN}
+
+# TODO:
+# Having a real install script
+# It will let using LANGUAGES easily
+# How to deal with Microsoft Fonts installation asked every time ?
+# How to deal with wine version installed ? (have a better mgmt of system one)
+# Look at debian pkg: http://packages.debian.org/sid/playonlinux
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+	"${FILES}/${PN}-4.2.4-pol-bash.patch"
+	"${FILES}/${PN}-4.2.4-binary-plugin.patch"
+	"${FILES}/${PN}-4.2.6-stop-update-warning.patch"
+)
+
+src_prepare() {
+	default
+
+#	python_fix_shebang .
+
+	# remove playonmac
+	rm etc/{playonmac.icns,terminal.applescript}
+
+	# remove desktop integration
+	rm etc/{PlayOnLinux.desktop,PlayOnLinux.directory,playonlinux-Programmes.menu}
+}
+
+src_install() {
+	# all things without exec permissions
+	INTO=/usr/share/${PN}
+	insinto ${INTO}
+	doins -r resources lang lib etc plugins python
+
+	# bash/ install
+	exeinto "${INTO}/bash"
+	find "${WORK}/bash" -type f -exec doexe '{}' +
+	exeinto "${INTO}/bash/expert"
+	find "${WORK}/bash/expert" -type f -exec doexe '{}' +
+
+	# main executable files
+	exeinto "/usr/share/${PN}"
+	doexe ${PN}{,-pkg,-bash,-shell,-url_handler}
+
+	# icons
+	doicon -s 128 etc/${PN}.png
+	for size in 16 22 32; do
+		newicon -s $size etc/${PN}$size.png ${PN}.png
+	done
+
+	doman "${FILES}"/playonlinux{,-pkg}.1
+	dodoc CHANGELOG.md
+
+	echo '#!/bin/sh'			 > ${PN}
+	echo "cd /usr/share/${PN}"	>> ${PN}
+
+	cp ${PN} ${PN}-pkg
+
+	echo "./${PN}"				>> ${PN}
+	echo "./${PN}-pkg"			>> ${PN}-pkg
+
+	dobin ${PN} ${PN}-pkg
+
+	install_desktop_entry "Exec=${PN}" "Name=${MY_PN}" "Categories=Game"
+
+	python_bytecompile ${INTO}
+}

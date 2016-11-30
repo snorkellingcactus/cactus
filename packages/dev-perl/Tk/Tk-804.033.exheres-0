@@ -1,0 +1,43 @@
+# Copyright 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+MY_PNV=${PNV/_p/_}
+require perl-module [ module_author=SREZIC ] escape
+
+SUMMARY='A graphical user interface toolkit for Perl'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='
+	(
+                providers:
+                        ijg-jpeg
+                        jpeg-turbo
+        ) [[ number-selected = exactly-one ]]
+'
+
+DEPENDENCIES="
+    build+run:
+	providers:ijg-jpeg?		( media-libs/jpeg:=			)
+	providers:jpeg-turbo?	( media-libs/libjpeg-turbo	)
+
+        media-libs/libpng
+        x11-libs/libX11
+        x11-libs/libXft
+"
+
+# Needs X11
+RESTRICT='test'
+
+PERL_MODULE_SRC_CONFIGURE_PARAMS=( XFT=1 )
+
+WORK="${WORKBASE}"/${MY_PNV}
+
+src_prepare(){
+
+	local TGT=$( exhost --target )
+	local TGT_PFX=/usr/${TGT}
+
+	edo sed -i -e 's/$inc    = ""/$X11LIB = "'"$( echo ${TGT_PFX}/lib | escape )"'";$X11INC = "'"$( echo ${TGT_PFX}/include | escape )"'";/' -e 's/my $ftinc = Ift("\/usr\/include"/my $ftinc = Ift($X11INC/' myConfig
+
+	edo sed -i -e 's/pkg-config/'${TGT}'-pkg-config/g' PNG/Makefile.PL
+}

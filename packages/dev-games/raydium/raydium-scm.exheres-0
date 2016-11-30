@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 SCM_REPOSITORY='svn://raydium.org/raydium/'
-require scm-svn
+require scm-svn escape
 
 SUMMARY='Raydium is a game engine. It provides a set of functions wich allow quick and flexible games creation.'
 HOMEPAGE='http://raydium.org/'
@@ -38,11 +38,6 @@ DEPENDENCIES='
 DEFAULT_SRC_CONFIGURE_PARAMS=(
 	--disable-x
 )
-
-function escape()
-{
-	sed -e 's/\\/\\\\/g' -e 's/\//\\\//g'
-}
 
 src_prepare() {
 	default

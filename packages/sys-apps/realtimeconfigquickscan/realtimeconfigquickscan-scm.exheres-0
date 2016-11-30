@@ -1,0 +1,38 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SLOT='0'
+SUMMARY='Linux configuration checker for systems to be used for real-time audio'
+DESCRIPTION='This linux-only script inspects a linux installation, and makes suggestions for improving realtime/audio performance. An experimental GUI is available'
+HOMEPAGE='https://github.com/raboof/realtimeconfigquickscan'
+SCM_REPOSITORY="${HOMEPAGE}"
+LICENCES='GPL-2'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='
+	(
+		platform:
+		x86
+		amd64
+	)
+'
+
+require scm-git
+
+DEPENDENCIES='
+	dev-perl/Tk
+'
+
+src_install()
+{
+	local INTO=/usr/share/${PN}
+	insinto ${INTO}
+
+	doins ${WORK}/*
+
+	echo '#!/bin/sh' > ${PN}
+	echo "cd ${INTO} && perl ./QuickScan.pl" >> ${PN}
+
+	dobin ${PN}
+
+	einfo 'In order to get the script working you need config.gz support in your kernel or as well a copy of kernel .config in boot/config-${kernel_version}'
+}
