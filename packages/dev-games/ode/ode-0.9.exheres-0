@@ -12,10 +12,10 @@ PLATFORMS='~amd64 ~x86'
 MYOPTIONS='debug doc double-precision gyroscopic
 	double-precision [[ description = [ More precise calculations at the expense of speed ] ]]'
 
-DEPENDENCIES=
+DEPENDENCIES='
 	build:
 		doc? ( app-doc/doxygen )
-
+'
 
 src_configure() {
 	econf \
