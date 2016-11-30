@@ -6,9 +6,57 @@ require virtualbox-ose
 PLATFORMS="~amd64"
 
 
+#function replace_xgccamd64()
+#{
+#	local TO_REPLACE="TOOL_XGCCAMD64LINUX_${1}"
+
+#	edo sed -i -e 's/'"${TO_REPLACE}"'  ?=/'"${TO_REPLACE}"' = '"${TOOL_PFX}${2}"'\n#/' "${FILE}"
+#}
+
+function replace_gxx32()
+{
+	edo sed -e 's/'"${1}"'/'"${1}${TOOL_PFX}"'/' -i kBuild/tools/GXX32.kmk
+}
+
 src_prepare()
 {
 	virtualbox-ose_src_prepare
 
-	edo sed -i -e 's/$FLGQT5"/$FLGQT5 -std=c++11"/' configure	
+	TOOL_PFX=$( exhost --tool-prefix )
+
+	#Fix build with qt5 enabled. Qt4 requires c++11 support.
+	edo sed -i -e 's/$FLGQT5"/$FLGQT5 -std=c++11"/' configure
+
+	edo sed -e 's/$(QUIET)objcopy/$(QUIET)'"${TOOL_PFX}"'objcopy/g' -i src/VBox/Additions/linux/Makefile.kmk -i src/VBox/Installer/linux/Makefile.kmk
+
+#	replace_gxx32 'TOOL_GXX32_LD  ?= '
+#	replace_gxx32 'TOOL_GXX32_OBJCOPY ?= '
+#	replace_gxx32 'TOOL_GXX32_LD_SYSMOD ?= '
+#	replace_gxx32 'TOOL_GXX32_OBJCOPY ?= '
+
+
+	echo "TOOL_GXX64_OBJCOPY	:= ${OBJCOPY}"	>> LocalConfig.kmk
+	echo "TOOL_GXX64_LD			:= ${CXX}"		>> LocalConfig.kmk
+	echo "TOOL_GXX64_LD_SYSMOD	:= ${LD}"		>> LocalConfig.kmk
+	echo "TOOL_GXX64_AR			:= ${AR}"		>> LocalConfig.kmk
+
+	echo "TOOL_GCC64_OBJCOPY	:= ${OBJCOPY}"	>> LocalConfig.kmk
+	echo "TOOL_GCC64_LD			:= ${CXX}"		>> LocalConfig.kmk
+	echo "TOOL_GCC64_LD_SYSMOD	:= ${LD}"		>> LocalConfig.kmk
+	echo "TOOL_GCC64_AR			:= ${AR}"		>> LocalConfig.kmk
+
+	echo "TOOL_GCC32_OBJCOPY	:= i686-pc-linux-gnu-objcopy"	>> LocalConfig.kmk
+	echo "TOOL_GCC32_LD	:= i686-pc-linux-gnu-g++"	>> LocalConfig.kmk
+	echo "TOOL_GCC32_LD_SYSMOD	:= i686-pc-linux-gnu-ld"	>> LocalConfig.kmk
+	echo "TOOL_GCC32_AR	:= i686-pc-linux-gnu-ar"	>> LocalConfig.kmk
+
+	sed -i -e 's/objcopy/'"${OBJCOPY}"'/' Config.kmk
+
+#	FILE=./kBuild/tools/XGCCAMD64LINUX.kmk
+
+#	replace_xgccamd64 LD ld
+#	replace_xgccamd64 CC cc
+# 	replace_xgccamd64 CXX cxx
+#	replace_xgccamd64 AS as
+#	replace_xgccamd64 AR ar
 }
