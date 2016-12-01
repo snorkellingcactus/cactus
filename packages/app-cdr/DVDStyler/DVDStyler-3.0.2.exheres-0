@@ -6,7 +6,7 @@ HOMEPAGE='http://www.dvdstyler.org/'
 SLOT='0'
 LICENCES='GPL'
 
-require lang-helper[ linguas='ar cs de es_ar eu fr hy ja mk nl pt_BR ro sk sr tr uz zh_CN ca da el es fi hu it ko nb pl pt ru sl sv uk vi zh_TW' ]
+require lang-helper [ linguas='ar cs de es_ar eu fr hy ja mk nl pt_BR ro sk sr tr uz zh_CN ca da el es fi hu it ko nb pl pt ru sl sv uk vi zh_TW' ]
 
 MYOPTIONS='
 	ecc [[ description = [ Enhance data survivability ] ]]
