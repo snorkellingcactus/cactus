@@ -1,0 +1,45 @@
+myexparam	linguas
+
+exparam -v my_linguas linguas
+
+MYOPTIONS+='(
+		linguas: '"${my_linguas}"'
+)'
+
+export_exlib_phases src_install
+
+function lang-helper-remove-locale()
+{
+	! optionq linguas:${2} && rm -rf ${1}${2} &>/dev/null
+}
+function lang-helper-remove-locales()
+{
+	local IMG_LOCALE="${1}" && shift
+
+	lang-helper-linguas-loop 'lang-helper-remove-locale '"${IMG_LOCALE} $@"
+
+	rm -df ${IMG_LOCALE} &>/dev/null
+}
+
+function lang-helper-linguas-loop()
+{
+	for l in ${my_linguas}
+	do
+		for x in "$@"
+		do
+			${x} ${l}
+		done
+	done
+}
+
+function lang-helper-remove-locales-usr()
+{
+	lang-helper-remove-locales "${IMAGE}"/usr/share/locale/ $@
+}
+
+lang-helper_src_install()
+{
+	default
+
+	lang-helper-remove-locales-usr $@
+}

@@ -6,7 +6,7 @@ HOMEPAGE='http://www.dvdstyler.org/'
 SLOT='0'
 LICENCES='GPL'
 
-linguas='ar cs de es_ar eu fr hy ja mk nl pt_BR ro sk sr tr uz zh_CN ca da el es fi hu it ko nb pl pt ru sl sv uk vi zh_TW'
+require lang-helper[ linguas='ar cs de es_ar eu fr hy ja mk nl pt_BR ro sk sr tr uz zh_CN ca da el es fi hu it ko nb pl pt ru sl sv uk vi zh_TW' ]
 
 MYOPTIONS='
 	ecc [[ description = [ Enhance data survivability ] ]]
@@ -14,9 +14,6 @@ MYOPTIONS='
 		providers:
 			ffmpeg
 			libav
-	)
-	(
-		linguas: '"${linguas}"'
 	)
 '
 PLATFORMS='~x86 ~amd64'
@@ -67,18 +64,11 @@ DEFAULT_SRC_COMPILE_PARAMS+=(
 
 CXXFLAGS="${CXXFLAGS} -std=c++11"
 
+function remove-help()
+{
+	rm -rf "${IMAGE}"/usr/share/dvdstyler/docs/help_${1}.zip &>/dev/null
+}
 src_install()
 {
-	default
-
-	for l in ${linguas}
-	do
-		IMG_SHARE="${IMAGE}"/usr/share
-		IMG_LOCALE="${IMG_SHARE}"/locale/
-		IMG_DOCS="${IMG_SHARE}"/dvdstyler/docs/
-
-		! optionq linguas:${l} && rm -rf "${IMG_LOCALE}"${l} "${IMG_DOCS}"help_${l}.zip &>/dev/null
-	done
-
-	rm -df "${IMG_DOCS}" "${IMG_LOCALE}" &>/dev/null
+	lang-helper-src_install remove-help
 }

@@ -33,7 +33,7 @@ DOWNLOADS+=' -> ${PNV}.zip'
 DEPENDENCIES='
 	build+run:
 		game? (
-			dev-libs/ogre[cg][boost][freeimage][opengl][archive]
+			dev-libs/ogre[cg][boost][freeimage][opengl][archives]
 			dev-games/mygui[ogre]
 			media-libs/SDL:2
 			media-libs/libvorbis
@@ -43,7 +43,7 @@ DEPENDENCIES='
 		)
 		dev-games/ois
 		dev-libs/boost
-		'${CATEGORY}/${PN}-tracks-${PV}'
+		'${CATEGORY}/${PN}-tracks[=${PV}]'
 		net-libs/enet[>=1.3.0]
 		sys-libs/libstdc++
 '
