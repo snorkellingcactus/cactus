@@ -23,9 +23,14 @@ DEPENDENCIES="
 		media-sound/pulseaudio[jack]
 "
 
-require scm-git python [ blacklist="2 4" ]
+require scm-git python [ blacklist='2 4' ]
 
-BUGS_TO="snorkellingcactus@gmail.com"
+src_prepare()
+{
+	default
+
+	edo sed -i -e 's/pkg-config/'"$( exhost --target )"'-pkg-config/g' $( grep -l pkg-config `find . -type f` )
+}
 
 src_compile()
 {

@@ -1,0 +1,26 @@
+#IMAGE=/tmp/image/
+#PALUDIS_IMAGE_DIR_VAR=IMAGE
+#INSDESTTREE=/dest/
+
+function doinsmv()
+{
+	for i in "$@"
+	do
+		[ ! -e "${i}" ] &&
+		    paludis_die_or_error "${i}: No such file or directory."
+
+		edo dodir "${INSDESTTREE}/$( expr substr ${i} 1 $( expr ${#i} - $( expr length $( basename ${i} ) ) ) )"
+
+		local DEST="${!PALUDIS_IMAGE_DIR_VAR}${INSDESTTREE}/${i}"
+
+		edo mv "${i}" "${DEST}"
+
+		einfo "INSOPTIONS: ${INSOPTIONS}"
+	done
+}
+
+#rm -r ${!PALUDIS_IMAGE_DIR_VAR}
+
+#cp -r work.copy work
+
+#doinsmv $@

@@ -1,0 +1,9 @@
+function domenu()
+{
+	insinto /usr/share/applications
+	
+	for i in "$@"
+	do
+		doins "${i}"
+	done
+}

@@ -14,6 +14,8 @@ exparam -v MY_MAKE_PREFIX MAKE_PREFIX
 exparam -v MY_REND_SUFFIX REND_SUFFIX
 exparam -v MY_BASEQ3_PATH BASEQ3_PATH[@]
 
+require doinsmv
+
 export_exlib_phases src_prepare src_compile src_install
 
 MYOPTIONS='
@@ -145,10 +147,8 @@ quake3_src_install()
 	then
 		local	DATA=/usr/share/games/${PN}/
 
-		einfo	'Copying '${PN}' data to '${DATA}'. This could take several minutes.'
-
 		insinto ${DATA}
-			doins -r "${MY_BASEQ3_PATH[@]}"
+			doinsmv "${MY_BASEQ3_PATH[@]}"
 	fi
 	if optionq server || optionq engine
 	then

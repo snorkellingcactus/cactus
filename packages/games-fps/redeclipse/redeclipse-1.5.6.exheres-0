@@ -1,0 +1,147 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'redeclipse-1.5.3.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+
+require newicon doinsmv domenu desktop-utils flag-o-matic
+
+SUMMARY='First-person ego-shooter, built as a total conversion of Cube Engine 2'
+HOMEPAGE='http://www.redeclipse.net/'
+
+PARTS=( base acerspyro actors appleflap blendbrush caustics crosshairs dziq elyvisions fonts freezurbern john jojo jwin luckystrike maps mayhem mikeplus64 misc nieb nobiax particles philipk projectiles props skyboxes snipergoth sounds textures torley trak ulukai unnamed vanities vegetation weapons wicked )
+
+for P in "${!PARTS[@]}"
+do
+	PART="${PARTS[${P}]}"
+
+	DOWNLOADS+="
+	https://github.com/red-eclipse/${i}/archive/v${PV}.tar.gz -> ${PART}-${PV}.tar.gz"
+done    
+
+# According to doc/license.txt file
+LICENCES='HPND ZLIB CC-BY-SA-3.0'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='
+	(
+		client
+		server
+		data
+	) [[ number-selected = at-least-one ]]
+'
+
+DEPENDENCIES='
+	client? (
+		media-libs/freetype:2
+		media-libs/SDL:2[opengl]
+		media-libs/SDL_image
+		media-libs/SDL_mixer:2[mad][ogg]
+		media-libs/glew
+		x11-libs/libX11
+	)
+	net-libs/enet[>=1.3.9]
+	sys-libs/zlib
+'
+
+WORK="${WORKBASE}"/base-${PV}
+
+src_prepare() {
+	# Unbundle enet
+	#epatch "${FILES}/${PN}_unbundle-enet.patch"
+
+	for P in "${!PARTS[@]}"
+	do
+		PART="${PARTS[${P}]}"
+
+		[ "${PART}" = "base" ] && continue
+
+		edo rm -d "${WORK}"/data/${PART}
+
+		edo mv "${WORKBASE}"/${PART}-${PV} "${WORK}"/data/${PART}
+	done
+
+	local LIBDIR=/usr/$( exhost --target )/lib
+	local DATADIR_BASE=/usr/share
+	local DATADIR=${DATADIR_BASE}/games/${PN}
+
+	rm -r src/enet
+
+	# Menu and mans
+	edo sed -e "s:@APPNAME@:${PN}:" \
+		-e "/^Keywords=/s/$/;/" \
+		src/install/nix/redeclipse.desktop.am \
+		> src/install/nix/redeclipse.desktop
+
+	edo sed -e "s:@LIBEXECDIR@:${LIBDIR}:g" \
+		-e "s:@DATADIR@:${DATADIR}:g" \
+		-e "s:@DOCDIR@:${DATADIR_BASE}/doc/${PNVR}:" \
+		-e "s:@REDECLIPSE@:${PN}:g" \
+		-e "s:@APPNAME@:${PN}:g" \
+		-e "s:@CAPPNAME@:REDECLIPSE:g" \
+		doc/man/redeclipse.6.am \
+		> doc/man/redeclipse.6
+
+	edo sed -e "s:@LIBEXECDIR@:${LIBDIR}:g" \
+		-e "s:@DATADIR@:${DATADIR}:g" \
+		-e "s:@DOCDIR@:${DATADIR_BASE}/doc/${PNVR}:" \
+		-e "s:@REDECLIPSE@:${PN}:g" \
+		-e "s:@APPNAME@:${PN}:g" \
+		-e "s:@CAPPNAME@:REDECLIPSE:g" \
+		doc/man/redeclipse-server.6.am \
+		> doc/man/redeclipse-server.6
+
+	edo sed -i -e 's/-Ienet\/include//' -e 's/-Lenet//g' -e 's/ $(LIBENET)//g' src/Makefile
+}
+
+src_compile() {
+		# game/bomber.cpp
+		# crt1.o: In function `_start'
+		# (.text+0x20): undefined reference to `main'
+		# edo append-cppflags -shared
+
+		( optionq client || optionq server ) && emake CXXFLAGS="${CXXFLAGS}" -C src $(
+			optionq client && echo ' client'
+		)$(
+			optionq server && echo ' server'
+		)
+}
+
+make_wrapper(){
+	local BIN_WRAP=${TEMP}/${1}
+	echo '#!/bin/sh' >	${BIN_WRAP}
+	echo "cd ${DATADIR} && exec ${BINDIR}/${1} "'$@' >>	${BIN_WRAP}
+
+	dobin ${BIN_WRAP}
+}
+
+src_install() {
+
+	DATADIR=/usr/share/games/${PN}
+
+	insinto ${DATADIR}
+		doinsmv config $( optionq data && echo data )
+
+	BINDIR=/usr/$( exhost --target )/share/games/${PN}
+	
+	exeinto ${BINDIR}
+
+	if optionq client
+	then
+		newexe src/redeclipse_linux ${PN}
+		newicon src/install/nix/${PN}_x128.png ${PN}.png
+		domenu src/install/nix/redeclipse.desktop
+		doman doc/man/redeclipse.6
+
+		make_wrapper ${PN}
+	fi
+
+	if optionq server
+	then
+		newexe src/redeclipse_server_linux ${PN}-server
+
+		doman doc/man/redeclipse-server.6
+		dodoc readme.txt doc/examples/servinit.cfg
+
+		make_wrapper ${PN}-server
+	fi
+}

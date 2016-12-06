@@ -11,3 +11,9 @@ HOMEPAGE='http://www.q3rally.com/'
 PLATFORMS='x86 amd64'
 LICENCES='GPL-2 Quake3-EULA'
 SLOT='0'
+
+#Produce errors of unexpected token in fterror.h
+#Don't forget to check troough the time.
+DEFAULT_SRC_COMPILE_PARAMS+=(
+	USE_FREETYPE=0
+)

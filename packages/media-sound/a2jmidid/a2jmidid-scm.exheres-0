@@ -1,35 +1,41 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
 
-SCM_REPOSITORY="http://repo.or.cz/a2jmidid.git"
+SCM_REPOSITORY='http://repo.or.cz/a2jmidid.git'
 
-SUMMARY="a2jmidid is daemon that implements automatic bridging."
+SUMMARY='a2jmidid is daemon that implements automatic bridging.'
 #TODO: dbus? --disable-dbus, --enable-pkg-config-dbus-service-dir
-HOMEPAGE="http://home.gna.org/a2jmidid/"
+HOMEPAGE='http://home.gna.org/a2jmidid/'
 
-LICENCES="GPL-2"
-SLOT="0"
-PLATFORMS="~x86 ~amd64"
-
-BUGS_TO="snorkellingcactus@gmail.com"
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
 
 #TODO: alsa-lib, virtual/pkgconfig, require python?
-DEPENDENCIES="
-    build+run:
-        media-sound/jack-audio-connection-kit
-	
-"
+DEPENDENCIES='
+	build+run:
+		media-sound/jack-audio-connection-kit
+'
 
 require scm-git waf
 
-src_configure()
+
+src_prepare()
 {
-	ewaf --jobs=1 configure \
-        --prefix=/usr/$(exhost --target)/ \
-        "${WAF_DEFAULT_PARAMS[@]}" \
-        "${WAF_SRC_CONFIGURE_PARAMS[@]}" \
-        $(for s in "${WAF_SRC_CONFIGURE_OPTIONS[@]}" ; do option ${s} ; done) \
-        $(for s in "${WAF_SRC_CONFIGURE_OPTION_ENABLES[@]}" ; do option_enable ${s} ; done) \
-        $(for s in "${WAF_SRC_CONFIGURE_OPTION_WITHS[@]}" ; do option_with ${s} ; done) \
-        $(for s in "${WAF_SRC_CONFIGURE_TESTS[@]}" ; do expecting_tests ${s} ; done)
+	local OPTIONS='--bindir --sbindir --libdir --datadir --htmldir'
+	local OPTIONS_STR
+
+
+	for o in ${OPTIONS}
+	do
+		OPTIONS_STR+="\n\tp('""${o}""',help = \"installation root [Default: '%s']\" % default_destdir,default = default_destdir,dest = '""${o}""')"
+	done
+
+	local LINE='p = parser.add_option'
+
+	./waf --version
+
+	edo sed -i -e 's/'"${LINE}"'/'"${LINE}${OPTIONS_STR}"'/' $(find . -name Options.py )
+
+	edo sed -i -e "s/pkgbin = 'pkg-config'/pkgbin = '""$( exhost --target )""-pkg-config'/" $(find . -name config_c.py )
 }

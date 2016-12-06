@@ -69,7 +69,7 @@ src_configure() {
 }
 src_install()
 {
-	default
+	cmake_src_install
 
 	local LIBDIR=/usr/$( exhost --target )/lib/
 

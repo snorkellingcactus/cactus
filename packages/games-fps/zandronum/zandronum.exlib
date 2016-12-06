@@ -3,7 +3,7 @@
 # Based in part upon 'zandronum-2.0.ebuild' from Gentoo, which is:
 #     Copyright 1999-2015 Gentoo Foundation
 
-SUMMARY='Doom 2 source port and Skulltag successor'
+SUMMARY='Doom 2 source port and Skulltag successor.'
 HOMEPAGE='https://zandronum.com'
 PLATFORMS='~x86 ~amd64'
 LICENCES='GPL-3 Sleepycat New BSD License'
@@ -100,7 +100,7 @@ function zan_dobin()
 }
 zandronum_src_unpack()
 {
-	default
+	cmake_src_unpack
 
 	WORK="${WORKBASE}"/${PNV}
 

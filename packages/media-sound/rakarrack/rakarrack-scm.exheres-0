@@ -1,3 +1,4 @@
+
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Based in part upon 'rakarrack-9999.ebuild', which is:
 # Copyright 1999-2013 Gentoo Foundation
@@ -30,11 +31,17 @@ DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=(
 	sse2
 )
 
-DEFAULT_SRC_CONFIGURE_PARAMS=(
+DEFAULT_SRC_CONFIGURE_PARAMS+=(
 	--bindir=/usr/bin
 	--prefix=/usr/
 )
 
+src_prepare()
+{
+	edo sed -i -e 's/pkg-config/'"$( exhost --target )"'-pkg-config/g' configure.ac
+
+	autotools_src_prepare
+}
 src_install() {
 
 	default
