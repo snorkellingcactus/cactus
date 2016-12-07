@@ -19,15 +19,15 @@ src_install()
 {
 	local DATADIR=/usr/share/games/${PN}
 
-	insinto ${DATADIR}
-		doinsmv "${WORK}"/{data,maps,scenarios,techs,tilesets}
-
 	optionq doc && dodoc docs manual
 
 	local ICONS_DIR=os_dependent/linux/shared/
 
 	doicon ${ICONS_DIR}${PN}.png
 	domenu ${ICONS_DIR}${PN}.desktop
+
+	insinto ${DATADIR}
+		doinsmv "${WORK}"/{data,maps,scenarios,techs,tilesets}
 
 	local BIN_WRAP="${TEMP}/${PN}"
 

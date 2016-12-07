@@ -19,7 +19,6 @@ function doicon()
 
 	for i in "$@"
 	do
-		CMD="CMDBASE ${i} ${i}"
-		${CMD}
+		edo ${CMDBASE} "${i}" "$( basename ${i} )"
 	done
 }
