@@ -19,23 +19,18 @@ DEPENDENCIES='
 
 require scm-git waf
 
+WAF_SRC_CONFIGURE_PARAMS+=(
+	'--hates=bindir'
+	'--hates=sbindir'
+	'--hates=libdir'
+	'--hates=datadir'
+	'--hates=htmldir'
+)
 
 src_prepare()
 {
-	local OPTIONS='--bindir --sbindir --libdir --datadir --htmldir'
-	local OPTIONS_STR
-
-
-	for o in ${OPTIONS}
-	do
-		OPTIONS_STR+="\n\tp('""${o}""',help = \"installation root [Default: '%s']\" % default_destdir,default = default_destdir,dest = '""${o}""')"
-	done
-
-	local LINE='p = parser.add_option'
-
+	# Make some waf files visible.
 	./waf --version
 
-	edo sed -i -e 's/'"${LINE}"'/'"${LINE}${OPTIONS_STR}"'/' $(find . -name Options.py )
-
-	edo sed -i -e "s/pkgbin = 'pkg-config'/pkgbin = '""$( exhost --target )""-pkg-config'/" $(find . -name config_c.py )
+	edo sed -i -e "s/pkgbin = 'pkg-config'/pkgbin = '""$( exhost --target )""-pkg-config'/" $( find . -name config_c.py )
 }

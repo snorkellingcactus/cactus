@@ -26,7 +26,7 @@ else
 	(( $( ever delete_all ${PV} ) <= 26 )) && BULLET_VERSION='[<2.85]'
 fi
 
-DOWNLOADS+=' -> ${PNV}.zip'
+DOWNLOADS+=" -> ${PNV}.zip"
 
 #todo: editor
 #ogre[-double-precision]
