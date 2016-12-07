@@ -1,0 +1,249 @@
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+# google-breakpad
+# TODO: fribidi, libvorbis static
+
+require doinsmv newicon gtk-icon-cache desktop-utils flag-o-matic cmake [ api=2 ]
+
+SUMMARY='Cross-platform 3D realtime strategy game'
+DESCRIPTION='MegaGlest is an entertaining free (freeware and free software) and open source cross-platform 3D real-time strategy (RTS) game, where you control the armies of one of seven different factions: Tech, Magic, Egyptians, Indians, Norsemen, Persian or Romans. The game is setup in one of 17 naturally looking settings, which -like the unit models- are crafted with great appreciation for detail. Additional game data can be downloaded from within the game at no cost.'
+HOMEPAGE='http://www.megaglest.org'
+URL_BASE='https://github.com/MegaGlest/megaglest-'
+SUFFIX=.tar.xz
+DIR_DATA=${PN}-standalone-data-${PV}
+FILE_DATA=${DIR_DATA}${SUFFIX}
+FILE_ENGINE=${PN}-source-${PV}${SUFFIX}
+
+DOWNLOADS="
+	data? (
+		${URL_BASE}data/releases/download/${PV}/${FILE_DATA}
+	)
+	engine? (
+		${URL_BASE}source/releases/download/${PV}/${FILE_ENGINE}
+	)
+"
+
+LICENCES='GPL-3 BitstreamVera'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+
+#static
+MYOPTIONS='
+	debug			[[ requires = engine ]]
+	(
+		data 
+		engine
+	) [[ number-selected = at-least-one ]]
+	editor			[[ requires = engine ]]
+	fribidi			[[ requires = engine ]]
+	streflop		[[ requires = engine ]]
+	tests 			[[ requires = engine ]]
+	tools			[[ requires = engine ]]
+	model-viewer	[[ requires = engine ]]
+	videos			[[ requires = engine ]]
+	( amd64_cpu_features: sse sse2 sse3 )
+	(
+		providers:
+			ijg-jpeg
+			jpeg-turbo
+	) [[ number-selected = exactly-one ]]
+'
+
+# NOTE: Build fail without libircclient.
+# ~games-strategy/${PN}-data-${PV}
+# media-libs/SDL[sound][joystick][video]
+# dev-libs/xerces-c[icu]
+# x11-libs/wxGTK:3.0[X][opengl]
+DEPENDENCIES='
+	engine? (
+		dev-lang/lua[>=5.1]
+		dev-libs/gnutls
+		dev-libs/libxml2
+		media-libs/fontconfig
+		media-libs/freetype
+		media-libs/SDL[X][opengl]
+		media-libs/libvorbis
+		media-libs/openal
+		sys-libs/zlib
+		x11-dri/glu
+		x11-libs/libX11
+		x11-libs/libXext
+
+		dev-libs/xerces-c
+		media-libs/ftgl
+		media-libs/glew
+		media-libs/libpng
+		net-irc/libircclient[>=1.6]
+		net-libs/miniupnpc[>=1.8]
+		net-misc/curl
+	)
+
+	editor? ( x11-libs/wxGTK:3.0 )
+	fribidi? ( dev-libs/fribidi )
+	model-viewer? ( x11-libs/wxGTK:3.0 )
+	videos? ( media/vlc )
+build:
+	sys-apps/help2man	
+'
+
+#static? (
+#	dev-libs/icu[static-libs]
+#	dev-libs/xerces-c[icu,static-libs]
+#	media-libs/ftgl[static-libs]
+#	media-libs/glew[static-libs]
+#	media-libs/libpng:0[static-libs]
+#	net-libs/libircclient[static-libs]
+#	net-libs/miniupnpc[static-libs]
+#	net-misc/curl[static-libs]
+#	virtual/jpeg:0[static-libs]
+#)
+
+TGT=/usr/$( exhost --target )
+BINDIR=${TGT}/share/games/${PN}
+DATADIR=/usr/share/games/${PN}
+WORK="${WORKBASE}"/${PNV}
+
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+	'debug wxWidgets_USE_DEBUG'
+)
+
+CMAKE_SRC_CONFIGURE_OPTION_BUILDS+=(
+	'engine			MEGAGLEST'
+	'editor			MEGAGLEST_MAP_EDITOR'
+	'model-viewer	MEGAGLEST_MODEL_VIEWER'
+	'tests			MEGAGLEST_TESTS'
+	'tools			MEGAGLEST_MODEL_IMPORT_EXPORT_TOOLS'
+)
+
+#	openssl USE_OpenSSL = Use libOpenSSL during CURL linking
+#	breakpad USE_GoogleBreakpad	= 
+#	XercesC USE_XercesC
+#	USE_SDL2
+#	DEV_OUTPATH
+#	static STATIC_LIBS	
+CMAKE_SRC_CONFIGURE_OPTION_WANTS+=(
+	'videos USE_VLC'
+	'fribidi USE_FriBiDi'
+	'streflop USE_STREFLOP'
+)
+
+#FORCE_STREFLOP_SOFTWRAPPER = "Set the streflop library to be forced to use the software emulator"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DMEGAGLEST_BIN_INSTALL_PATH="${BINDIR}"
+	-DMEGAGLEST_DATA_INSTALL_PATH="${DATADIR}"
+	-DMEGAGLEST_DESKTOP_INSTALL_PATH="/usr/share/applications"
+	-DMEGAGLEST_MANPAGE_INSTALL_PATH="/usr/share/man"
+	-DMEGAGLEST_ICON_INSTALL_PATH="/usr/share/pixmaps"
+	-DCUSTOM_DATA_INSTALL_PATH="${DATADIR}"
+	-DWANT_GIT_STAMP=off
+	-DWANT_USE_FTGL=ON
+	-DFORCE_EMBEDDED_LIBS=OFF
+	-DMINIUPNP_DEBUG_BUILD=OFF
+	-DwxWidgets_wxrc_EXECUTABLE=${TGT}/bin/wxrc-3.0
+	-DwxWidgets_CONFIG_EXECUTABLE=${TGT}/bin/wx-config-3.0-gtk2
+	-DWANT_USE_Ircclient=ON
+	-DWANT_USE_FontConfig=ON
+)
+
+src_unpack()
+{
+	optionq engine && unpack ${FILE_ENGINE}
+
+	if optionq data
+	then
+		mkdir -p ${DIR_DATA}
+		pushd ${DIR_DATA}
+			unpack ${FILE_DATA}	
+		popd
+	fi
+}
+
+src_configure() {
+	local SSE
+
+	if		optionq amd64_cpu_features:sse3	; then
+		SSE=3
+	elif	optionq amd64_cpu_features:sse2	; then
+		SSE=2
+	elif	optionq amd64_cpu_features:sse	; then
+		SSE=1
+	else
+		SSE=0
+	fi
+
+	CMAKE_SRC_CONFIGURE_PARAMS+=(
+		-DFORCE_MAX_SSE_LEVEL="${SSE}"
+		-DCMAKE_BUILD_TYPE="$( option debug Debug Release )"
+	)
+
+	cmake_src_configure
+}
+
+function make_wrapper()
+{
+	local BIN_WRAP=${TEMP}/${1}
+
+	echo '#!/bin/sh' > ${BIN_WRAP}
+	echo "${BINDIR}/${1} --data-path=${DATADIR} "'"$@"' >> ${BIN_WRAP}
+	dobin ${BIN_WRAP}
+}
+
+src_install() {
+	insinto ${DATADIR}
+		doinsmv "${WORKBASE}"/${DIR_DATA}/*
+
+	dodoc "${WORKBASE}"/${PNV}/docs/{AUTHORS.source_code,CHANGELOG,README}.txt
+
+	local CAT_STR='Categories=Game;StrategyGame'
+	local ICONS_DIR="${WORKBASE}"/${PNV}/mk/shared/
+
+	if optionq engine
+	then
+		local ICON=${PN}.ico
+
+		doicon ${ICONS_DIR}${ICON}
+
+		install_desktop_entry "Exec=${PN}" "Name=MegaGlest" "${CAT_STR}" "Icon=${ICON}"
+
+		make_wrapper "${PN}"
+	fi
+
+	if optionq editor
+	then
+		local ICON=${PN}-editor.ico
+
+		newicon ${ICONS_DIR}editor.ico ${ICON}
+
+		install_desktop_entry "Exec=${PN}_editor" "Name=MegaGlest Map Editor" "${CAT_STR}" "Icon=${ICON}"
+
+		make_wrapper "${PN}_editor"
+	fi
+
+	if optionq model-viewer
+	then
+		local ICON=${PN}-model-viewer.ico
+
+		newicon ${ICONS_DIR}g3dviewer.ico ${ICON}
+
+		install_desktop_entry "Exec=${PN}_g3dviewer" "Name=MegaGlest Model Viewer" "${CAT_STR}" "Icon=${ICON}"
+
+		make_wrapper "${PN}_g3dviewer"
+	fi
+
+	cmake_src_install
+}
+
+pkg_postinst() {
+	einfo
+	elog 'Note about Configuration:'
+	elog 'DO NOT directly edit glest.ini and glestkeys.ini but rather glestuser.ini'
+	elog 'and glestuserkeys.ini in ~/.megaglest/ and create your user over-ride'
+	elog 'values in these files.'
+	elog
+	elog 'If you have an older graphics card which only supports OpenGL 1.2, and the'
+	elog 'game crashes when you try to play, try starting with "megaglest --disable-vbo"'
+	elog 'Some graphics cards may require setting Max Lights to 1.'
+	einfo
+}

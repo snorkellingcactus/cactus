@@ -1,26 +1,31 @@
-#IMAGE=/tmp/image/
-#PALUDIS_IMAGE_DIR_VAR=IMAGE
-#INSDESTTREE=/dest/
-
 function doinsmv()
 {
 	for i in "$@"
 	do
-		[ ! -e "${i}" ] &&
-		    paludis_die_or_error "${i}: No such file or directory."
-
-		edo dodir "${INSDESTTREE}/$( expr substr ${i} 1 $( expr ${#i} - $( expr length $( basename ${i} ) ) ) )"
-
-		local DEST="${!PALUDIS_IMAGE_DIR_VAR}${INSDESTTREE}/${i}"
-
-		edo mv "${i}" "${DEST}"
-
-		einfo "INSOPTIONS: ${INSOPTIONS}"
-	done
+		donewinsmv "${i}"
+	done	
 }
+donewinsmv()
+{
+	local NEW_NAME
 
-#rm -r ${!PALUDIS_IMAGE_DIR_VAR}
+	if [ -z ${2} ] 
+	then
+		NEW_NAME="$( basename ${i} )"
+	else
+		NEW_NAME="${2}"
+	fi
 
-#cp -r work.copy work
+	[ ! -e "${1}" ] &&
+		paludis_die_or_error "${1}: No such file or directory."
 
-#doinsmv $@
+	edo dodir "${INSDESTTREE}"
+
+	edo mv "${1}" "${!PALUDIS_IMAGE_DIR_VAR}${INSDESTTREE}/${NEW_NAME}"
+
+	#chmod -R $(
+	#	expr substr ${INSOPTIONS} 3 $(
+	#		expr length ${INSOPTIONS}
+	#	) 
+	#) "${DEST}"	
+}

@@ -1,0 +1,38 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+
+SCM_REPOSITORY='https://bitbucket.org/annexctw/annex.git'
+SCM_BRANCH='develop'
+
+require newicon doinsmv domenu scm-git
+
+SUMMARY='MegaGlest engine mod.'
+DESCRIPTION='Annex brings fast paced combat with a diverse arsenal. Play as one of four Factions: The East Ocean Alliance, NEO Republic, Renegades, or the Shadow Organization, and fight for dominance over the world, competing for a priceless red mineral. The focus of the game are multiplayer and single-player skirmishes. However there are also scripted scenarios/missions! Currently, no plans are in place for campaigns or story mode, however this may change.'
+HOMEPAGE='http://annexconquer.com'
+SLOT='0'
+#LICENCES='?'
+PLATFORMS='x86 amd64'
+
+MYOPTIONS='doc'
+DEPENDENCIES='games-strategy/megaglest[engine]'
+
+src_install()
+{
+	local DATADIR=/usr/share/games/${PN}
+
+	insinto ${DATADIR}
+		doinsmv "${WORK}"/{data,maps,scenarios,techs,tilesets}
+
+	optionq doc && dodoc docs manual
+
+	local ICONS_DIR=os_dependent/linux/shared/
+
+	doicon ${ICONS_DIR}${PN}.png
+	domenu ${ICONS_DIR}${PN}.desktop
+
+	local BIN_WRAP="${TEMP}/${PN}"
+
+	echo '#!/bin/sh' > ${BIN_WRAP}
+	echo "/usr/$( exhost --target )/share/games/megaglest/megaglest --data-path=${DATADIR} "'"$@"' > ${BIN_WRAP}
+
+	dobin ${BIN_WRAP}
+}
