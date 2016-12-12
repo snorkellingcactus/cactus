@@ -24,7 +24,7 @@ function rainlendar_split_pn()
 # example: hello -> Hello
 function rainlendar_to_upper()
 {
-	local STR=${1}
+	local STR=$1
 
 	echo ${STR^}
 }
@@ -40,7 +40,7 @@ function rainlendar_split_pn_upper()
 # example: Rainlendar-Lite-2.9.b12-2-@string.tar.bz2
 function rainlendar_fmt_tmpfile()
 {
-	TMPFILE+=${1}.tar.bz2
+	TMPFILE+=$1${FMT}
 }
 
 # params: @string
@@ -60,19 +60,19 @@ function rainlendar_fmt_url()
 {
 	rainlendar_fmt_tmpfile $1
 
-	echo '(' ${URL_BASE}download/${TMPFILE} '->' ${TMPFILE} ')'
+	echo '(' ${URL_BASE}${TMPFILE} '->' ${TMPFILE} ')'
 }
 
 MY_V=$(		rainlendar_split_pn_upper	2	)
 MY_PN=$(	rainlendar_split_pn			1	)
 
-TMPFILE=$( rainlendar_to_upper ${MY_PN} )-$MY_V-$( ever range 1-2 )
+TMPFILE=$( rainlendar_to_upper $MY_PN )-$MY_V-$( ever range 1-2 )
 
 #Example: 2.9.12.2 -> 2.9.b12-2
 THIRD=$(	ever range 3 )
 FOURTH=$(	ever range 4 )
 
-[ ! -z "${THIRD}"	] && TMPFILE+=.${THIRD}
+[ ! -z "${THIRD}"	] && TMPFILE+=.b${THIRD}
 [ ! -z "${FOURTH}"	] && TMPFILE+=-${FOURTH}
 
 unset THIRD FOURTH
@@ -88,17 +88,20 @@ MYOPTIONS='
 	)
 '
 
-URL_BASE='http://www.rainlendar.net/'
-ICON_EXT=.png
-ICON_FILENAME=$( rainlendar_to_upper ${MY_PN}${ICON_EXT} )
+#doc? (
+#		http://www.rainlendar.net/download/pdf/UserGuide.pdf
+# 		http://www.rainlendar.net/download/pdf/ApiReference.pdf
+#		http://www.rainlendar.net/download/pdf/SkinReference.pdf
+#	)
+FMT=.tar.bz2
+URL_BASE='http://www.rainlendar.net/download/'
 DOWNLOADS="
 	platform:amd64?	$( rainlendar_fmt_url amd64	)
 
 	platform:x86?	$( rainlendar_fmt_url i386	)
-
-	${URL_BASE}cms/components/com_joomlaboard/uploaded/images/${ICON_FILENAME}
 "
 #platform:x86? ( x11-libs/gtk+:2[>=2.12][xinerama] )
+#TODO: lite and pro could be installed at the same time
 DEPENDENCIES="
 		dev-libs/atk[>=1.20]
 		dev-libs/expat
@@ -115,33 +118,35 @@ DEPENDENCIES="
 "
 #app-text/tofrodos
 
-LINGUAS='de_DE hi_IN zh_TW pt_PT bs es_ES da_DK hy nl_NL fr_FR ja_JP tr_TR sk_SK hu_HU nb_NO pt_BR uk_UA ko_KR it_IT th_TH lt_LT zh_CN ro_RO et_EE sr_SR he_IL fi_FI id_ID cs_CZ sv_SE pl_PL ca_ES ru_RU'
+LINGUAS=" ar ast be bg br bs ca chr cs cv_RU da de_AU de de_DE2 el es et eu fi fil fr ga gl he hi hr hu id is it ja km ko l33t lt lv mk nb_NO nn_NO nl pl pt pt_BR ro ru sk sl sq sr sv ta th tr uk vi zh_CN zh_TW "
+
+MYOPTIONS="$MYOPTIONS
+        linguas:"
 
 for lingua in ${LINGUAS} ; do
-        DEPENDENCIES+="
-			linguas:${lingua}? ( app-arch/zip )
-		"
-done
 
-require desktop-utils gtk-icon-cache doinsmv newicon lang-helper [ linguas="${LINGUAS}" ]
+        MYOPTIONS="${MYOPTIONS} ${lingua}"
+        DEPENDENCIES="${DEPENDENCIES}
+                        linguas:${lingua}? ( app-arch/zip )
+        "
+done
 
 unset LINGUAS
 
-export_exlib_phases src_unpack src_prepare src_install pkg_postinst
+require desktop-utils gtk-icon-cache
 
-rainlendar_src_unpack() {
+src_unpack() {
 
 	unpack $( rainlendar_what_to_unpack )
 
-	FOLDER_NAME=${MY_PN}$( ever range 1 )
-
-	WORK="${WORKBASE}"/${FOLDER_NAME}
-
 	unset TMPFILE
+
+	FOLDER_NAME=$MY_PN$( ever range 1 )
+
+	WORK=${WORKBASE}/${FOLDER_NAME}
 }
 
-rainlendar_src_prepare() {
-	default
+src_prepare() {
 
 	# Translation support
     #for r2lang in "${FETCHEDDIR}"/*.r2lang ; do
@@ -151,44 +156,57 @@ rainlendar_src_prepare() {
 	#	unzip -q "${r2lang}" -d "locale" || die "Failed to unzip translation !"
     #done
 
+	# Autostart entry
+	cat <<-EOF >rainlendar2.desktop
+		[Desktop Entry]
+		Type=Application
+		Name=Rainlendar2
+		Comment=${DESCRIPTION}
+		Exec=rainlendar2
+		Icon=rainlendar2
+		Categories=Office;Calendar;
+		StartupNotify=true
+		Terminal=false
+		Hidden=false
+	EOF
+
 }
 
-rainlendar_src_install() {
+#TODO: Remove unused languages.
+src_install() {
 
-	local PREFIX=/usr/$(exhost --target)
-	local PREFIX_BIN=${PREFIX}/bin
-	local DEST=${PREFIX}/share/${FOLDER_NAME}
+	R_DIR=share/${FOLDER_NAME}
+	PREFIX=/usr/$(exhost --target)
+	PREFIX_BIN=${PREFIX}/bin
+	DEST=${PREFIX}/${R_DIR}
 
 	insinto ${DEST}
 	exeinto ${DEST}
 
-	doinsmv locale plugins resources scripts skins lfs.so rainlendar2.htb
+	doins -r locale plugins resources scripts skins lfs.so rainlendar2.htb
 	doexe ${FOLDER_NAME}
 
 	mkdir -p ${IMAGE}/${PREFIX_BIN}
 	dosym ${DEST}/${FOLDER_NAME} ${PREFIX_BIN}/${FOLDER_NAME}
 
-	optionq doc && dodoc {Changes,License.txt} 
-	#"${FETCHEDDIR}"/{UserGuide,{Api,Skin}Reference}.pdf
-
-	install_desktop_entry "Name=${MY_PN}" "Exec=${FOLDER_NAME}" "Icon=${FOLDER_NAME}" "Comment=${SUMMARY}" "Categories=Office;Calendar;" "StartupNotify=true" "Terminal=false" "Hidden=false"
+	dodoc Changes.txt
+	#optionq doc && dodoc ../doc/${FOLDER_NAME}/{copyright,license.txt} "${FETCHEDDIR}"/{UserGuide,{Api,Skin}Reference}.pdf
 
 	# install the menu and autostart entries
 	insinto /etc/xdg/autostart
-		doins "${TEMP}"/${PN}-${FOLDER_NAME}.desktope
+	doins "${WORK}"/${FOLDER_NAME}.desktop
+	#doicon ../pixmaps/${FOLDER_NAME}.png
 
-	newicon -s 128 "${FETCHEDDIR}"/${ICON_FILENAME} ${FOLDER_NAME}${ICON_EXT}
-
-	lang-helper-remove-locales "${IMAGE}"/usr/$( exhost --target )/share/${FOLDER_NAME}/locale/
+    install_desktop_entry "Exec=${FOLDER_NAME}" "Name=Rainlendar2" "Categories=Office;Calendar;"
 }
 
-rainlendar_pkg_postinst() {
-	einfo 'Some translations are incomplete, see homepage for details.'
+pkg_postinst() {
+	einfo "Some translations are incomplete, see homepage for details."
 
 	if [[ ${MY_V} = Pro ]]; then
-    	einfo 'Your license file for Rainendar2 Pro should'
+    	einfo "Your license file for Rainendar2 Pro should"
 	    einfo "be copied to '~/.config/.${FOLDER_NAME}/'."
     fi
 
-	einfo 'An autostart entry should be available in your DE settings.'
+	einfo "An autostart entry should be available in your DE settings."
 }

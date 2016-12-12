@@ -201,9 +201,9 @@ src_install() {
 
 	if optionq engine
 	then
-		local ICON=${PN}.ico
+		local ICON=${PN}
 
-		doicon ${ICONS_DIR}${ICON}
+		doicon ${ICONS_DIR}${ICON}.ico
 
 		install_desktop_entry "Exec=${PN}" "Name=MegaGlest" "${CAT_STR}" "Icon=${ICON}"
 
@@ -212,9 +212,9 @@ src_install() {
 
 	if optionq editor
 	then
-		local ICON=${PN}-editor.ico
+		local ICON=${PN}-editor
 
-		newicon ${ICONS_DIR}editor.ico ${ICON}
+		newicon ${ICONS_DIR}editor.ico ${ICON}.ico
 
 		install_desktop_entry "Exec=${PN}_editor" "Name=MegaGlest Map Editor" "${CAT_STR}" "Icon=${ICON}"
 
@@ -223,9 +223,9 @@ src_install() {
 
 	if optionq model-viewer
 	then
-		local ICON=${PN}-model-viewer.ico
+		local ICON=${PN}-model-viewer
 
-		newicon ${ICONS_DIR}g3dviewer.ico ${ICON}
+		newicon ${ICONS_DIR}g3dviewer.ico ${ICON}.ico
 
 		install_desktop_entry "Exec=${PN}_g3dviewer" "Name=MegaGlest Model Viewer" "${CAT_STR}" "Icon=${ICON}"
 
