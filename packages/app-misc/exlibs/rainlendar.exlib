@@ -175,7 +175,7 @@ rainlendar_src_install() {
 
 	# install the menu and autostart entries
 	insinto /etc/xdg/autostart
-		doins "${TEMP}"/${PN}-${FOLDER_NAME}.desktope
+		doins "${TEMP}"/${PN}-${FOLDER_NAME}.desktop
 
 	newicon -s 128 "${FETCHEDDIR}"/${ICON_FILENAME} ${FOLDER_NAME}${ICON_EXT}
 

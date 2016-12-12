@@ -3,14 +3,12 @@
 # Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-require gnome-2 desktop-utils gtk-icon-cache
-
 SLOT="${PV:0:1}"
 MY_PN="sublime_text_${SLOT}"
 
 DESCRIPTION='Sophisticated text editor for code, markup and prose'
 HOMEPAGE='http://www.sublimetext.com'
-
+PLATFORMS='~amd64 ~x86'
 BASE_URI="https://download.sublimetext.com/${MY_PN}_build_${PV}_x"
 
 DOWNLOADS="
@@ -18,7 +16,6 @@ DOWNLOADS="
 	platform:x86?	( ${BASE_URI}32.tar.bz2 )
 "
 LICENCES='Sublime'
-PLATFORMS='~amd64 ~x86'
 
 MYOPTIONS='
 	dbus
@@ -33,9 +30,13 @@ DEPENDENCIES='
 	x11-libs/gtk+:2[>=2.24.8]
 '
 
-WORK="${WORKBASE}/${MY_PN}"
+WORK="${WORKBASE}"/${MY_PN}
 
-src_install()
+require gnome-2 desktop-utils gtk-icon-cache
+
+export_exlib_phases src_install
+
+sublime-text_src_install()
 {
 	local TGT=/usr/$(exhost --target)
 	local BINDIR=${TGT}/bin
