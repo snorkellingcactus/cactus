@@ -2,6 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # Based in part upon 'zandronum-2.0.ebuild' from Gentoo, which is:
 #     Copyright 1999-2015 Gentoo Foundation
+# TODO: Prevent wrapper for fix-linkage
 
 SUMMARY='Doom 2 source port and Skulltag successor.'
 HOMEPAGE='https://zandronum.com'
@@ -25,15 +26,6 @@ MYOPTIONS="
 "
 
 require cmake [ api=2 ]
-
-if ever is_scm
-then
-	SCM_REPOSITORY="https://bitbucket.org/Torr_Samaho/zandronum"
-
-	require scm-hg
-else
-	DOWNLOADS="https://bitbucket.org/Torr_Samaho/zandronum/get/ZA_${PV}.tar.bz2"
-fi
 
 export_exlib_phases src_unpack src_prepare src_configure src_compile src_install
 

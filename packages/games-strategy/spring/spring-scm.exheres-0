@@ -1,0 +1,38 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY='https://github.com/spring/spring.git'
+SCM_BRANCH='master'
+#SCM_TAG='100.0'
+
+SCM_SECONDARY_REPOSITORIES='
+	E323AI
+	HughAI
+	Python
+	Shard
+	KAIK
+	python
+	prdownloader
+'
+
+SCM_EXTERNAL_REFS='
+	AI/Skirmish/E323AI:E323AI
+	AI/Skirmish/HughAI:HughAI
+	AI/Interfaces/Python:Python
+	AI/Skirmish/Shard:
+	AI/Skirmish/KAIK:KAIK
+	tools/unitsync/python:python
+	tools/pr-downloader:prdownloader
+'
+
+SCM_E323AI_REPOSITORY='git://github.com/spring/E323AI.git'
+SCM_HughAI_REPOSITORY='git://github.com/spring/HughAI.git'
+SCM_Python_REPOSITORY='git://github.com/spring/Python.git'
+SCM_Shard_REPOSITORY='git://github.com/spring/Shard.git'
+#SCM_Shard_REPOSITORY='https://github.com/Tarendai/Shard/'
+#SCM_Shard_REPOSITORY='https://github.com/tomjn/Shard'
+SCM_KAIK_REPOSITORY='git://github.com/spring/KAIK.git'
+SCM_python_REPOSITORY='git://github.com/spring/pyunitsync.git'
+SCM_prdownloader_REPOSITORY='git://github.com/spring/pr-downloader.git'
+
+require scm-git spring

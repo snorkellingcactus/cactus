@@ -1,0 +1,304 @@
+# Copyright 2009, 2010 Ingmar Vanhassel
+# Copyright 2012, 2013 Wouter van Kesteren <woutershep@gmail.com>
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'spring-101.0.ebuild', which is:
+# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+# wrong cxx_flags will lead to desyncs in multiplayer, the following -O*
+# are all used by upstream in the various build targets and thus safe
+# the -g* shouldn't affect the program in any way so should be safe.
+ALLOWED_FLAGS="-O -O0 -O1 -O2 -g*"
+
+# spring has a LTO option, so these might be safe. or might not.
+ALLOWED_FLAGS="${ALLOWED_FLAGS} -flto -flto-compression-level -flto-partition -fno-fat-lto-objects -fuse-linker-plugin"
+
+SUMMARY='A powerful free RTS engine'
+DESCRIPTION="
+Spring is a project aiming to create a new and versatile RTS Engine. It features:
+* Large battles limited only by the power of your computer; support for up to
+  5000 units.
+* Large, highly detailed maps in which to wage those battles, fully 3D with
+  deformable terrain, forest fires, dynamic and reflective water, and custom
+  skyboxes.
+* Several camera modes, allowing for anything to be viewed from almost any angle.
+* Fully 3D combat in land, sea, and air, with realistic weapon trajectories
+  (physics engine).
+* Many different Games, made just for Spring.
+* Complex 3rd party AIs (Bots) that can work very competently in many cases
+  with multiple Spring engine games and mods.
+* A powerful GUI designed to minimize unnecessary micromanagement that is
+  easily extensible via a Lua API.
+* Frequent engine additions and bugfixes.
+"
+HOMEPAGE='http://springrts.com/'
+
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='
+	ai [[
+		description = [ Build support for bots. ]
+	]]
+	bindist [[
+		description = [ When enabled, disable dxt/s3tc texture compression. ]
+	]]
+	custom-cflags [[
+		description = [ Enable use of custom cflags. ]
+	]]
+	custom-march [[
+		description = [ Enable use of custom march cflag. ]
+	]]
+	debug
+	java 
+	lto [[
+		description = [ lto support on build. ]
+	]]
+	profile
+	tcmalloc
+	test
+	test-ai
+	sound [[
+		description = [ Enable sound support. ]
+	]]
+	threaded
+	(
+		default
+		headless [[
+			description = [
+				Build a console program which allows to run spring without a gfx card to run for example ai vs ai games without user in or output.
+			]
+		]]
+		dedicated
+	) [[ number-selected = at-least-one ]]
+	streflop [[
+		description = [ Use streflop for reliable floating point calculations. ]
+	]]
+'
+
+# media-libs/DevIL[jpeg][png][gif]
+# FIXME internal copies in rts/lib/ >:(
+# lua hpiutil2 oscpack streflop squish
+
+GUI_DEPS='
+	media-libs/DevIL[opengl][tiff]
+	media-libs/freetype:2
+	media-libs/glew[>=1.6]
+	media-libs/libogg
+	media-libs/libvorbis
+	media-libs/openal
+	media-libs/SDL[X][opengl]
+	x11-dri/glu
+	x11-dri/mesa
+	x11-libs/libXcursor
+'
+DEPENDENCIES="
+	build:
+		app-arch/p7zip
+		dev-libs/boost[>=1.35.0]
+		sys-libs/zlib[>=1.2.7-r1] [[ note = [ for minizip ] ]]
+		media-libs/DevIL[opengl]
+	build+run:
+		default? ( ${GUI_DEPEND} )
+		java? ( virtual/jdk[>=1.6] )
+		tcmalloc? ( dev-util/gperftools )
+"
+
+# OPTIONS:
+#	STREFLOP_SSE
+#	AVI_CAPTURING
+#	USE_FONTCONFIG
+#	LUA_USE_DLOPEN
+#	LUA_USE_MKSTEMP
+#	LUA_COMPAT_ARGRET
+#	ASSIMP_BUILD_NO_OWN_ZLIB
+#	ASSIMP_BUILD_NO_VALIDATEDS_PROCESS
+#	LIBM_COMPILING_FLT32=1
+#	SQUISH_USE_SSE=2
+#	SQUISH_USE_ALTIVEC=1
+#	NDEBUG
+#	DEBUG
+#	PROFILE
+#	NO_CATCH_EXCEPTIONS
+#	_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+#	DEBUG_LUANAN
+#	_RANDOM_TCC
+#	_GLIBCXX_USE_NANOSLEEP
+#	USE_VALGRIND
+#	USE_LIBSQUISH
+#	NOT_USING_CREG
+#	SYNCCHECK
+#	_LOG_LEVEL_MIN=
+#	SPRING_DATADIR=
+#	
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-Wno-dev
+)
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+	'threaded THREADPOOL'
+	'lto LTO'
+	'debug DEBUG_SIGNAL_NANS'
+	'debug DEBUG_LUANAN'
+	'debug NO_CATCH_EXCEPTIONS'
+	'!sound NO_SOUND'
+)
+CMAKE_SRC_CONFIGURE_OPTION_USES+=(
+	'tcmalloc TCMALLOC'
+	'!bindist LIBSQUISH'
+)
+
+#CMAKE_SOURCE="${WORKBASE}"/${PN}_${PV}/
+
+if ! ever is_scm
+then
+	DOWNLOADS="mirror://sourceforge/springrts/${PN}_${PV}_src.tar.lzma"
+	
+fi
+
+require cmake [ api=2 ] flag-o-matic freedesktop-desktop freedesktop-mime
+
+export_exlib_phases src_prepare src_configure src_install
+
+spring_src_prepare() {
+    edo pushd "${CMAKE_SOURCE}"
+
+    default
+
+    # lets leave that to build_options: symbols
+    edo sed -e 's/-Wl,--compress-debug-sections=zlib//' \
+            -i CMakeLists.txt
+
+    # sandboxing problems
+    edo sed -e '/ADD_TEST(NAME testUDPListener COMMAND test_UDPListener)/d' \
+            -i test/CMakeLists.txt
+
+    # stupid test depending on the way static variables are intialised and
+    # relying on assert statements scatted throughout the logging code.
+    edo sed -e '/static PrePostMainLogTest prePostMainLogTest;/d' \
+            -i test/engine/System/Log/TestILog.cpp
+
+    # new test with 94.0, emits lots of warnings.
+    # too much patches to backport to fix the warnings
+#    edo sed -e '/add_test(NAME testCreg/d' \
+#            -i test/CMakeLists.txt
+
+	edo popd
+}
+
+#-DCUSTOM_COMPILER_DEFINITIONS=-DNDEBUG
+#TODO:+bindir +~prefix -DOCDIR
+spring_src_configure() {
+	CMAKE_SRC_CONFIGURE_PARAMS+=(
+		# FIXME: support Java + Python AI's
+		-DDATADIR=share/${PN}
+		-DDOCDIR=share/doc/${PNVR}
+		-DLIBDIR=/usr/$( exhost --target )/lib
+	)
+
+    # Custom cflags break online play
+	if optionq custom-cflags ; then
+		ewarn "\e[1;31m*********************************************************************\e[0m"
+		ewarn "You enabled Custom-CFlags! ('custom-cflags' USE flag)"
+		ewarn "It's \e[1;31mimpossible\e[0m that this build will work in online play."
+		ewarn "Disable it before doing a bugreport."
+		ewarn "\e[1;31m*********************************************************************\e[0m"
+		ebeep 6
+	else
+		strip-flags
+	fi
+
+	# Custom march may break online play
+	if optionq custom-march
+	then
+		ewarn "\e[1;31m*********************************************************************\e[0m"
+		ewarn "You enabled Custom-march! ('custom-march' USE flag)"
+		ewarn "It may break online play."
+		ewarn "If so, disable it before doing a bugreport."
+		ewarn "\e[1;31m*********************************************************************\e[0m"
+
+		if [ ! -z "${MARCH}" ]
+		then
+			CMAKE_SRC_CONFIGURE_PARAMS+=(
+				-DMARCH_FLAG="${MARCH}"
+			)
+		else
+			ewarn "Empty -march on cflags."
+		fi
+	fi
+
+	# AI
+	if optionq ai ; then
+		# Several AI are found in submodules
+#		EGIT_HAS_SUBMODULES="true"
+
+		if ! optionq java ; then
+			# Don't build Java AI
+			CMAKE_SRC_CONFIGURE_PARAMS+=(
+				-DAI_TYPES=NATIVE
+			)
+		fi
+
+		if ! optionq test-ai ; then
+			# Don't build example AIs
+			CMAKE_SRC_CONFIGURE_PARAMS+=(
+				-DAI_EXCLUDE_REGEX='Null|Test'
+			)
+		fi
+	else
+		if !optionq test-ai ; then
+			CMAKE_SRC_CONFIGURE_PARAMS+=(
+				-DAI_TYPES=NONE
+			)
+		else
+			CMAKE_SRC_CONFIGURE_PARAMS+=(
+				-DAI_TYPES=NATIVE
+				-DAI_EXCLUDE_REGEX='^[^N].*AI'
+			)
+		fi
+	fi
+
+	# Selectivly enable/disable build targets
+	for build_type in default headless dedicated
+	do
+		optionq "${build_type}" && CMAKE_SRC_CONFIGURE_PARAMS+=(
+			-DBUILD_spring-${build_type}:BOOL=ON
+		)
+	done
+
+	# Enable/Disable debug symbols
+	if optionq profile ; then
+		CMAKE_SRC_CONFIGURE_PARAMS+=(
+			-DCMAKE_BUILD_TYPE="PROFILE"
+		)
+	else
+		if optionq debug ; then
+#				-DCMAKE_BUILD_TYPE="RELWITHDEBINFO"
+				CMAKE_SRC_CONFIGURE_PARAMS+=(
+					-DCMAKE_BUILD_TYPE="DEBUG"
+				)
+		else
+			CMAKE_SRC_CONFIGURE_PARAMS+=(
+				-DCMAKE_BUILD_TYPE="RELEASE"
+			)
+		fi
+	fi
+
+	cmake_src_configure
+}
+
+spring_src_install() {
+    cmake_src_install
+
+    # done by emagicdocs without things like licences
+    mv "${IMAGE}"/usr/$(exhost --target)/share/{applications,man,mime,pixmaps} "${IMAGE}"/usr/share/
+}
+
+spring_pkg_postrm() {
+    freedesktop-desktop_pkg_postrm
+    freedesktop-mime_pkg_postrm
+}
+
+spring_pkg_postinst() {
+    freedesktop-desktop_pkg_postinst
+    freedesktop-mime_pkg_postinst
+}

@@ -3,6 +3,6 @@
 
 SCM_TAG='1.0'
 
-DEPENDENCIES="x11-libs/qt:4"
+DEPENDENCIES='x11-libs/qt:4'
 
-require doomseeker
+require ${PN}

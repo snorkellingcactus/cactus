@@ -1,0 +1,32 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_SVN_RAW_URI=1
+SCM_REPOSITORY='svn://svn.code.sf.net/p/q3rallysa/code/'
+
+SUMMARY='A quake3 based rally and shooting game.'
+HOMEPAGE='http://www.q3rally.com/'
+PLATFORMS='x86 amd64'
+LICENCES='GPL-2 Quake3-EULA'
+SLOT='0'
+
+require scm-svn quake3 [ BASEQ3_PATH=[ 'baseq3r' ] REND_SUFFIX='rend2' MAKE_PREFIX='engine' ]
+
+if [ $( ever range 5 ) -ge 171 ]
+then
+	# Produce errors of unexpected token in fterror.h
+	# Don't forget to check troough the time.
+	# And check upon what version the error happens.
+	DEFAULT_SRC_COMPILE_PARAMS+=(
+		USE_FREETYPE=0
+	)
+
+	export_exlib_phases src_install
+
+	q3rally_src_install()
+	{
+		quake3_src_install
+
+		edo find "${IMAGE}" -type d -empty -delete
+	}
+fi

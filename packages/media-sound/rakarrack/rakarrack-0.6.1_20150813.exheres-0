@@ -1,0 +1,6 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REVISION='a6208406d94a1da978f435605072ee5caefe1491'
+
+require rakarrack

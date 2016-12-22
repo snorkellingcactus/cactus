@@ -1,0 +1,59 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'cairo-dock-2.4.0.2.exheres-0', which is:
+# Copyright 2011 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY='https://github.com/Cairo-Dock/cairo-dock-core.git'
+
+SUMMARY='Cairo-Dock is a desktop interface that takes the shape of docks, desklets, panel, etc'
+HOMEPAGE='https://launchpad.net/cairo-dock-core/'
+PLATFORMS='~x86 ~amd64'
+LICENCES='
+	GPL-3
+	GPL-2 [[ note = [ src/gldidt/texture-gradation.h ] ]]
+	LGPL-2 [[ note = [ man pages, themes ] ]]
+'
+SLOT='0'
+
+DEPENDENCIES='
+	build:
+		dev-util/pkg-config[>=0.18]
+		sys-devel/cmake[>=2.6]
+	build+run:
+		dev-libs/dbus-glib:1
+		dev-libs/glib:2
+		dev-libs/libgcrypt
+		dev-libs/libxml2:2.0
+		gnome-desktop/librsvg:2
+		net-misc/curl
+		sys-apps/dbus
+		x11-libs/cairo
+		x11-libs/gtkglext
+		x11-libs/libXcomposite
+		x11-libs/libXext
+		x11-libs/libXinerama
+		x11-libs/libXrender
+		x11-libs/libXrandr
+		x11-libs/libXtst
+		x11-libs/gtk+:3
+'
+
+WORK="${WORKBASE}/"${PNV}
+
+require scm-git cmake lang-helper [ linguas='ar be bg bn ca cs cy da de el en eo es et eu fi fo fr gl he hu id it ja ko lt nb nl nn oc pl pt pt_BR ro ru sk sl sr sr@latin sv tr uk uz vi zh_CN zh_TW' ]
+
+export_exlib_phases src_prepare src_install
+
+cairo-dock_src_prepare()
+{
+	cmake_src_prepare
+
+	edo sed -i -e 's/datadir "${prefix}\//datadir "/' -e 's/CAIRO_DOCK_LOCALE_DIR "${prefix}\//CAIRO_DOCK_LOCALE_DIR "/' CMakeLists.txt
+}
+
+cairo-dock_src_install()
+{
+	cmake_src_install
+
+	lang-helper-remove-locales-usr
+}

@@ -1,2 +1,7 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
-require stuntrally
+# Distributed under the terms of the GNU General Public License v2
+
+DOWNLOADS="https://github.com/${PN}/${PN}/archive/master.zip"
+WORK="${WORKBASE}"/${PN}-master
+
+require ${PN}

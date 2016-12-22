@@ -9,7 +9,7 @@ function newicon()
 
 	mkdir -p "${DIR}"
 
-	cp "${1}" "${DIR}/${2}"
+	edo cp "${1}" "${DIR}/${2}"
 }
 function doicon()
 {

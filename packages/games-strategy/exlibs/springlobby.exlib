@@ -1,0 +1,73 @@
+# Copyright 2009, 2010 Ingmar Vanhassel
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+# TODO: Based upon...
+
+SUMMARY='A free cross-platform lobby client for the Spring RTS project'
+HOMEPAGE='http://springlobby.info/'
+DOWNLOADS="http://www.springlobby.info/tarballs/${PNV}.tar.bz2"
+
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='
+	notifications [[ description = [ Enables libnotify support for popup status messages ] ]]
+	sound [[ description = [ Enable sound support ] ]]
+	debug
+'
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+		sys-devel/gettext
+	build+run:
+		dev-libs/boost[>=1.42.0]
+		net-misc/curl
+		x11-libs/libX11
+		x11-libs/wxGTK:3.0[>=2.9]
+
+		notifications? (
+			dev-libs/glib:2
+			x11-libs/libnotify
+		)
+        sound? (
+			media-libs/alure
+			media-libs/flac
+			media-libs/libvorbis
+			media-libs/openal
+			media-sound/mpg123
+		)
+	suggestion:
+		games-strategy/spring
+'
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	-DBUILD_SHARED_LIBS:BOOL=TRUE
+	-DOPTION_TRANSLATION_SUPPORT:BOOL=TRUE
+	-DSHARE_INSTALL_DIR:PATH="/usr/share"
+)
+
+CMAKE_SRC_CONFIGURE_OPTIONS=(
+	'notifications OPTION_NOTIFY'
+	'sound OPTION_SOUND'
+)
+
+require cmake [ api=2 cmake_minimum_version=2.8.11 ]
+require lang-helper [ linguas='ar cs da de el es fi fr it pl pt ro ru sv uk zh_CN' ]
+
+export_exlib_phases src_install src_prepare
+
+springlobby_src_prepare()
+{
+	edo sed -i -e 's/${CMAKE_INSTALL_PREFIX}${SHARE_INSTALL_DIR/${SHARE_INSTALL_DIR/g'  "${CMAKE_SOURCE}"/CMakeLists.txt
+
+	cmake_src_prepare
+}
+springlobby_src_install() {
+	cmake_src_install
+
+	# Remove files already installed by emagicdocs into correct location
+	edo rm -r "${IMAGE}"/usr/share/doc/${PN}
+
+	lang-helper-remove-locales-usr
+}

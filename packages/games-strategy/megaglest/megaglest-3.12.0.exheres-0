@@ -3,6 +3,7 @@
 
 # google-breakpad
 # TODO: fribidi, libvorbis static
+# TODO: Prevent wrapper bin to make it visible by fix-linkage , find a way of tell megaglest where is her data.
 
 require doinsmv newicon gtk-icon-cache desktop-utils flag-o-matic cmake [ api=2 ]
 
@@ -27,6 +28,7 @@ DOWNLOADS="
 LICENCES='GPL-3 BitstreamVera'
 SLOT='0'
 PLATFORMS='~amd64 ~x86'
+RESTRICT='mirror'
 
 #static
 MYOPTIONS='
@@ -145,6 +147,10 @@ CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DwxWidgets_CONFIG_EXECUTABLE=${TGT}/bin/wx-config-3.0-gtk2
 	-DWANT_USE_Ircclient=ON
 	-DWANT_USE_FontConfig=ON
+)
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+	"${FILES}"/${PNV}-fix-new-miniupnpc.patch
 )
 
 src_unpack()

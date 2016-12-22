@@ -1,0 +1,92 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY='svn://raydium.org/raydium/'
+
+DATA_FILE_NAME=ManiaDrive-1.2-data
+DATA_FILE=${DATA_FILE_NAME}.tar.gz
+
+DOWNLOADS="
+	 http://downloads.sourceforge.net/project/${PN}/${PN}/1.2/${DATA_FILE}
+"
+
+SUMMARY='Free trackmania clone'
+DESCRIPTION='Arcade car game on acrobatic tracks, with a quick and nervous gameplay (tracks almost never exceed one minute), and features a network mode, as the original.'
+HOMEPAGE='http://maniadrive.raydium.org/'
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='x86 amd64'
+
+# TODO: v4l kernel einfo, v4l-utils required?
+# 		providers jpeg
+#		png
+DEPENDENCIES='
+		dev-games/raydium
+'
+require scm-svn
+
+export_exlib_phases src_prepare src_compile src_install
+
+maniadrive_src_prepare()
+{
+	unpack ${DATA_FILE}
+
+	rm configure Makefile
+}
+#TODO: server
+maniadrive_src_compile()
+{
+	local	PHP_CONFIG=php-config
+	local	PKG_CONFIG=$( exhost --target )-pkg-config
+			TGT_DIR=/usr/$( exhost --target )
+
+	local COMMON_CFLAGS="$( ${PHP_CONFIG} --libs ) $( ${PKG_CONFIG} --libs gl glew ) -lraydium $( ${PHP_CONFIG} --includes ) -L${TGT_DIR}/lib"
+
+	local COMMAND_PREFIX="
+		edo ${CC} mania_drive.c ${CFLAGS}
+	"
+
+	${COMMAND_PREFIX} -DFORCE_LIBRAYDIUM -o ${PN} $(${PKG_CONFIG} --libs xinerama libjpeg freealut vorbisfile libv4lconvert xext x11 ) -lode -lphp5 ${COMMON_CFLAGS}
+
+	#${COMMAND_PREFIX} -DFORCE_LIBRAYDIUM -o ${PN} ${COMMON_CFLAGS}
+}
+maniadrive_src_install()
+{
+	local	INTO_TGT=${TGT_DIR}/share/games/${PN}
+	local	DATA_DIR=/usr/share/games/${PN}
+
+	exeinto ${INTO_TGT}
+
+	doexe ${PN}
+
+	# Error, no tracks available. Main exe must be with data.
+	# --path ${DATA_DIR}/game 
+
+	echo '#!/bin/sh' > ${PN}
+	echo "${INTO_TGT}/${PN} --rayphp /usr/share/rayphp" >> ${PN}
+
+	dobin ${PN}
+
+	insinto ${DATA_DIR}
+		doins -r ${DATA_FILE_NAME}/*
+
+	insinto ${DATA_DIR}/game
+
+	DATA_FILE_NAME+='/game'
+
+    local FILES=( $( find "${DATA_FILE_NAME}" -printf '%P'"${IFS}"'' ) )
+
+    for I in "${!FILES[@]}"
+    do
+		local FILE="${FILES[${I}]}"
+
+		[ -d "${DATA_FILE_NAME}/${FILE}" ] &&
+		dodir "${INTO_TGT}/${FILE}"
+
+		[ -f "${DATA_FILE_NAME}/${FILE}" ] &&
+		dosym "${DATA_DIR}/game/${FILE}" "${INTO_TGT}/${FILE}"
+
+		( [ -f "${FILE}" ] || [ -d "${FILE}" ] ) &&
+		doins "${FILE}"
+	done
+}

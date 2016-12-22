@@ -1,36 +1,4 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
 
-SCM_REPOSITORY='http://repo.or.cz/a2jmidid.git'
-
-SUMMARY='a2jmidid is daemon that implements automatic bridging.'
-#TODO: dbus? --disable-dbus, --enable-pkg-config-dbus-service-dir
-HOMEPAGE='http://home.gna.org/a2jmidid/'
-
-LICENCES='GPL-2'
-SLOT='0'
-PLATFORMS='~x86 ~amd64'
-
-#TODO: alsa-lib, virtual/pkgconfig, require python?
-DEPENDENCIES='
-	build+run:
-		media-sound/jack-audio-connection-kit
-'
-
-require scm-git waf
-
-WAF_SRC_CONFIGURE_PARAMS+=(
-	'--hates=bindir'
-	'--hates=sbindir'
-	'--hates=libdir'
-	'--hates=datadir'
-	'--hates=htmldir'
-)
-
-src_prepare()
-{
-	# Make some waf files visible.
-	./waf --version
-
-	edo sed -i -e "s/pkgbin = 'pkg-config'/pkgbin = '""$( exhost --target )""-pkg-config'/" $( find . -name config_c.py )
-}
+require ${PN}

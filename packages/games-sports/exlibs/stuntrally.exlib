@@ -10,21 +10,7 @@ SLOT='0'
 PLATFORMS='x86 amd64'
 MYOPTIONS='dedicated game editor static-libs'
 
-require cmake 
-
-if [[ ${PV} = scm ]]
-then
-	DOWNLOADS='
-		https://github.com/stuntrally/stuntrally/archive/master.zip
-	'
-	WORK="${WORKBASE}"/${PN}-master
-else
-	DOWNLOADS="
-		https://github.com/${PN}/${PN}/archive/${PV}.tar.gz
-	"
-
-	(( $( ever delete_all ${PV} ) <= 26 )) && BULLET_VERSION='[<2.85]'
-fi
+(( $( ever delete_all ${PV} ) <= 26 )) && BULLET_VERSION='[<2.85]'
 
 DOWNLOADS+=" -> ${PNV}.zip"
 
@@ -52,12 +38,16 @@ DEPENDENCIES='
 
 #DOCS=( Readme.txt )
 
-src_prepare(){
+require cmake
+
+export_exlib_phases src_prepare src_configure src_install
+
+stuntrally_src_prepare(){
 	default
 
 	edo sed -i -r 's/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\}\)/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\} BulletFileLoader LinearMath\)/g' "${WORK}"/CMakeLists.txt
 }
-src_configure() {
+stuntrally_src_configure() {
 	CMAKE_SRC_CONFIGURE_PARAMS=(
 		-DBUILD_MASTER_SERVER=$( option dedicated ON OFF )
 		-DBUILD_GAME=$( option game ON OFF )
@@ -67,7 +57,7 @@ src_configure() {
 	
 	cmake_src_configure
 }
-src_install()
+stuntrally_src_install()
 {
 	cmake_src_install
 

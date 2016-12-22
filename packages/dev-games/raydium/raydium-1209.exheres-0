@@ -1,0 +1,14 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REVISION=${PV}
+
+require raydium
+
+pkg_pretend()
+{
+	einfo "1: $(ever range 0-1)"
+	einfo "1: $(ever range 1-2)"
+	einfo "1: $(ever range 2-3)"
+	einfo "1: $(ever range 3-4)"
+}

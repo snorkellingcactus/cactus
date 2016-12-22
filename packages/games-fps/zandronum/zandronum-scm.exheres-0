@@ -3,4 +3,6 @@
 
 SLOT='0'
 
-require zandronum
+SCM_REPOSITORY="https://bitbucket.org/Torr_Samaho/${PN}"
+
+require scm-hg ${PN}

@@ -2,21 +2,17 @@
 # Distributed under the terms of the GNU General Public License v2
 # Based in part upon 'doomseeker-1.0-r1.ebuild' from Gentoo, which is:
 #     Copyright 1999-2016 Gentoo Foundation
-#
-#https://github.com/gentoo-mirror/earshark/blob/master/games-util/doomseeker/doomseeker-1.0-r1.ebuild
+# TODO: system libs.
 
-SUMMARY="Internet Doom server browser"
-HOMEPAGE="http://doomseeker.drdteam.org/"
+SUMMARY='Internet Doom server browser'
+HOMEPAGE='http://doomseeker.drdteam.org/'
 SCM_REPOSITORY='https://bitbucket.org/Doomseeker/doomseeker'
-PLATFORMS="~amd64 ~x86"
+PLATFORMS='~amd64 ~x86'
 
-DEPENDENCIES="
+DEPENDENCIES='
 	app-arch/bzip2
 	sys-libs/zlib
-
-	x11-libs/qtbase:5
-	x11-libs/qtmultimedia:5
-"
+'
 SLOT='0'
 
 CMAKE_SRC_CONFIGURE_PARAMS+=(
@@ -26,7 +22,9 @@ CMAKE_SRC_CONFIGURE_PARAMS+=(
 
 require cmake scm-hg
 
-src_prepare() {
+export_exlib_phases src_prepare
+
+doomseeker_src_prepare() {
 	default
 
 	#libs go into libdir, not share

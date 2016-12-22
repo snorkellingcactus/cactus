@@ -6,4 +6,4 @@ DEPENDENCIES+='
 		media-plugins/gst-plugins-bad:1.0[gstreamer_plugins:soundtouch]
 '
 
-require sayonara
+require ${PN}
