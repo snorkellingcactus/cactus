@@ -14,7 +14,7 @@ MYOPTIONS='
 	claudia
 '
 
-#TODO: rev jackdbus
+#TODO: rev jackdbus, per-module install
 DEPENDENCIES="
 	build+run:
 		dev-python/PyQt4[python_abis:*?][dbus]

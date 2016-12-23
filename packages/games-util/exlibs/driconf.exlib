@@ -1,0 +1,36 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+#SCM_REPOSITORY='svn://svn.code.sf.net/p/driconf/code/driconf'
+#SCM_REPOSITORY='https://github.com/ChristophHaag/driconf-fork'
+SCM_REPOSITORY='https://github.com/calexil/DriConf'
+
+SUMMARY='Configuration applet for the Direct Rendering Infrastructure'
+DESCRIPTION='It allows customizing performance and visual quality settings of OpenGL drivers on a per-driver, per-screen and/or per-application level.It is written in Python with the python-gtk toolkit bindings. The settings are stored in system wide and per-user XML configuration files, which are parsed by the OpenGL drivers on startup'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+	run:
+		gnome-bindings/pygtk:2
+		x11-apps/xdriinfo
+'
+
+require scm-git lang-helper [ linguas='de es it ru' ] distutils [ has_lib=true has_bin=true ]
+
+export_exlib_phases src_install src_prepare
+
+driconf_src_prepare()
+{
+	edo rm setup.cfg
+	distutils_src_prepare
+}
+
+driconf_src_install()
+{
+	emake
+
+	distutils_src_install
+
+	lang-helper-remove-locales-usr
+}
