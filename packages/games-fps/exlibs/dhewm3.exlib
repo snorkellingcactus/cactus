@@ -27,13 +27,14 @@ DEPENDENCIES='
 	media-libs/libogg
 	media-libs/libvorbis
 	media-libs/openal
-	media-libs/SDL[>=1.2]
 	sys-libs/zlib
 	x11-libs/libX11
 
 	curl? ( net-misc/curl )
 	providers:ijg-jpeg?		( media-libs/jpeg:=			)
 	providers:jpeg-turbo?	( media-libs/libjpeg-turbo	)
+	sdl? ( media-libs/SDL:0 )
+	sdl2? ( media-libs/SDL:2 )
 '
 
 CMAKE_SOURCE="${WORK}"/neo

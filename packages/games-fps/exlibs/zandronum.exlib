@@ -94,7 +94,7 @@ zandronum_src_unpack()
 {
 	cmake_src_unpack
 
-	WORK="${WORKBASE}"/${PNV}
+	#WORK="${WORKBASE}"/${PNV}
 
 	ever is_scm || edo mv "${WORKBASE}"/Torr_Samaho-zandronum-* "${WORK}"
 }

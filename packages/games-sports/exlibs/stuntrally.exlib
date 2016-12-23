@@ -12,8 +12,6 @@ MYOPTIONS='dedicated game editor static-libs'
 
 (( $( ever delete_all ${PV} ) <= 26 )) && BULLET_VERSION='[<2.85]'
 
-DOWNLOADS+=" -> ${PNV}.zip"
-
 #todo: editor
 #ogre[-double-precision]
 DEPENDENCIES='

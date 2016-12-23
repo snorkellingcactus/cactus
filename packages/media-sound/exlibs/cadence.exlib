@@ -1,6 +1,6 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
-# TODO: TGT independent pycompile.
+
 SCM_REPOSITORY='https://github.com/falkTX/Cadence.git'
 
 SUMMARY='Cadence is a set of tools useful for audio production.'
@@ -10,12 +10,18 @@ LICENCES='GPL-2'
 SLOT='0'
 PLATFORMS='~amd64'
 
+MYOPTIONS='
+	claudia
+'
+
 #TODO: rev jackdbus
 DEPENDENCIES="
 	build+run:
 		dev-python/PyQt4[python_abis:*?][dbus]
 		media-sound/jack-audio-connection-kit[dbus]
 		x11-libs/qt:4
+	run:
+		claudia? ( media-sound/ladish )
 	recommendation:
 		media-sound/a2jmidid
 		media-sound/jack_capture
@@ -23,7 +29,7 @@ DEPENDENCIES="
 		media-sound/pulseaudio[jack]
 "
 
-require scm-git python [ blacklist='2 4' ]
+require doinsmv scm-git python [ blacklist='2 4' ]
 
 export_exlib_phases src_prepare src_compile src_install
 
@@ -31,17 +37,33 @@ cadence_src_prepare()
 {
 	default
 
-	edo sed -i -e 's/pkg-config/'"$( exhost --target )"'-pkg-config/g' $( grep -l pkg-config `find . -type f` )
+	TGT=$( exhost --target )
+
+	edo sed -i -e 's/pkg-config/'"${TGT}"'-pkg-config/g' $( grep -l pkg-config `find . -type f` )
 }
 
 cadence_src_compile()
 {
-	edo make -j${EXJOBS} CC=${CC} AR=${AR} CXX=${CXX} STRIP=$( exhost --target )-strip
+	edo emake CC=${CC} AR=${AR} CXX=${CXX} STRIP=${TGT}-strip
 }
 
 cadence_src_install()
 {
-	edo make install DESTDIR="${IMAGE}" PREFIX=/usr/$( exhost --target )/
+	edo emake install DESTDIR="${IMAGE}" PREFIX=/usr
 
-	[ -d "${IMAGE}"/bin ] && mv "${IMAGE}"/bin "${IMAGE}"/usr/$( exhost --target )
+	local PREFIX=/usr/${TGT}/
+
+	local TO_MOVE="${IMAGE}"usr/bin
+
+	edo sed -i -e 's/INSTALL_PREFIX="\/usr/INSTALL_PREFIX="\/usr\/'"${TGT}"'/' "${TO_MOVE}"/${PN}
+
+	insinto "${PREFIX}"
+		doinsmv "${TO_MOVE}"
+
+	PREFIX+="/share/${PN}/"
+
+	insinto "${PREFIX}"
+		doinsmv "${IMAGE}"usr/share/${PN}/src
+
+	python_bytecompile ${PREFIX}/src
 }

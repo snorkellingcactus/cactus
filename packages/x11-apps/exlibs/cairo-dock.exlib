@@ -10,10 +10,11 @@ HOMEPAGE='https://launchpad.net/cairo-dock-core/'
 PLATFORMS='~x86 ~amd64'
 LICENCES='
 	GPL-3
-	GPL-2 [[ note = [ src/gldidt/texture-gradation.h ] ]]
-	LGPL-2 [[ note = [ man pages, themes ] ]]
+	GPL-2	[[ note = [ src/gldidt/texture-gradation.h ] ]]
+	LGPL-2	[[ note = [ man pages, themes ] ]]
 '
 SLOT='0'
+MYOPTIONS='cd_session [[ description = [ Enables a desktop manager.	] ]]'
 
 DEPENDENCIES='
 	build:
@@ -38,7 +39,12 @@ DEPENDENCIES='
 		x11-libs/gtk+:3
 '
 
-WORK="${WORKBASE}/"${PNV}
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+	'cd_session enable-desktop-manager'
+)
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCMAKE_INSTALL_MANDIR=../share
+)
 
 require scm-git cmake lang-helper [ linguas='ar be bg bn ca cs cy da de el en eo es et eu fi fo fr gl he hu id it ja ko lt nb nl nn oc pl pt pt_BR ro ru sk sl sr sr@latin sv tr uk uz vi zh_CN zh_TW' ]
 

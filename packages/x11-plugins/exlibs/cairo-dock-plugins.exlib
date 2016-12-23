@@ -6,6 +6,7 @@
 #https://www.archlinux.org/packages/community/x86_64/cairo-dock-plug-ins/
 #TODO: per-dir enabled modules install (cd <module> && make install). 
 #http://bazaar.launchpad.net/~indicators-gtk2-team/indicators-gtk2/ido-gtk2/files libido
+
 SUMMARY='Plug-ins part of Cairo-Dock project.'
 HOMEPAGE='http://www.glx-dock.org https://launchpad.net/cairo-dock-plug-ins'
 SCM_REPOSITORY='https://github.com/Cairo-Dock/cairo-dock-plug-ins'
@@ -184,8 +185,6 @@ DEPENDENCIES="
 			x11-apps/xgamma
 		)
 "
-
-WORK="${WORKBASE}"/${PNV}
 
 #Other options:
 #	force_old_indicator_names
