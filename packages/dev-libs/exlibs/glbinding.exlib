@@ -1,0 +1,28 @@
+SUMMARY='A C++ binding for the OpenGL API, generated using the gl.xml specification'
+HOMEPAGE='http://www.glbinding.org'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+MYOPTIONS='doc examples tools'
+
+# TODO: pystache
+DEPENDENCIES='
+	build:
+	build+run:
+		dev-scm/git
+		dev-scm/subversion
+		tools? (
+			media-libs/glfw
+		)
+		examples? (
+			media-libs/glew[>=1.6]
+			media-libs/glfw[>=3.0]
+			x11-libs/qtbase:5
+		)
+		doc? (
+			app-doc/doxygen[>=1.8]
+		)
+'
+
+SCM_REPOSITORY='https://github.com/cginternals/glbinding.git'
+require scm-git python cmake [ api=2 cmake_minimum_version=3.0 ]

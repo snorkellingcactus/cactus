@@ -1,0 +1,35 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='Fork of the OpenRaider Open Source implementation of the classic Tomb Raider Game Engine'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+# TODO:
+# LICENCES=''
+
+MYOPTIONS='audio'
+
+SCM_REPOSITORY='https://github.com/xythobuz/OpenRaider.git'
+require scm-git cmake [ api=2 ]
+
+
+CMAKE_SRC_CONFIGURE_OPTION_ENABLES+=(
+	'audio AUDIO'
+)
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCMAKE_BUILD_TYPE:STRING=Release
+)
+
+DEFAULT_SRC_CONFIGURE_PATCHES+=(
+	${FILES}/'OpenRaider-scm-glbinding-2-fixes.patch'
+)
+
+DEPENDENCIES='
+	sound? (
+		media-libs/openal
+		media-libs/freealut
+	)
+	media-libs/SDL[opengl]:2
+	dev-libs/glm[>=0.9.6]
+	dev-libs/glbinding[=1.1.0]
+'

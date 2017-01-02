@@ -1,0 +1,33 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 27ac9069..ffdd15eb 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -257,7 +257,7 @@ if (UNIX)
+ endif (UNIX)
+ 
+ # Link to all found libs
+-target_link_libraries (OpenRaider ${LIBS})
++target_link_libraries (OpenRaider PUBLIC glbinding::glbinding ${LIBS})
+ 
+ #################################################################
+ 
+diff --git a/src/main.cpp b/src/main.cpp
+index 11486e56..3e433e22 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -44,13 +44,11 @@ static void glErrorCallback(const glbinding::FunctionCall& call) {
+     }
+ 
+     auto& log = Log::get(LOG_DEBUG);
+-    if (glbinding::Meta::stringsByGL()) {
+-        log << "OpenGL Error: " << glbinding::Meta::getString(error) << Log::endl;
+-    } else {
++
+         log << "OpenGL Error: "
+             << static_cast<std::underlying_type<gl::GLenum>::type>(error)
+             << Log::endl;
+-    }
++
+     log << call.function->name() << "(";
+ 
+     for (int i = 0; i < call.parameters.size(); i++) {

@@ -1,0 +1,32 @@
+SUMMARY='An open-source Tomb Raider 1-5 engine remake'
+HOMEPAGE='http://opentomb.github.io/'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+LICENCES='GPL-3'
+
+# TODO system-ogg system-bullet system-freetype2
+MYOPTIONS='tests'
+
+DEPENDENCIES='
+	dev-lang/lua:5.2
+	media-libs/libpng
+	media-libs/openal
+	media-libs/SDL:2
+	sys-libs/zlib
+'
+
+SCM_REPOSITORY='https://github.com/opentomb/OpenTomb.git'
+require scm-git newicon desktop-utils cmake [ api=2 ]
+
+src_install()
+{
+	insinto /usr/share/games/${PN}
+		doins -r "${CMAKE_SOURCE}"/{scripts,shaders,config.lua,autoexec.lua,config.lua} $( optionq tests && echo "${CMAKE_SOURCE}"/tests )
+
+	dobin ${PN}
+
+	#TODO: 16x16 && 32x32
+	newicon -s 32 "${CMAKE_SOURCE}"/resource/icon/opentomb.ico ${PN}.ico
+
+	install_desktop_entry "Exec=${PN}" "Name=${PN}" "Categories=Game" "Icon=${PN}"
+}

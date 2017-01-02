@@ -1,0 +1,4 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <
+# Distributed under the terms of the GNU General Public License v2
+
+require glbinding

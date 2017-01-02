@@ -1,0 +1,35 @@
+# Copyright 2015 Kylie McClain <somasis@exherbo.org>
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='A frontend to easily manage connections to remote filesystems using gvfs.'
+DESCRIPTION='It mounts what it is told to.'
+SLOT='0'
+
+HOMEPAGE="https://www.uvena.de/${PN}"
+
+UPSTREAM_DOCUMENTATION="
+    ${HOMEPAGE}/help.html [[ lang = en ]]
+"
+
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+	build:
+		xfce-extra/xfce4-dev-tools
+    build+run:
+        dev-libs/glib:2[>=2.16]
+        x11-libs/gtk+:2[>=2.12]
+    run:
+        gnome-desktop/gvfs
+'
+
+require xfce [ module=apps ] gtk-icon-cache lang-helper [ linguas='ar
+ast bg ca cs da de el en_AU eo es eu fi fr gl he hr hu id is it ja kk ko lt lv ms nb nl oc pl pt pt_BR ru sk sl sr sv te th tr ug uk ur ur_PK zh_CN zh_TW' ]
+
+src_prepare()
+{
+	#edo nonfatal mv configure.ac.in configure.in
+	./autogen.sh
+	xfce_src_prepare
+}
