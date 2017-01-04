@@ -1,0 +1,30 @@
+# Copyright 2016-2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'stuntrally-tracks-9999.ebuild', which is:
+# Copyright 1999-2012 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="A set of tracks for ${CATEGORY}/${PN//-tracks}"
+HOMEPAGE='http://code.google.com/p/vdrift-ogre/'
+SLOT='0'
+LICENCES='GPL3'
+
+PLATFORMS='x86 amd64'
+
+SCM_REPOSITORY="https://github.com/stuntrally/tracks"
+
+# Is not scm and not ${PV}_p${DATE}
+if [ "${PV}" = "$( ever replace_all '.' )" ] && ( ! ever is_scm )
+then
+	# 2.6.1 does not exists. It's a way of 
+	( ! ever at_least 2.6.1 ) && BULLET_VERSION='[<2.85]'
+
+	DOWNLOADS="${SCM_REPOSITORY}/archive/${PV}.zip -> ${PNV}.zip"
+else
+	REQUIRE_SCM='scm-git'
+fi
+
+require ${REQUIRE_SCM} cmake [ api=2 ]
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DSHARE_INSTALL="/usr/$(exhost --target)/share/games/stuntrally"
+)

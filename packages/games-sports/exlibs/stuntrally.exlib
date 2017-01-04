@@ -1,4 +1,4 @@
-# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Copyright 2016-2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Based in part upon 'stuntrally-9999.ebuild', which is:
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
@@ -8,12 +8,24 @@ HOMEPAGE='http://stuntrally.tuxfamily.org/'
 LICENCES='GPL-3'
 SLOT='0'
 PLATFORMS='x86 amd64'
-MYOPTIONS='dedicated game editor static-libs'
+MYOPTIONS='dedicated game editor static'
 
-(( $( ever delete_all ${PV} ) <= 26 )) && BULLET_VERSION='[<2.85]'
+SCM_REPOSITORY="https://github.com/${PN}/${PN}"
+# Is not scm and not ${PV}_p${DATE}
+if [ "${PV}" = "$( ever replace_all '.' )" ] && ( ! ever is_scm )
+then
+	# 2.6.1 does not exists. It's a way of 
+	( ! ever at_least 2.6.1 ) && BULLET_VERSION='[<2.85]'
 
-#todo: editor
-#ogre[-double-precision]
+	DOWNLOADS="${SCM_REPOSITORY}/archive/${PV}.zip -> ${PNV}.zip"
+else
+	REQUIRE_SCM='scm-git'
+fi
+
+
+# TODO: editor
+# ogre[-double-precision]
+# REQUIRED="editor? ( game )"
 DEPENDENCIES='
 	build+run:
 		game? (
@@ -23,43 +35,40 @@ DEPENDENCIES='
 			media-libs/libvorbis
 			media-libs/openal
 			media-libs/libogg
-			sci-physics/bullet'$BULLET_VERSION'[bullet3][extras]
+			sci-physics/bullet'${BULLET_VERSION}'[bullet3][extras]
 		)
 		dev-games/ois
 		dev-libs/boost
-		'${CATEGORY}/${PN}-tracks[=${PV}]'
 		net-libs/enet[>=1.3.0]
 		sys-libs/libstdc++
+	run:
+		'${CATEGORY}/${PN}-tracks[=${PV}]'
 '
 
-#REQUIRED_USE="editor? ( game )"
+CMAKE_SRC_CONFIGURE_OPTION_BUILDS+=(
+	'dedicated MASTER_SERVER'
+	'game GAME'
+	'editor EDITOR'
+	'!static SHARED_LIBS'
+)
 
-#DOCS=( Readme.txt )
+require ${REQUIRE_SCM} cmake [ api=2 ]
 
-require cmake
-
-export_exlib_phases src_prepare src_configure src_install
+export_exlib_phases src_prepare src_install
 
 stuntrally_src_prepare(){
-	default
+	# Fix bullet linking.
+	edo nonfatal sed -i -r 's/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\}\)/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\} BulletFileLoader LinearMath\)/g' "${WORKBASE}"/${PNV}/CMakeLists.txt
 
-	edo sed -i -r 's/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\}\)/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\} BulletFileLoader LinearMath\)/g' "${WORK}"/CMakeLists.txt
+	cmake_src_prepare
 }
-stuntrally_src_configure() {
-	CMAKE_SRC_CONFIGURE_PARAMS=(
-		-DBUILD_MASTER_SERVER=$( option dedicated ON OFF )
-		-DBUILD_GAME=$( option game ON OFF )
-		-DBUILD_EDITOR=$( option editor ON OFF )
-		-DBUILD_SHARED_LIBS=$( option static-libs OFF ON )
-	)
-	
-	cmake_src_configure
-}
+
 stuntrally_src_install()
 {
 	cmake_src_install
 
 	local LIBDIR=/usr/$( exhost --target )/lib/
 
+	# TODO: Maybe best to do it on game's executable folder.
 	dosym ${LIBDIR}/OGRE/libshiny.OgrePlatform.so ${LIBDIR}/
 }

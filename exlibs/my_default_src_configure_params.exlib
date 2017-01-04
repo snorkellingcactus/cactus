@@ -1,0 +1,11 @@
+my_econf()
+{
+	echo "${@} ${MY_DEFAULT_SRC_CONFIGURE_PARAMS[@]}"
+	${@} ${MY_DEFAULT_SRC_CONFIGURE_PARAMS[@]}
+}
+my_default_src_configure_params()
+{
+	MY_DEFAULT_SRC_CONFIGURE_PARAMS+=("${@}")
+
+	ECONF_WRAPPER=my_econf
+}

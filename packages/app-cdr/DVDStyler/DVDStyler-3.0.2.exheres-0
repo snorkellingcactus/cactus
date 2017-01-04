@@ -1,4 +1,4 @@
-# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Copyright 2016-2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
 
 SUMMARY='DVDStyler is a cross-platform free DVD authoring application for the creation of professional-looking DVDs'
@@ -6,22 +6,19 @@ HOMEPAGE='http://www.dvdstyler.org/'
 SLOT='0'
 LICENCES='GPL'
 
-require lang-helper [ linguas='ar cs de es_ar eu fr hy ja mk nl pt_BR ro sk sr tr uz zh_CN ca da el es fi hu it ko nb pl pt ru sl sv uk vi zh_TW' ]
-
 MYOPTIONS='
-	ecc [[ description = [ Enhance data survivability ] ]]
+	ecc [[ description = [ Enhance data survivability. ] ]]
 	(
 		providers:
 			ffmpeg
 			libav
-	)
+	) [[ number-selected = exactly-one ]]
 '
 PLATFORMS='~x86 ~amd64'
 
-#providers: wx2 wx3
-#doc:
-#https://sourceforge.net/p/dvdstyler/discussion/318795/thread/a72932d3/
-#you can remove the line with xmlto in configure.ac and the run "./autogen.sh"
+# doc:
+# https://sourceforge.net/p/dvdstyler/discussion/318795/thread/a72932d3/
+# you can remove the line with xmlto in configure.ac and the run "./autogen.sh"
 DEPENDENCIES='
 	app-cdr/cdrtools[>=2.01]
 	media/dvdauthor[>=0.7.0]
@@ -36,24 +33,10 @@ DEPENDENCIES='
 	ecc? ( app-cdr/dvdisaster )
 
 	run:
-		media-plugins/gst-plugins-bad[mjpeg]
+		media-plugins/gst-plugins-bad[gstreamer_plugins:mjpeg]
 '
 
-#function tolower()
-#{
-#        echo "$1" | awk '{print tolower($0)}'
-#}
-
-#require sourceforge [ project=$( tolower ${PN} ) ]
-
-require sourceforge [ project=dvdstyler ]
-
-#wx-config-3.0.2-gtk3 = main window not shown
-#wx-config-2.8-gtk2 = build errors
-
-DEFAULT_SRC_CONFIGURE_PARAMS+=(
-	--with-wx-config=wx-config-3.0-gtk2
-)
+CXXFLAGS+=" -std=c++11"
 
 DEFAULT_SRC_COMPILE_PARAMS+=(
 	STRIP=$(	exhost --tool-prefix	)strip
@@ -62,13 +45,22 @@ DEFAULT_SRC_COMPILE_PARAMS+=(
 	RANLIB=$(	exhost --tool-prefix	)ranlib
 )
 
-CXXFLAGS="${CXXFLAGS} -std=c++11"
+# wx-config-3.0.2-gtk3 = main window not shown
+# wx-config-2.8-gtk2 = build errors
 
+require lang-helper [ linguas='ar cs de es_ar eu fr hy ja mk nl pt_BR ro sk sr tr uz zh_CN ca da el es fi hu it ko nb pl pt ru sl sv uk vi zh_TW' ] sourceforge [ project=dvdstyler ] wx [ BLACKLIST='2.8-gtk2' ] my_default_src_configure_params
+
+src_configure()
+{
+	my_default_src_configure_params --with-wx-config=$( wx_get_config_bin_name )
+
+	default
+}
 function remove-help()
 {
 	rm -rf "${IMAGE}"/usr/share/dvdstyler/docs/help_${1}.zip &>/dev/null
 }
 src_install()
 {
-	lang-helper-src_install remove-help
+	lang-helper_src_install remove-help
 }
