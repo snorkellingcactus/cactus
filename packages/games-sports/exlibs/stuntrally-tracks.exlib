@@ -3,19 +3,19 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
+SCM_REPOSITORY="https://github.com/stuntrally/tracks"
+
 SUMMARY="A set of tracks for ${CATEGORY}/${PN//-tracks}"
-HOMEPAGE='http://code.google.com/p/vdrift-ogre/'
+HOMEPAGE=${SCM_REPOSITORY}
 SLOT='0'
 LICENCES='GPL3'
 
-PLATFORMS='x86 amd64'
-
-SCM_REPOSITORY="https://github.com/stuntrally/tracks"
+PLATFORMS='~x86 ~amd64'
 
 # Is not scm and not ${PV}_p${DATE}
 if [ "${PV}" = "$( ever replace_all '.' )" ] && ( ! ever is_scm )
 then
-	# 2.6.1 does not exists. It's a way of 
+	# 2.6.1 does not exists. It's a way of test if ${PV} < 2.6.
 	( ! ever at_least 2.6.1 ) && BULLET_VERSION='[<2.85]'
 
 	DOWNLOADS="${SCM_REPOSITORY}/archive/${PV}.zip -> ${PNV}.zip"

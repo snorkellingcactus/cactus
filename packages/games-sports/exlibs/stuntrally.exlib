@@ -7,12 +7,15 @@ SUMMARY='Rally game focused on closed rally tracks with possible stunt elements 
 HOMEPAGE='http://stuntrally.tuxfamily.org/'
 LICENCES='GPL-3'
 SLOT='0'
-PLATFORMS='x86 amd64'
+PLATFORMS='~x86 ~amd64'
 MYOPTIONS='dedicated game editor static'
 
 SCM_REPOSITORY="https://github.com/${PN}/${PN}"
+
+require my_ever_is_scm
+
 # Is not scm and not ${PV}_p${DATE}
-if [ "${PV}" = "$( ever replace_all '.' )" ] && ( ! ever is_scm )
+if ! my_ever_is_scm
 then
 	# 2.6.1 does not exists. It's a way of 
 	( ! ever at_least 2.6.1 ) && BULLET_VERSION='[<2.85]'
@@ -21,7 +24,6 @@ then
 else
 	REQUIRE_SCM='scm-git'
 fi
-
 
 # TODO: editor
 # ogre[-double-precision]

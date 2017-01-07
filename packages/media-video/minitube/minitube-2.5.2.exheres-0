@@ -1,0 +1,102 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="https://github.com/flaviotordini/${PN}"
+SUMMARY='Qt5 YouTube Client.'
+SLOT='0'
+DOWNLOADS=${SCM_REPOSITORY}/archive/${PV}.zip
+HOMEPAGE='http://flavio.tordini.org/minitube'
+LICENCES='GPL-3'
+PLATFORMS='~x86 ~amd64'
+
+MYOPTIONS='
+downloads [[
+		description = [ Enable video downloads. ]
+	]]
+'
+
+# qtbase[qtnetwork][dbus]
+# qtwidgets
+DEPENDENCIES+='
+	x11-libs/qtbase:5[sqlite][gui]
+	x11-libs/qtscript
+	media-libs/phonon[qt5]
+'
+
+require qmake [ slot=5 ] lang-helper [ linguas='bg_BG ca ar ca_ES ast be cs_CZ da de_DE en el es_AR es es_MX es_ES fi fi_FI fr gl hr he_IL hu ky ja_JP id ia ko_KR it nb nl nn pl ms_MY pl_PL pt ru ro sk pt_BR sl sq sv_SE tr th uk_UA uk vi zh_CN zh_TW' ]
+
+MYOPTIONS+='downloads'
+
+pkg_pretend()
+{
+	if [ -z "${MINITUBE_GOOGLE_API_KEY}" ]
+	then
+		einfo
+		einfo 'Since version 2.4, you need to generate a Google API Key to use'
+		einfo 'with this application. Please head over to'
+		einfo 'https://console.developers.google.com/ and'
+		einfo 'https://github.com/flaviotordini/minitube/blob/master/README.md'
+		einfo 'for more information.'
+		einfo
+		einfo 'If you set MINITUBE_GOOGLE_API_KEY variable'
+		einfo 'i can include it for you at compile time.'
+	else
+		einfo 'You have provided a google api key.'
+		einfo 'I will include it for you at compile time.'
+	fi
+}
+
+EQMAKE_PARAMS+=(
+	"DEFINES+=APP_GOOGLE_API_KEY=${MINITUBE_GOOGLE_API_KEY}"
+)
+minitube_remove_locale()
+{
+	optionq linguas:${1} && trans+=" ${1}.ts"
+
+	[[ -n ${trans} ]] && edo sed -i -e "/^TRANSLATIONS/s/+=.*/+=${trans}/" locale/locale.pri
+}
+src_prepare()
+{
+	default
+
+	lang-helper-linguas-loop minitube_remove_locale
+
+	# unbundle qtsingleapplication
+#	sed -i \
+#		's|include(src/qtsingleapplication/qtsingleapplication.pri)|CONFIG += qtsingleapplication|g' \
+#		${PN}.pro
+
+	echo "target.path=/usr/$( exhost --target )/bin" >> ${PN}.pro
+	
+}
+
+src_configure()
+{
+	# Enable video downloads.
+	optionq downloads && EQMAKE_PARAMS+=( 'DEFINES += APP_DOWNLOADS' )
+
+	qmake_src_configure
+}
+
+pkg_postinst() {
+	if [ -z ${MINITUBE_GOOGLE_API_KEY} ]
+	then
+		einfo ${PN}' was compiled without a google api key.'
+		einfo 'please generate one and put it in QSettings key \"googleApiKey\", e.g.:'
+		einfo '# echo 'googleApiKey=YourKeyHere' >> \"\${HOME}/.config/Flavio Tordini/Minitube.conf\"'
+		einfo
+	fi
+
+	if optionq downloads; then
+		ewarn "You activated the 'download' option. This allows you to"
+		ewarn "download videos from youtube, which might violate the youtube"
+		ewarn "terms-of-service (TOS) in some legislations. If downloading"
+		ewarn "youtube-videos is not allowed in your legislation, please"
+		ewarn "disable the 'download' option. For details on the youtube TOS,"
+		ewarn "see http://www.youtube.com/t/terms"
+	fi
+}
+src_install()
+{
+	default
+}

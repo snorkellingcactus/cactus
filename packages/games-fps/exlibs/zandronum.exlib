@@ -25,7 +25,7 @@ MYOPTIONS="
 		amd64
 "
 
-require cmake [ api=2 ]
+require cmake [ api=2 ] my_ever_is_scm
 
 export_exlib_phases src_unpack src_prepare src_configure src_compile src_install
 
@@ -96,7 +96,7 @@ zandronum_src_unpack()
 
 	#WORK="${WORKBASE}"/${PNV}
 
-	ever is_scm || edo mv "${WORKBASE}"/Torr_Samaho-zandronum-* "${WORK}"
+	my_ever_is_scm || edo mv "${WORKBASE}"/Torr_Samaho-zandronum-* "${WORK}"
 }
 zandronum_src_prepare()
 {

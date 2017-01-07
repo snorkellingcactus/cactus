@@ -1,0 +1,72 @@
+# Copyright 2016-2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the Gnu General Public License v2
+
+# TODO: DEP_SUFFIX
+
+myexparam DEP_SUFFIX=
+myexparam BLACKLIST=
+
+exparam -v MY_DEP_SUFFIX DEP_SUFFIX
+exparam -v MY_BLACKLIST BLACKLIST
+
+MYOPTIONS+=' ('
+
+for i in "2.8-gtk2" "3.0-gtk2" "3.0-gtk3"
+do
+	SKIP=
+
+	for j in ${MY_BLACKLIST}
+	do
+		if [ "${i/${j}/}" != "${i}" ]
+		then
+			SKIP=continue
+			break
+		fi
+	done
+
+	${SKIP}
+
+	OPT="wx-${i}"
+
+	WX_VERSIONS+="${i} "
+	MYOPTIONS+=" ${OPT}"
+	DEPENDENCIES+=" ${OPT}? ( x11-libs/wxGTK:${i%-*}[providers:${i#*-}] ) "
+done
+
+MYOPTIONS+=' ) [[ number-selected = exactly-one ]]'
+
+wx_select()
+{
+	for i in ${WX_VERSIONS}
+	do
+		! optionq "wx-${i}" && continue
+
+		WX_SELECTION_CURRENT=${i}
+
+		break
+	done
+}
+wx_save_default()
+{
+	[ -z WX_SELECTION_DEFAULT ] && WX_SELECTION_DEFAULT="$( eclectic --no-color wxwidgets show )"
+}
+wx_get_default()
+{
+	wx_save_default	
+
+	echo ${WX_SELECTION_DEFAULT}
+}
+wx_save_current()
+{
+	[ -z ${WX_SELECTION_CURRENT} ] && wx_select
+}
+wx_get_current()
+{
+	wx_save_current
+
+	echo ${WX_SELECTION_CURRENT}
+}
+wx_get_config_bin_name()
+{
+	echo "wx-config-$(wx_get_current)"
+}
