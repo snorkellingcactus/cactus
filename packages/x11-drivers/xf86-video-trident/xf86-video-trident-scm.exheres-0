@@ -1,0 +1,5 @@
+SUMMARY='Drivers for trident graphic cards.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+SCM_REPOSITORY="https://cgit.freedesktop.org/xorg/driver/xf86-video-trident/"
+require scm-git autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ]
