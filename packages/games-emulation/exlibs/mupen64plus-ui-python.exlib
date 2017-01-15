@@ -1,0 +1,20 @@
+SUMMARY='A frontend for Mupen64Plus'
+HOMEPAGE='http://m64py.sourceforge.net/'
+PLATFORMS='~arm ~x86 ~amd64'
+SLOT='0'
+#LICENCES=''
+SCM_REPOSITORY="https://github.com/${PN%%-*}/${PN}"
+
+DEPENDENCIES='
+	dev-python/PyQt5
+	media-libs/SDL
+'
+
+require freedesktop-desktop distutils [ has_bin=true has_lib=true ] my_ever_is_scm
+
+if my_ever_is_scm
+then
+	require scm-git
+else
+	DOWNLOADS="${SCM_REPOSITORY}/archive/${PV}.zip -> ${PNV}.zip"
+fi

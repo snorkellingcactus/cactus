@@ -1,0 +1,4 @@
+SUMMARY="Low-level RSP processor plugin for the Mupen64Plus v2.0 project. This is based on Ziggy's Z64 plug"
+HOMEPAGE="https://github.com/mupen64plus/${PN}"
+
+require mupen64plus-sub

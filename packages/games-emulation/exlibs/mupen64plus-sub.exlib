@@ -1,0 +1,6 @@
+require mupen64plus
+
+DEPENDENCIES+="
+	build+run:
+		games-emulation/$( get_main_pn )-core
+"

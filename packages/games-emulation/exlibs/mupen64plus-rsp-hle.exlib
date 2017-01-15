@@ -1,0 +1,3 @@
+SUMMARY='RSP processor plugin for the Mupen64Plus project. This plugin is based on the Mupen64 HLE RSP plugin v0.2 with Azimers code by Hacktarux'
+
+require mupen64plus-sub

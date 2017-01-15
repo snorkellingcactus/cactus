@@ -1,0 +1,67 @@
+# Based in part upon 'oregano-0.82.ebuild', which is:
+# Copyright 1999-2014 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+DESCRIPTION='Oregano is an application for schematic capture and simulation of electrical circuits.'
+HOMEPAGE="https://github.com/drahnr/${PN}"
+DOWNLOADS="${HOMEPAGE}/archive/v${PV}.zip -> ${PNV}.zip"
+LICENCES='GPL-2'
+SLOT='0'
+PLATFORMS='~amd64 ~ppc ~x86'
+
+# || ( gnome-base/dconf gnome-base/gconf )
+# sci-electronics/electronics-menu
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+	build+run:
+		dev-libs/libxml2:2.0
+		x11-libs/goocanvas:2.0
+		x11-libs/gtk+:3
+		gnome-desktop/gtksourceview:3.0
+		app-text/rarian
+	recommendation:
+		sci-electronics/ngspice
+'
+
+require freedesktop-desktop gsettings waf
+
+WAF_SRC_CONFIGURE_PARAMS+=(
+	'--localedir=/usr/share/locale'
+	'--mandir=/usr/share/locale'
+)
+
+#DEFAULT_SRC_PREPARE_PATCHES+=(
+#	"${FILES}"/${PNV}-format-security.patch
+#	"${FILES}"/${PNV}-remove.unneeded.docs.patch
+#	"${FILES}"/${PNV}-asneeded.patch
+#	"${FILES}"/${PNV}-automake.patch
+#)
+
+src_prepare() {
+
+	# Do not use GTK_DISABLE_DEPRECATED (needed by >=gtk+-3.8.1
+#	edo sed -i -e "s/-DGTK_DISABLE_DEPRECATED//g" src/sheet/Makefile.am
+#	edo sed -i -e "s/-DGTK_DISABLE_DEPRECATED//g" src/Makefile.am
+#	edo sed -i -e "s/(OREGANO_LIBS)/(OREGANO_LIBS) -lm/" src/Makefile.am
+
+	# Aclocal 1.13 deprecated error #467708
+	
+	waf_src_prepare
+}
+
+src_compile()
+{
+	ewaf --jobs=${EXJOBS:-1} "${WAF_DEFAULT_PARAMS[@]}" "${WAF_SRC_COMPILE_PARAMS[@]}" release
+}
+
+# econf --disable-update-mimedb --disable-silent-rules
+# emake DESTDIR="${D}" oreganodocdir=/usr/share/doc/${PF} install
+# gnome2_schemas_savelist
+
+pkg_postinst() {
+	elog "You'll need to install your prefered simulation backend"
+	elog "such ngspice or gnucap for simulation to work."
+	elog "As an alternative generate a netlist and use sci-electronics/ngspice"
+	elog "from the command line for simulation."
+}

@@ -1,0 +1,4 @@
+SUMMARY='Video plugin for Mupen64Plus, based on the Arachnoid plugin for Project64.'
+HOMEPAGE="https://github.com/mupen64plus/${PN}"
+
+require mupen64plus-sub

@@ -1,0 +1,38 @@
+SUMMARY='A fork of Mupen64 Nintendo 64 emulator.'
+HOMEPAGE="http://www.mupen64plus.org/"
+
+# NEON
+# VFP_HARD
+MYOPTIONS='
+	asm [[ description = [ build assembly dynamic recompiler or MMX/SSE code. ] ]]
+	gles [[ description = [ build against GLESv2 instead of OpenGL. ] ]]
+	lirc [[ description = [ enable LIRC support. ] ]]
+	osd [[ description = [ build of OpenGL On-screen display. ] ]]
+	vc [[ description = [ build against Broadcom Videocore GLESv2. ] ]]
+	newdynarec  [[ description = [ Replace dynamic recompiler with Ari64 experimental dynarec. ] ]]
+'
+
+DEPENDENCIES='
+	build+run:
+		media-libs/SDL
+		media-libs/freetype
+		sys-libs/zlib
+		media-libs/libpng
+	
+		lirc? ( remote/lirc )
+'
+
+require mupen64plus
+
+src_compile()
+{
+	MUPEN_SRC_COMPILE_PARAMS+=(
+		USE_GLES=$( option gles 1 0 )
+		NO_ASM=$( option asm 0 1 )
+		VC=$( option vc 1 0 )
+		OSD=$( option osd 1 0 )
+		NEW_DYNAREC=$( option newdynarec 1 0 )
+	)
+
+	mupen64plus_src_compile
+}

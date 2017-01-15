@@ -1,8 +1,6 @@
 my_ever_is_scm()
 {
-	q=0
+	( [ "${PV}" != "$( ever replace_all '.' )" ] || ( ever is_scm ) ) && return 0
 
-	( [ "${PV}" != "$( ever replace_all '.' )" ] && q=1 ) || ( ever is_scm && q=1 )
-
-	echo q
+	return 1
 }

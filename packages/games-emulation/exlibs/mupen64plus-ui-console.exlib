@@ -1,0 +1,4 @@
+SUMMARY='Console (command-line) front-end user interface for Mupen64Plus project.'
+HOMEPAGE="http://www.mupen64plus.org/"
+
+require mupen64plus-sub

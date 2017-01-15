@@ -1,0 +1,10 @@
+SCM_REVISION='2a79d2832bd4a3ad918b8c84bcded460ede387a1'
+
+require ${PN}
+
+src_install()
+{
+	mupen64plus_src_install
+
+	edo find "${IMAGE}" -type d -empty -delete
+}

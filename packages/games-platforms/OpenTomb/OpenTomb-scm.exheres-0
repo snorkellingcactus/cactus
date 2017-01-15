@@ -1,3 +1,6 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <
+# Distributed under the terms of the GNU General Public License v2
+
 SUMMARY='An open-source Tomb Raider 1-5 engine remake'
 HOMEPAGE='http://opentomb.github.io/'
 SLOT='0'

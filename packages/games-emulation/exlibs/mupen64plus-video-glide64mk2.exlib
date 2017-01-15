@@ -1,0 +1,4 @@
+SUMMARY='Video plugin for Mupen64Plus 2.0 based on 10th anniversary release code from gonetz'
+HOMEPAGE="https://github.com/mupen64plus/${PN}"
+
+require mupen64plus-sub
