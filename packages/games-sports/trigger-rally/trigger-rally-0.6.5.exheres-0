@@ -1,0 +1,63 @@
+#SCM_REPOSITORY='svn checkout svn://svn.code.sf.net/p/trigger-rally/code/ trigger-rally-code'
+
+HOMEPAGE='http://trigger-rally.sourceforge.net'
+SUMMARY='Trigger Rally is a fast-paced single-player racing game for Linux and Windows.'
+SLOT='0'
+LICENCES='GPL-2'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES+='
+	build+run:
+		dev-games/physfs
+		media-libs/freealut
+		media-libs/glew
+		media-libs/openal
+		media-libs/SDL:2
+		media-libs/SDL_image:2
+		x11-dri/glu
+		x11-dri/mesa[X]
+'
+
+DEFAULT_SRC_COMPILE_PARAMS+=(
+	OPTIMS=${CXXFLAGS}
+)
+
+TGT=/usr/$( exhost --target )/
+EXEC_PREFIX=${TGT}/share
+
+DEFAULT_SRC_INSTALL_PARAMS+=(
+	DESTDIR="${IMAGE}"
+	prefix=/usr/
+	exec_prefix=${EXEC_PREFIX}
+)
+
+WORK="${WORKBASE}"/${PNV}/src
+
+require sourceforge [ suffix=tar.gz ] newicon desktop-utils gtk-icon-cache
+
+src_prepare()
+{
+	default
+
+	# Let we do the stripping.
+	edo sed -e 's/@strip $@//g' -i GNUmakefile
+}
+src_install()
+{
+	default
+
+	mkdir -p ${IMAGE}/${TGT}/bin/
+
+	dosym ${EXEC_PREFIX}/games/${PN} ${TGT}/bin/
+
+	for s in 96 72 64 48 36 32 256 24 22 192 16 128
+	do
+		icon_name=${PN%-*}-${s}
+
+		newicon -s ${s} ../data/icon/${icon_name}.png ${PN}.png
+
+		dosym /usr/share/icons/hicolor/${s}x${s}/apps/${PN}.png /usr/share/games/${PN}/icon/${icon_name}.png
+	done
+
+	install_desktop_entry "Exec=${PN}" "Name=${PN}" Icon="${PN}.png" 'Categories=Game;SportsGame'
+}
