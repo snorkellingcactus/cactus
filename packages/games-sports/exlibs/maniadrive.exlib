@@ -37,7 +37,7 @@ maniadrive_src_prepare()
 maniadrive_src_compile()
 {
 	local	PHP_CONFIG=php-config
-	local	PKG_CONFIG=$( exhost --target )-pkg-config
+	local	PKG_CONFIG=$( exhost --tool-prefix )pkg-config
 			TGT_DIR=/usr/$( exhost --target )
 
 	local COMMON_CFLAGS="$( ${PHP_CONFIG} --libs ) $( ${PKG_CONFIG} --libs gl glew ) -lraydium $( ${PHP_CONFIG} --includes ) -L${TGT_DIR}/lib"

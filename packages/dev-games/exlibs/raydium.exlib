@@ -47,7 +47,7 @@ raydium_src_prepare()
 {
 	default
 
-	sed -i -r -e 's/lex --version/flex --version/g' -e 's/comp="gcc"/comp="'$( exhost --target )'-gcc"/g' -e 's/"g\+\+"/"'$( exhost --target )'-g\+\+"/g' configure
+	sed -i -r -e 's/lex --version/flex --version/g' -e 's/comp="gcc"/comp="'$( exhost --tool-prefix )'gcc"/g' -e 's/"g\+\+"/"'$( exhost --tool-prefix )'g\+\+"/g' configure
 
 	local PHP5_INCLUDES=$( php-config-${PHP_SLOT} --includes | escape )
 

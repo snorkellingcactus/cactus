@@ -39,5 +39,5 @@ src_prepare(){
 
 	edo sed -i -e 's/$inc    = ""/$X11LIB = "'"$( echo ${TGT_PFX}/lib | escape )"'";$X11INC = "'"$( echo ${TGT_PFX}/include | escape )"'";/' -e 's/my $ftinc = Ift("\/usr\/include"/my $ftinc = Ift($X11INC/' myConfig
 
-	edo sed -i -e 's/pkg-config/'${TGT}'-pkg-config/g' PNG/Makefile.PL
+	edo sed -i -e 's/pkg-config/'$( exhost --tool-prefix )'-pkg-config/g' PNG/Makefile.PL
 }

@@ -17,6 +17,7 @@ DEPENDENCIES='
 	media-libs/libsndfile
 	sys-sound/alsa-utils[>=0.9]
 	media-sound/jack-audio-connection-kit[>=0.100.0]
+	media-libs/lv2[>=1.10.0]
 '
 
 require scm-git cmake

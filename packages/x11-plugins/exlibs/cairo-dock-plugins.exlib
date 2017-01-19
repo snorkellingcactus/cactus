@@ -234,7 +234,7 @@ export_exlib_phases src_prepare src_install
 
 cairo-dock-plugins_src_prepare() {
     edo find . -name *.c > po/POTFILES.in
-    edo sed -i -e 's/pkg-config/'"$( exhost --target )-pkg-config"'/' -e 's/localedir "${prefix}\//localedir "/' CMakeLists.txt
+    edo sed -i -e 's/pkg-config/'"$( exhost --tool-prefix )pkg-config"'/' -e 's/localedir "${prefix}\//localedir "/' CMakeLists.txt
 }
 cairo-dock-plugins_src_install()
 {

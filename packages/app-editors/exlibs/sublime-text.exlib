@@ -32,7 +32,7 @@ DEPENDENCIES='
 
 WORK="${WORKBASE}"/${MY_PN}
 
-require gnome-2 desktop-utils gtk-icon-cache
+require desktop-utils gtk-icon-cache
 
 export_exlib_phases src_install
 

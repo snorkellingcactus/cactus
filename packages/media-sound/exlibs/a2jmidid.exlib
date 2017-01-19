@@ -34,5 +34,5 @@ a2jmidid_src_prepare()
 	# Make some waf files visible.
 	./waf --version
 
-	edo sed -i -e "s/pkgbin = 'pkg-config'/pkgbin = '""$( exhost --target )""-pkg-config'/" $( find . -name config_c.py )
+	edo sed -i -e "s/pkgbin = 'pkg-config'/pkgbin = '""$( exhost --tool-prefix )""pkg-config'/" $( find . -name config_c.py )
 }

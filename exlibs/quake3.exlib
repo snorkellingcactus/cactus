@@ -116,7 +116,7 @@ quake3_src_prepare()
 {
 	default
 
-	edo sed -i -r "s/pkg-config/$(exhost --target)\-pkg\-config/g" ${MY_MAKE_PREFIX}/Makefile
+	edo sed -i -r "s/pkg-config/$( exhost --tool-prefix )pkg\-config/g" ${MY_MAKE_PREFIX}/Makefile
 }
 
 quake3_src_compile(){

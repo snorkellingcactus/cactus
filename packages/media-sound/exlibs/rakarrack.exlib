@@ -39,7 +39,7 @@ export_exlib_phases src_prepare src_install
 
 rakarrack_src_prepare()
 {
-	edo sed -i -e 's/pkg-config/'"$( exhost --target )"'-pkg-config/g' configure.ac
+	edo sed -i -e 's/pkg-config/'"$( exhost --tool-prefix )"'pkg-config/g' configure.ac
 
 	autotools_src_prepare
 }

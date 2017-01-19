@@ -9,7 +9,7 @@ DOWNLOADS="mirror://sourceforge/opende/${PN}-src-${PV}.zip"
 LICENCES='|| ( LGPL-2.1 BSD-3 )'
 SLOT='0'
 PLATFORMS='~amd64 ~x86'
-MYOPTIONS='debug doc double-precision gyroscopic
+MYOPTIONS='debug doc double-precision examples gyroscopic
 	double-precision [[ description = [ More precise calculations at the expense of speed ] ]]'
 
 DEPENDENCIES='

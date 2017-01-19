@@ -90,13 +90,13 @@ MYOPTIONS='
 
 URL_BASE='http://www.rainlendar.net/'
 ICON_EXT=.png
-ICON_FILENAME=$( rainlendar_to_upper ${MY_PN}${ICON_EXT} )
+ICON_FILENAME=51791
 DOWNLOADS="
 	platform:amd64?	$( rainlendar_fmt_url amd64	)
 
 	platform:x86?	$( rainlendar_fmt_url i386	)
 
-	${URL_BASE}cms/components/com_joomlaboard/uploaded/images/${ICON_FILENAME}
+	https://www.macbed.com/wp-content/uploads/2016/05/${ICON_FILENAME}
 "
 #platform:x86? ( x11-libs/gtk+:2[>=2.12][xinerama] )
 DEPENDENCIES="
