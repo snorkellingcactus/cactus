@@ -36,6 +36,8 @@ LICENCES="NVIDIA"
 SLOT="0"
 MYOPTIONS="( platform: amd64 x86 ) ( multibuild_c: 32 64 )"
 
+LIBDIR=/usr/$( exhost --target )/lib
+
 DEPENDENCIES="
     build:
         virtual/pkg-config
@@ -53,6 +55,7 @@ DEPENDENCIES="
         x11-libs/pango
     build+run:
         x11-server/xorg-server[xinerama(+)]
+        x11-dri/mesa[X]
     suggestion:
         x11-libs/libvdpau[>=0.3]
 "
@@ -95,7 +98,7 @@ src_install_old() {
 
     dolib.so usr/lib/*so* usr/X11R6/lib/lib*
 
-    exeinto /usr/${LIBDIR}/tls/
+    exeinto ${LIBDIR}/tls/
     doexe usr/lib/tls/*
 
     if ! $(exhost --is-native) ; then
@@ -104,7 +107,7 @@ src_install_old() {
 
          dolib.so usr/lib32/*so*
 
-         exeinto /usr/${LIBDIR}/tls/
+         exeinto ${LIBDIR}/tls/
          doexe usr/lib32/tls/*
 
          multibuild_switch_build_target C "${current_target}"
@@ -155,30 +158,30 @@ src_install_256() {
                 dolib.so ${line[0]}
                 ;;
             XLIB_SYMLINK|UTILITY_LIB_SYMLINK)
-                dosym ${line[3]} /usr/${LIBDIR}/${line[0]}
+                dosym ${line[3]} ${LIBDIR}/${line[0]}
                 ;;
             OPENGL_LIB|VDPAU_LIB|CUDA_LIB)
                 if [[ ${line[3]} == "NATIVE" ]] ; then
-                    exeinto /usr/${LIBDIR}/${line[4]}
+                    exeinto ${LIBDIR}/${line[4]}
                     doexe ${line[0]}
                 elif [[ ${line[3]} == "COMPAT32" ]] &&  optionq platform:x86 ; then
-                     exeinto /usr/$( exhost --target )/lib/${line[4]}
+                     exeinto ${LIBDIR}/lib/${line[4]}
                      doexe ${line[0]}
                 fi
                 ;;
             VDPAU_SYMLINK|CUDA_SYMLINK)
                 if [[ ${line[3]} == "NATIVE" ]] ; then
-                    dosym ${line[5]} /usr/${LIBDIR}/${line[4]}/${line[0]}
+                    dosym ${line[5]} ${LIBDIR}/${line[4]}/${line[0]}
                 elif [[ ${line[3]} == "COMPAT32" ]] &&  optionq platform:x86 ; then
                      dosym ${line[5]} /usr/$(exhost --target)/lib/${line[4]}/${line[0]}
                 fi
                 ;;
             TLS_LIB)
                 if [[ ${line[3]} == "NATIVE" ]] ; then
-                    exeinto /usr/$( exhost --target )/${line[5]}
+                    exeinto ${LIBDIR}/${line[5]}
                     doexe ${line[0]}
                 elif [[ ${line[3]} == "COMPAT32" ]] &&  option multibuild_c:32 ; then
-                     exeinto /usr/$( exhost --target )/${line[5]}
+                     exeinto ${LIBDIR}/${line[5]}
                      doexe ${line[0]}
                 fi
                 ;;
@@ -203,14 +206,16 @@ src_install_256() {
 
 nvidia_alternatives() {
     # rename the library so it isn't picked up by ldconfig as provider of libGL.so.1
-    edo mkdir "${IMAGE}"/usr/${LIBDIR}/libGL
-    edo mv "${IMAGE}"/usr/${LIBDIR}/libGL{.so.${PV},/libGL-nvidia.so}
+    edo mkdir "${IMAGE}"${LIBDIR}/libGL
+    edo mv "${IMAGE}"${LIBDIR}/libGL{.so.${PV},/libGL-nvidia.so}
 
     alternatives+=(
         ${moduledir}/extensions/libglx.so{,.${PV}}
-        /usr/${LIBDIR}/libGL{.so,/libGL-nvidia.so}
+        ${LIBDIR}/libGL{.so,/libGL-nvidia.so}
         # Some packages link to libGL.so.1, so also provide that symlink
-        /usr/${LIBDIR}/libGL{.so.1,/libGL-nvidia.so}
+        ${LIBDIR}/libGL{.so.1,/libGL-nvidia.so}
+        ${LIBDIR}/{libEGL.so,/opengl/libEGL-xorg.so}
+        ${LIBDIR}/{libEGL.so.1,/opengl/libEGL-xorg.so}
     )
 }
 
@@ -224,7 +229,7 @@ cactus-nvidia-drivers_src_install() {
     fi
 
     hereenvd 40nvidia <<EOF
-LDPATH="/usr/${LIBDIR}/vdpau"
+LDPATH="${LIBDIR}/vdpau"
 EOF
 
     local alternatives=()
