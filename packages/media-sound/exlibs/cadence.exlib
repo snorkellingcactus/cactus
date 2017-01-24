@@ -8,7 +8,7 @@ HOMEPAGE='http://kxstudio.linuxaudio.org/Applications:Cadence'
 
 LICENCES='GPL-2'
 SLOT='0'
-PLATFORMS='~amd64'
+PLATFORMS='~x86 ~amd64'
 
 MYOPTIONS='
 	claudia
@@ -18,7 +18,8 @@ MYOPTIONS='
 DEPENDENCIES="
 	build+run:
 		dev-python/PyQt4[python_abis:*?][dbus]
-		media-sound/jack-audio-connection-kit[dbus]
+		dev-python/dbus-python[python_abis:*?]
+		media-sound/jack-audio-connection-kit[>=1.9][dbus]
 		x11-libs/qt:4
 	run:
 		claudia? ( media-sound/ladish )
@@ -39,7 +40,7 @@ cadence_src_prepare()
 
 	TGT=$( exhost --target )
 
-	edo sed -i -e 's/pkg-config/'"$( exhost --target )"'pkg-config/g' $( grep -l pkg-config `find . -type f` )
+	edo sed -i -e 's/pkg-config/'"$( exhost --tool-prefix )"'pkg-config/g' $( grep -l pkg-config `find . -type f` )
 }
 
 cadence_src_compile()

@@ -1,0 +1,28 @@
+
+SUMMARY='Wrapper for the Gnome Assistive Technology Service Provider Interface for use in Python.'
+
+MY_PV=$( ever replace_all '_' )
+FOLDER="PYATSPI_${MY_PV}"
+DOWNLOADS="https://github.com/GNOME/pyatspi2/archive/${FOLDER}.zip"
+PLATFORMS='~x86 ~amd64'
+SLOT='0'
+
+# gnome-bindings/pygobject[>=2.90.1]
+# gmodule[2.0.0]
+# gobject[2.0.0]
+# dev-libs/atk[gobject-introspection] ?
+# x11-libs/gtk+[gobject-introspection] ?
+DEPENDENCIES='
+	build+run:
+		dev-python/dbus-python[python_abis:*(-)?]
+		dev-libs/glib:2
+		dev-libs/dbus-glib:1
+		gnome-bindings/pygobject:3[python_abis:*(-)?]
+		dev-libs/libxml2:2.0[python_abis:*(-)?]
+		dev-libs/atk[>=2.11.2]
+		x11-libs/gtk+[>=2.10.0]
+'
+
+WORK="${WORKBASE}/${PN}$(ever major)-${FOLDER}"
+
+require autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ] python [ blacklist='2.7' ]

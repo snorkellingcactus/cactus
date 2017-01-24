@@ -1,0 +1,42 @@
+SUMMARY='PulseAudio Preferences (paprefs) is a simple GTK based configuration dialog for the PulseAudio sound server.'
+HOMEPAGE='https://freedesktop.org/software/pulseaudio/paprefs/'
+SLOT='0'
+LICENCES='GPL-2'
+DOWNLOADS="http://freedesktop.org/software/pulseaudio/${PN}/${PN}-${PV}.tar.gz"
+PLATFORMS='~x86 ~amd64'
+
+MYOPTIONS='nls'
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+
+	build+run:
+		gnome-bindings/libglademm
+		media-sound/pulseaudio
+		gnome-bindings/gtkmm
+'
+
+DEFAULT_SRC_CONFIGURE_PARAMS+=(
+	'--prefix=/usr'
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=(
+	'nls'
+)
+
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.15 ] ] flag-o-matic lang-helper [ linguas='as bn_IN ca cs da de el es fi fr gu hi hu it kn ml mr ms nl or pa pl pt pt_BR sk sr sr@latin sv ta te th tr uk zh_CN' ]
+
+src_prepare()
+{
+	edo sed -e 's/`pkg-config/`'"${PKG_CONFIG}"'/' -i configure.ac
+
+	autotools_src_prepare
+}
+
+src_configure()
+{
+	append-flags -std=c++11
+
+	default
+}
