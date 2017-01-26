@@ -134,7 +134,7 @@ quake3_src_compile(){
             SERVERBIN=${PN}${SRV_BIN_SUFFIX}
 		)
 
-		ARCH='i686'
+		ARCH='x86'
 		optionq platform:amd64 && ARCH='x86_64'
 
 		emake -C ${MY_MAKE_PREFIX} ${DEFAULT_SRC_COMPILE_PARAMS[@]} ARCH=${ARCH} PLATFORM=linux
