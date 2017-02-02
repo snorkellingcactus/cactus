@@ -12,7 +12,7 @@ SLOT='0'
 
 require scm-svn quake3 [ BASEQ3_PATH=[ 'baseq3r' ] REND_SUFFIX='rend2' MAKE_PREFIX='engine' ]
 
-if [ $( ever range 5 ) -ge 171 ]
+if [ $( ever range 5 ) -ge 169 ]
 then
 	# Produce errors of unexpected token in fterror.h
 	# Don't forget to check troough the time.

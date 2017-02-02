@@ -1,9 +1,12 @@
-SUMMARY='The terminal widget for QTerminal.'
-SLOT='0'
-PLATFORMS='~x86 ~amd64'
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="The terminal widget for QTerminal."
+SLOT="0"
+PLATFORMS="~x86 ~amd64"
 HOMEPAGE="https://github.com/lxde/${PN}"
 DOWNLOADS="${HOMEPAGE}/archive/${PV}.zip -> ${PNV}.zip"
-LICENCES='GPL-2'
+LICENCES="LGPL-2.1"
 
 CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DCMAKE_BUILD_TYPE=Release
@@ -11,9 +14,22 @@ CMAKE_SRC_CONFIGURE_PARAMS+=(
 
 require cmake [ api=2 ]
 
-# TODO: qtbase[gui]?
-DEPENDENCIES='
+DEPENDENCIES="
 	build+run:
 		x11-libs/qtbase:5
 		lxqt/liblxqt
-'
+"
+
+src_prepare()
+{
+	cmake_src_prepare
+
+	# A hack to prevent banned commands of dependent packages.
+	# This ${EXHERBO_TOOL_PREFIX} will let us append a prefix
+	# to the banned toolchain comands ( gcc-ar and gcc-ranlib )
+	# through -DEXHERBO_TOOL_PREFIX=$( exhost --tool-prefix ).
+	edo sed -e 's/set(CMAKE_AR "gcc/set(CMAKE_AR "${EXHERBO_TOOL_PREFIX}gcc/' -e 's/set(CMAKE_RANLIB "gcc/set(CMAKE_RANLIB "${EXHERBO_TOOL_PREFIX}gcc/' -i cmake/modules/LXQtCompilerSettings.cmake
+
+	# Disable pul translations at compile phase of dependent packages.
+	edo sed -e 's/if (TR_PULL_TRANSLATIONS/if (0/' -i cmake/modules/LXQtTranslateTs.cmake
+}

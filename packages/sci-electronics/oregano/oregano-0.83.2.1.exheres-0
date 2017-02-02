@@ -24,7 +24,7 @@ DEPENDENCIES='
 		sci-electronics/ngspice
 '
 
-require freedesktop-desktop gsettings waf
+require freedesktop-desktop freedesktop-mime gtk-icon-cache gsettings waf lang-helper [ linguas='sv ru ro pt_BR pl ja it fr es de ca' ]
 
 WAF_SRC_CONFIGURE_PARAMS+=(
 	'--localedir=/usr/share/locale'
@@ -41,9 +41,9 @@ WAF_SRC_CONFIGURE_PARAMS+=(
 src_prepare() {
 
 	# Do not use GTK_DISABLE_DEPRECATED (needed by >=gtk+-3.8.1
-#	edo sed -i -e "s/-DGTK_DISABLE_DEPRECATED//g" src/sheet/Makefile.am
-#	edo sed -i -e "s/-DGTK_DISABLE_DEPRECATED//g" src/Makefile.am
-#	edo sed -i -e "s/(OREGANO_LIBS)/(OREGANO_LIBS) -lm/" src/Makefile.am
+	#	edo sed -i -e "s/-DGTK_DISABLE_DEPRECATED//g" src/sheet/Makefile.am
+	#	edo sed -i -e "s/-DGTK_DISABLE_DEPRECATED//g" src/Makefile.am
+	#	edo sed -i -e "s/(OREGANO_LIBS)/(OREGANO_LIBS) -lm/" src/Makefile.am
 
 	# Aclocal 1.13 deprecated error #467708
 	
@@ -64,4 +64,14 @@ pkg_postinst() {
 	elog "such ngspice or gnucap for simulation to work."
 	elog "As an alternative generate a netlist and use sci-electronics/ngspice"
 	elog "from the command line for simulation."
+
+	freedesktop-desktop_pkg_postinst
+	freedesktop-mime_pkg_postinst
+	gtk-icon-cache_pkg_postinst
+}
+
+pkg_postrm() {
+	freedesktop-desktop_pkg_postrm
+	freedesktop-mime_pkg_postrm
+	gtk-icon-cache_pkg_postrm
 }

@@ -1,0 +1,16 @@
+SCM_REPOSITORY="https://github.com/stefonarch/${PN}.git"
+
+SUMMARY='A lxqt theme.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+require scm-git doinsmv
+
+export_exlib_phases src_install
+
+lxqt-stefonarch-theme_src_install()
+{
+	rm -r .git
+	insinto /usr/share/lxqt/themes/
+		doinsmv ${WORKBASE}/${PNV}
+}

@@ -19,7 +19,6 @@ function lang-helper-linguas-loop()
 	do
 		for x in "$@"
 		do
-			echo "${x} ${l}"
 			${x} ${l}
 		done
 	done

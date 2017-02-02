@@ -6,7 +6,7 @@ SLOT='0'
 PLATFORMS='~x86 ~amd64'
 HOMEPAGE="https://github.com/lxde"
 DOWNLOADS="${HOMEPAGE}/${PN}/archive/${PV}.zip -> ${PNV}.zip"
-LICENCES='GPL-2'
+LICENCES="LGPL-2.1"
 
 CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DCMAKE_BUILD_TYPE=Release

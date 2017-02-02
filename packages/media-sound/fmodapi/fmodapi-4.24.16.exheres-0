@@ -20,6 +20,7 @@ PLATFORMS="~x86 ~amd64"
 LICENCES="BSD BSD-2 fmod"
 SLOT="1"
 
+# TODO: use expart, use at-least-one.
 MYOPTIONS="
 	development
 	documentation

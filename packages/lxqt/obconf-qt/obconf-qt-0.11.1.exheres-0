@@ -1,0 +1,15 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY='ObConf-Qt is a Qt port of ObConf, a configuration editor for window manager OpenBox.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+	lxqt/liblxqt
+	lxqt/lxqt-l10n
+'
+
+DOWNLOADS="https://github.com/lxde/${PN}/archive/${PV}.zip -> ${PNV}.zip"

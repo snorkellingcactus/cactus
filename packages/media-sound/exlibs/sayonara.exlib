@@ -26,8 +26,52 @@ DEPENDENCIES+='
 '
 
 CMAKE_SRC_CONFIGURE_PARAMS=(
-    -DCMAKE_BUILD_TYPE:STRING='Release'
+	-DCMAKE_BUILD_TYPE:STRING='Release'
 )
 
 SCM_REPOSITORY='https://git.sayonara-player.com/sayonara.git'
-require scm-git cmake [ api=2 ]
+require scm-git cmake [ api=2 ] freedesktop-desktop gtk-icon-cache lang-helper [ linguas='br cs de en es fr hu it pl pt ro ru ua zh_cn' ]
+
+export_exlib_phases src_prepare src_install
+
+sayonara_src_prepare()
+{
+	cmake_src_prepare
+
+	local TGT=${IMAGE}usr/$( exhost --target )
+
+	edo sed -e 's/DESTINATION share/DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/g' -i resources/CMakeLists.txt;
+    edo sed -e 's/^\s*share/${CMAKE_INSTALL_DATAROOTDIR}/' -i src/Languages/CMakeLists.txt
+
+    edo sed -e 's/"share/"${CMAKE_INSTALL_DATAROOTDIR}/' -i {src/GUI/Resources/{,Icons/},src/3rdParty/Soundcloud/}CMakeLists.txt
+
+    edo sed -e 's@"${CMAKE_INSTALL_PREFIX}/share@"${CMAKE_INSTALL_DATAROOTDIR}@' -i CMakeLists.txt
+}
+
+sayonara_remove_locale()
+{	
+	rm -f "${1}${PN}_lang_${2}.qm" &>/dev/null
+	rm -f "${1}icons/${2}.png" &>/dev/null
+}
+
+sayonara_src_install()
+{
+	cmake_src_install
+
+	local TDIR="${IMAGE}/usr/share/${PN}/translations/"
+
+	lang-helper-linguas-loop 'sayonara_remove_locale '"${TDIR}"
+
+	rm -df "${TDIR}icons"
+	rm -df "${TDIR}"
+}
+
+sayonara_pkg_postinst() {
+	freedesktop-desktop_pkg_postinst
+	gtk-icon-cache_pkg_postinst
+}
+
+sayonara_pkg_postrm() {
+	freedesktop-desktop_pkg_postrm
+	gtk-icon-cache_pkg_postrm
+}

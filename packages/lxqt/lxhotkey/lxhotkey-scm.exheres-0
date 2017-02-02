@@ -1,0 +1,16 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='Universal application for the LXDE which allows view and change global keyboard shortcuts for Window Manager actions, including ones to start applications.'
+HOMEPAGE="https://github.com/lxde/${PN}"
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+SCM_REPOSITORY="${HOMEPAGE}.git"
+
+require scm-git autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ]
+
+DEPENDENCIES='
+	lxqt/liblxqt
+	lxqt/lxqt-l10n
+'

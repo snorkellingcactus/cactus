@@ -26,15 +26,15 @@ DEPENDENCIES='
 		app-crypt/gnupg
 		app-emulation/wine
 		dev-python/wxPython:2.8
-		(
+		|| (
 			media-gfx/ImageMagick
-			media-gfx/graphicsmagick[imagemagick]
-		) [[ number-selected = exactly-one ]]
+			media-gfx/GraphicsMagick[imagemagick]
+		)
 		net-misc/wget
-		(
+		|| (
 			net-misc/netcat
 			net-misc/netcat6
-		) [[ number-selected = exactly-one ]]
+		)
 		x11-dri/mesa-demos
 		x11-apps/xterm
 		media-gfx/icoutils
@@ -42,7 +42,7 @@ DEPENDENCIES='
 '
 #mesa-demos=mesa-progs?
 
-#WORK=${WORKBASE}/${PN}
+WORK=${WORKBASE}/${PN}
 
 # TODO:
 # Having a real install script

@@ -1,0 +1,112 @@
+# Copyright 2016-2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'opera.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+
+DESCRIPTION='A fast and secure web browser.'
+HOMEPAGE="http://www.${PN}.com/"
+LICENCES='OPERA-2014'
+SLOT='0'
+DOWNLOAD_URI_BASE="http://get.geo.opera.com/pub/${PN}/desktop/${PV}/linux/${PN}-stable_${PV}_"
+DOWNLOADS="
+	platform:amd64? ( "${DOWNLOAD_URI_BASE}amd64.deb" )
+
+	platform:x86? ( "${DOWNLOAD_URI_BASE}i386.deb" )
+"
+PLATFORMS='~x86 ~amd64'
+MYOPTIONS='platform: x86 amd64'
+
+DEPENDENCIES="
+	dev-libs/expat
+	dev-libs/glib:2
+	dev-libs/nspr
+	dev-libs/nss
+	dev-libs/openssl[>=1.0.1]
+	gnome-platform/GConf:2
+	sys-sound/alsa-lib
+	media-libs/fontconfig
+	media-libs/freetype
+	net-misc/curl
+	net-print/cups
+	sys-apps/dbus
+	sys-libs/libcap
+	x11-libs/cairo
+	x11-libs/gdk-pixbuf
+	x11-libs/gtk+:2
+	x11-libs/libX11
+	x11-libs/libXScrnSaver
+	x11-libs/libXcomposite
+	x11-libs/libXcursor
+	x11-libs/libXdamage
+	x11-libs/libXext
+	x11-libs/libXfixes
+	x11-libs/libXi
+	x11-libs/libXrandr
+	x11-libs/libXrender
+	x11-libs/libXtst
+	x11-libs/libnotify
+	x11-libs/pango[X]
+"
+
+require lang-helper [ linguas='ca uz pt-BR es-419 af ja es hi th gd pt-PT lt fy az nl en-US it ta be fr-CA tr ko ru zu da nn fil uk zh-TW mk zh-CN ms en-GB fi de pl kk hr lv bn id fr he vi sk sv hu pa me nb cs el te bg sw sr ro' ] freedesktop-desktop freedesktop-mime gtk-icon-cache
+
+src_unpack() {
+	default
+
+	edo tar xf "${WORKBASE}"/data.tar.xz
+
+	WORK="${WORKBASE}"
+}
+
+src_prepare() {
+	default
+
+	edo sed -e 's|^TargetEnvironment|X-&|g' -i usr/share/applications/${PN}.desktop
+}
+
+function opera_remove_locales()
+{
+	rm -rf "${IMAGE}"/usr/x86_64-pc-linux-gnu/lib/opera/localization/${1}.pak &>/dev/null
+}
+
+src_install() {
+
+	local TGT=/usr/$( exhost --target )
+	local LIBDIR=${TGT}/lib
+	local BINDIR=${TGT}/bin
+	local ARCHDIR
+
+	optionq platform:amd64 &&	ARCHDIR=x86_64
+	optionq platform:x86 &&		ARCHDIR=i386
+
+	ARCHDIR+='-linux-gnu'
+
+	mkdir -p "${IMAGE}"${TGT}
+
+	mv "${WORK}"/usr/lib/${ARCHDIR}/${PN} "${IMAGE}"${LIBDIR}
+
+	mv "${WORK}"/usr/share "${IMAGE}"/usr
+
+	mkdir "${IMAGE}"${BINDIR}
+	dosym ../lib/${PN}/${PN} ${BINDIR}/${PN}
+
+	chmod 4755 "${IMAGE}"${LIBDIR}/${PN}/opera_sandbox
+
+	opera_remove_locales
+}
+
+pkg_postinst() {
+	elog "You'll need to install your prefered simulation backend"
+	elog "such ngspice or gnucap for simulation to work."
+	elog "As an alternative generate a netlist and use sci-electronics/ngspice"
+	elog "from the command line for simulation."
+
+	freedesktop-desktop_pkg_postinst
+	freedesktop-mime_pkg_postrm
+	gtk-icon-cache_pkg_postinst
+}
+
+pkg_postrm() {
+	freedesktop-desktop_pkg_postrm
+	freedesktop-mime_pkg_postrm
+	gtk-icon-cache_pkg_postrm
+}
