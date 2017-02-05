@@ -107,6 +107,7 @@ DEPENDENCIES="
         media-libs/fontconfig[>=2.4]
         media-libs/freetype:2[>=2.3.5]
         media-libs/libpng:1.2
+        net-libs/webkit-gtk
         sys-libs/glibc[>=2.6.1]
         x11-libs/cairo[>=1.4.10]
         x11-libs/libX11

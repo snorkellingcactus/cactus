@@ -25,11 +25,20 @@ DEPENDENCIES='
 	x11-libs/libX11
 '
 
+src_compile()
+{
+	export PYTHON=/usr/$( exhost --build )/bin/python2
+
+	distutils_src_compile
+}
+
 src_install()
 {
 	distutils_src_install
 
 	python_bytecompile /usr/share/cherrytree/modules/
+
+	edo sed -e "s@bin/python@bin/python2@" -i "${IMAGE}"${PYTHON}
 }
 
 #PLOCALES='cs de es fr hy it ja lt nl pl pt_BR ru sl tr uk zh_CN'
