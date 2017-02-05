@@ -38,7 +38,7 @@ src_install()
 
 	python_bytecompile /usr/share/cherrytree/modules/
 
-	edo sed -e "s@bin/python@bin/python2@" -i "${IMAGE}"${PYTHON}
+	edo sed -e "s@bin/python@bin/python2@" -i "${IMAGE}"/usr/$( exhost --target )/bin/${PN}
 }
 
 #PLOCALES='cs de es fr hy it ja lt nl pl pt_BR ru sl tr uk zh_CN'
