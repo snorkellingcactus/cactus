@@ -27,6 +27,7 @@ DEPENDENCIES='
 
 src_compile()
 {
+	# Probably because i'm not using the 2 API
 	export PYTHON=/usr/$( exhost --build )/bin/python2
 
 	distutils_src_compile
@@ -36,7 +37,26 @@ src_install()
 {
 	distutils_src_install
 
-	python_bytecompile /usr/share/cherrytree/modules/
+	local PACKAGE_SHARE=/usr/$( exhost --target )/share/${PN}
+	local MODULES_DIR=${PACKAGE_SHARE}/modules/
+
+	edo mkdir -p ${IMAGE}${PACKAGE_SHARE}
+	for i in "${IMAGE}"usr/share/${PN}/*
+	do
+		if [ "$( basename ${i} )" = "modules" ]
+		then
+			edo mkdir ${IMAGE}${MODULES_DIR}
+
+			for j in ${i}/*
+			do
+				dosym ../../../.."${j#"${IMAGE}"usr}" ${MODULES_DIR}
+			done
+		else
+			dosym ../../.."${i#"${IMAGE}"usr}" ${PACKAGE_SHARE}
+		fi
+	done
+
+	python_bytecompile ${MODULES_DIR}
 }
 
 #PLOCALES='cs de es fr hy it ja lt nl pl pt_BR ru sl tr uk zh_CN'
