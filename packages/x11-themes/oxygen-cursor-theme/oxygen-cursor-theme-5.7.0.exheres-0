@@ -1,0 +1,12 @@
+SCM_REPOSITORY='git://anongit.kde.org/oxygen.git'
+HOMEPAGE=${SCM_REPOSITORY}
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+require doinsmv scm-git
+
+src_install()
+{
+	insinto /usr/share/icons
+		doinsmv	cursors/Oxygen_*
+}
