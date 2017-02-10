@@ -1,0 +1,62 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'qtpascal-2.5.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+myexparam slot=4
+myexparam qt_minors=5.3
+
+exparam -v my_slot slot
+exparam -v my_qt_minors qt_minors
+
+[ "${PV}" != "${PV%_Alpha}" ] && ALPHA_STR=Alpha
+
+DESCRIPTION="selective bind Qt to free pascal"
+HOMEPAGE="http://users.telenet.be/Jan.Van.hijfte/qtforfpc/fpcqt4.html"
+
+FULL_VERSION="splitbuild-qt${my_slot}pas-V${PV%_Alpha}${ALPHA_STR}_Qt${my_slot}.${my_qt_minors}"
+URI_BASE="http://users.telenet.be/Jan.Van.hijfte/qtforfpc/V${PV%_Alpha}/"
+DOWNLOADS="
+	!bindist? (
+		${URI_BASE}${FULL_VERSION}.tar.gz
+	)
+	bindist? (
+		platform:x86? (
+			${URI_BASE}bin-${FULL_VERSION}.tar.gz
+		)
+		platform:amd64? (
+			${URI_BASE}bin64-${FULL_VERSION}.tar.gz
+		)
+	)
+"
+
+LICENCES="GPL-2"
+SLOT="${my_slot}"
+
+PLATFORMS="~x86 ~amd64"
+MYOPTIONS="bindist"
+
+# qt[gui]
+DEPENDENCIES="
+	x11-libs/qt:4
+	virtual/qtwebkit:4
+"
+
+# QA_PREBUILT="bindist? ( */libQt4Pas.so.5.2.5 )"
+
+WORK="${WORKBASE}"/${FULL_VERSION}
+EQMAKE_SOURCES=( Qt${my_slot}Pas.pro )
+
+#qtpascal_src_prepare(){
+#	eapply_user
+
+#	if ! optionq bindist; then
+#		eqmake 
+#	fi
+#}
+
+require qmake [ slot=${my_slot} ]
+
+qtpascal_src_install(){
+	dolib libQt${my_slot}Pas*
+}

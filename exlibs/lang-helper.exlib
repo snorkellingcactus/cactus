@@ -1,3 +1,6 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
 myexparam	linguas
 
 exparam -v my_linguas linguas

@@ -8,26 +8,38 @@ PLATFORMS='~x86 ~amd64'
 LICENCES='wxWindows Library Licence, Version 3'
 SLOT='0'
 
-# wxGTK[>=2.6.3]
+# TODO: rename to wxsvg
+# build: expat [development]?
 DEPENDENCIES="
-	media/ffmpeg[>=0.5]
-	build: sys-devel/libtool[>=1.5.26]
+	build:
+		sys-devel/libtool[>=1.5.26]
+	build+run:
+		dev-libs/expat
+		media/ffmpeg[>=0.5]
+		media-libs/libexif
+		x11-libs/cairo
+		x11-libs/pango
+		x11-libs/wxGTK[>=2.6.3]
+		libav? (
+			media/libav
+		)
 "
-MYOPTIONS="platform: x86 amd64"
-# MYOPTIONS libav
+MYOPTIONS='
+	libav
+	( platform: x86 amd64 )
+'
 
 require wx my_default_src_configure_params
+
+WORK="${WORKBASE}"/wxsvg-${PV}
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=(
+	'libav'
+)
 
 src_configure()
 {
 	my_default_src_configure_params --with-wx-config=$( wx_get_config_bin_name )
 
 	default
-}
-
-src_unpack()
-{
-	default
-
-	WORK=${WORKBASE}/wxsvg-${PV}
 }

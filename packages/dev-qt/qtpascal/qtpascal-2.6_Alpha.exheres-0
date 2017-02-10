@@ -1,6 +1,6 @@
 # Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'qtpascal-2.5.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-SCM_REVISION='171'
-
-require q3rally
+require ${PN} [ slot=5 qt_minors=1.1 ]

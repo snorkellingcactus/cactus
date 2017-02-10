@@ -1,0 +1,180 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'fpc-3.0.0.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+HOMEPAGE='http://www.freepascal.org/'
+DESCRIPTION='Free Pascal Compiler'
+URI_BASE=mirror://sourceforge/freepascal/
+DOWNLOADS="
+	${URI_BASE}fpcbuild-${PV}.tar.gz
+	${URI_BASE}fpc-${PV}.source.tar.gz
+	platform:amd64? (
+		${URI_BASE}${PNV}.x86_64-linux.tar -> ${PNV}.tar
+	)
+	platform:x86? (
+		${URI_BASE}${PNV}.i386-linux.tar -> ${PNV}.tar
+	)
+	doc? (
+		${URI_BASE}Documentation/${PV}/doc-html.tar.gz -> ${PN}-doc-html.tar.gz
+	)
+"
+
+SLOT='0'
+LICENCES='GPL-2 LGPL-2.1-with-linking-exception'
+PLATFORMS='~amd64 ~x86'
+
+MYOPTIONS='
+	doc ide source
+	( platform: x86 amd64 )
+'
+
+# DEPENDENCIES="ide? ( !dev-lang/fpc-ide )"
+
+# RESTRICT="strip" #269221
+
+src_unpack() {
+
+	default
+
+	if optionq platform:amd64
+	then
+		PBITS="x86_64"
+		BITS="x64"
+	fi
+	if optionq platform:x86
+	then
+		PBITS="i386"
+		BITS="386"
+	fi
+
+	[ -z ${PBITS} ] && die "This architecture is not supported."
+
+	unpack ./${PN}-${PV}.${PBITS}-linux/binary.${PBITS}-linux.tar
+	unpack ./base.${PBITS}-linux.tar.gz
+
+	WORK="${WORKBASE}"/fpcbuild-${PV}/fpcsrc
+}
+
+src_prepare() {
+	edo find . -name Makefile -exec sed -i -e 's/ -Xs / /g' {} +
+
+	# let the pkg manager compress man files
+	sed -i '/find man.* gzip /d' ../install/man/Makefile
+}
+
+set_pp() {
+	case ${1} in
+		bootstrap)
+			pp="${WORKBASE}"/lib/fpc/${PV}/ppc${BITS}
+			;;
+		new)
+			pp="${WORK}"/compiler/ppc${BITS}
+			;;
+		*)
+			die "set_pp: unknown argument: ${1}"
+			;;
+	esac
+}
+
+src_compile() {
+	local pp
+	local compiler="${WORK}/compiler/ppc${BITS}"
+	local compiler_new="${compiler}.new"
+	local TOOLPFX=$( exhost --tool-prefix )
+
+	# Using the bootstrap compiler.
+	set_pp bootstrap
+
+	# TODO: need AS=?
+	emake -j1 PP="${pp}" compiler_cycle AS="${AS}" BINUTILSPREFIX="${TOOLPFX}"
+
+	# Save new compiler from cleaning...
+	edo cp "${compiler}" "${compiler_new}"
+
+	# ...rebuild with current version...
+	emake -j1 PP="${compiler_new}" AS="${AS}" BINUTILSPREFIX=${TOOLPFX} compiler_cycle
+
+	# ..and clean up afterwards
+	edo rm "${compiler_new}"
+
+	# Using the new compiler.
+	set_pp new
+
+	emake -j1 PP="${pp}" AS="${AS}" BINUTILSPREFIX=${TOOLPFX} rtl_clean
+
+	emake -j1 PP="${pp}" AS="${AS}" BINUTILSPREFIX=${TOOLPFX} rtl packages_all utils
+
+#	if use ide ; then
+#		cd "${WORK}"/ide
+#		emake -j1 PP="${pp}" AS="${AS}"
+#	fi
+}
+
+src_install() {
+	local TGT=/usr/$( exhost --target )/
+	local pp
+	set_pp new
+
+	set -- PP="${pp}" FPCMAKE="${WORK}/utils/fpcm/bin/${PBITS}-linux/fpcmake" \
+		INSTALL_PREFIX="${IMAGE}"/usr/$( exhost --target ) \
+		INSTALL_DOCDIR="${IMAGE}"/usr/share/doc/${PNVR} \
+		INSTALL_MANDIR="${IMAGE}"/usr/share/man \
+		INSTALL_SOURCEDIR="${IMAGE}"${TGT}lib/fpc/${PV}/source
+
+	emake -j1 "$@" compiler_install rtl_install packages_install utils_install
+
+	dosym ../lib/fpc/${PV}/ppc${BITS} ${TGT}bin/ppc${BITS}
+
+#	edo cd ../install/doc
+#	emake -j1 "$@" installdoc
+
+#	edo cd ../install/man
+#	emake -j1 "$@" installman
+
+	if optionq doc ; then
+		pushd ../../doc
+			dodoc -r *
+		popd
+	fi
+
+	if optionq ide ; then
+		pushd ide
+			emake -j1 "$@" install
+		popd
+	fi
+
+	if optionq source
+	then
+		shift
+
+		emake -j1 PP="${IMAGE}"${TGT}bin/ppc${BITS} "$@" sourceinstall
+
+		local TO_FIND="${IMAGE}"${TGT}lib/fpc/${PV}/source
+
+		edo find ${TO_FIND} -name '*.o' -exec rm {} \;
+		edo find "${TO_FIND}" -type d -empty -delete
+
+		unset TO_FIND
+	fi
+
+	edo "${IMAGE}"${TGT}lib/fpc/${PV}/samplecfg "${IMAGE}"${TGT}lib/fpc/${PV} "${IMAGE}"/etc
+
+	# TODO: maybe add -XP${TOOL_PREFIX}
+	edo sed -i "s:${IMAGE}::g" "${IMAGE}"etc/{{fpc,fppkg}.cfg,fppkg/default}
+
+	if optionq ide ; then
+		edo sed -e "s:${IMAGE}::g" \
+			-i "${IMAGE}"/etc/fppkg.cfg \
+			-i "${IMAGE}"/etc/fppkg/* \
+			-i "${IMAGE}"${TGT}lib/fpc/${PV}/ide/text/fp*.cfg
+	fi
+
+	edo rm -r "${IMAGE}"${TGT}lib/fpc/lexyacc
+}
+
+#pkg_postinst() {
+#	if [[ -z ${REPLACING_VERSIONS} ]] && use ide; then
+#		einfo "To read the documentation in the fpc IDE, enable the doc USE flag"
+#	fi
+#}

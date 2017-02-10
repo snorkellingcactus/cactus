@@ -19,15 +19,17 @@ PLATFORMS='~x86 ~amd64'
 # doc:
 # https://sourceforge.net/p/dvdstyler/discussion/318795/thread/a72932d3/
 # you can remove the line with xmlto in configure.ac and the run "./autogen.sh"
+# x11-libs/wxGTK[>=2.8.7][gstreamer]?
 DEPENDENCIES='
 	app-cdr/cdrtools[>=2.01]
+	app-cdr/dvd+rw-tools
 	media/dvdauthor[>=0.7.0]
 	media-gfx/exif[>=0.6.16]
 	media-video/xine-ui[>=0.99.1]
 	providers:ffmpeg? ( media/ffmpeg[>=0.10.0] )
 	providers:libav? ( media/libav[>=0.8.0] )
 	sys-devel/gettext[>=0.17]
-	x11-libs/wxGTK[>=2.8.7][gstreamer]
+	x11-libs/wxGTK[>=2.8.7]
 	x11-libs/wxSVG[>=1.1.7]
 
 	ecc? ( app-cdr/dvdisaster )

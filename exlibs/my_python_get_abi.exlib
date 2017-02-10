@@ -1,0 +1,17 @@
+# Assume python abi 2 included
+my_python_get_abi()
+{
+	local PYTHON_SELECTED_ABI
+
+	for i in ${PYTHON_FILTERED_ABIS}
+	do
+		if optionq python_abis:${i}
+		then
+			PYTHON_SELECTED_ABI=${i}
+			break
+		fi
+	done
+
+	echo ${PYTHON_SELECTED_ABI}
+}
+	

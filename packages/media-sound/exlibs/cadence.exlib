@@ -31,7 +31,7 @@ DEPENDENCIES="
 		media-sound/pulseaudio[jack]
 "
 
-require doinsmv scm-git python [ blacklist='2 4' ]
+require doinsmv scm-git python [ blacklist='2 4' ] my_python_get_abi
 
 export_exlib_phases src_prepare src_compile src_install
 
@@ -57,18 +57,7 @@ cadence_src_install()
 
 	local TO_MOVE="${IMAGE}"usr/bin
 
-	local PYTHON_SELECTED_ABI
-
-	for i in ${PYTHON_FILTERED_ABIS}
-	do
-		if optionq python_abis:${i}
-		then
-			PYTHON_SELECTED_ABI=${i}
-			break
-		fi
-	done
-
-	edo sed -i -e "s/python3/python${PYTHON_SELECTED_ABI}/g" -e 's/INSTALL_PREFIX="\/usr/INSTALL_PREFIX="\/usr\/'"${TGT}"'/' "${TO_MOVE}"/${PN}
+	edo sed -i -e "s/python3/python$( my_python_get_abi )/g" -e 's/INSTALL_PREFIX="\/usr/INSTALL_PREFIX="\/usr\/'"${TGT}"'/' "${TO_MOVE}"/${PN}
 
 	insinto "${PREFIX}"
 		doinsmv "${TO_MOVE}"
