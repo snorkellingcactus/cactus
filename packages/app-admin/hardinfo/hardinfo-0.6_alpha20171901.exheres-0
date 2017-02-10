@@ -1,0 +1,37 @@
+# Copyright 2016 Julian Ospald <hasufell@posteo.de>
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="https://github.com/lpereira/${PN}.git"
+
+SCM_REVISION='e4f54445f64453ed5775bf2591d519642411eb1e'
+
+require scm-git cmake [ api=2 ]
+
+SUMMARY="A system information and benchmark tool for Linux systems"
+HOMEPAGE="http://hardinfo.org/"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    build+run:
+        dev-libs/glib:2
+        gnome-desktop/libsoup
+        x11-libs/gdk-pixbuf
+        x11-libs/gtk+:2
+        x11-libs/pango
+"
+
+#REMOTE_IDS="github:lpereira/${PN}"
+
+src_prepare() {
+    edo sed -i \
+        -e '/PREFIX/s:@CMAKE_INSTALL_PREFIX@/share:@CMAKE_INSTALL_DATAROOTDIR@:' \
+        "${CMAKE_SOURCE}"/config.h.cmake
+    cmake_src_prepare
+}
+
