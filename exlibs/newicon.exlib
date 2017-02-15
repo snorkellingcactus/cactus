@@ -3,7 +3,7 @@ function newicon()
 {
 	local s=48
 
-	[ ${1} = '-s' ] && shift && local s=${1} && shift
+	[ "${1}" = "-s" ] && shift && local s=${1} && shift
 
 	local DIR="${IMAGE}/usr/share/icons/hicolor/${s}"'x'"${s}/apps"
 
@@ -13,12 +13,12 @@ function newicon()
 }
 function doicon()
 {
-	[ ${1} = '-s' ] && shift && local s="-s ${1}" && shift
+	[ "${1}" = "-s" ] && shift && local s="-s ${1}" && shift
 
 	CMDBASE="newicon ${s}"
 
 	for i in "$@"
 	do
-		edo ${CMDBASE} "${i}" "$( basename ${i} )"
+		edo ${CMDBASE} "${i}" $( basename "${i}" )
 	done
 }

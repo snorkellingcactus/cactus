@@ -2,12 +2,16 @@
 # Distributed under the terms of the GNU General Public License v2
 
 myexparam	linguas
+myexparam	at_least_one=false
 
 exparam -v my_linguas linguas
+exparam -v my_at_least_one at_least_one
 
 MYOPTIONS+='(
 		linguas: '"${my_linguas}"'
 )'
+
+[ "${at_least_one}" != "false" ] && MYOPTIONS+=' [[ number-selected = at-least-one ]] '
 
 export_exlib_phases src_install
 

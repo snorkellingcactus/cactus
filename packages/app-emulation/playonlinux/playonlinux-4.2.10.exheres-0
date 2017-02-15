@@ -119,4 +119,7 @@ pkg_postinst()
 	einfo "You also may want to make symlinks like:"
 	einfo "linux-x86/1.3.37/bin/wine -> linux-amd64/1.3.37/bin/wine" 
 	einfo "to force ${MY_PN} use a wine 32 or 64 version."
+	einfo ""
+	einfo "If you have i686 wine installed you can export "
+	einfo "PATH=${PATH}:${YOUR_i686_BINDIR} before running ${PN} ."
 }

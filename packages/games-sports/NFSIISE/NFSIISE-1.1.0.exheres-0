@@ -1,0 +1,111 @@
+linguas='english french german italian spanish swedish'
+
+require lang-helper [ linguas="${linguas}" at_least_one=1 ] newicon domenu
+
+HOMEPAGE="https://github.com/zaps166/${PN}"
+DOWNLOADS="
+	( ${HOMEPAGE}/archive/v1.1.0.tar.gz -> ${PNV}.tar.gz )
+	( ${HOMEPAGE%${PN}}NFSIISE-ASM/archive/master.zip -> ${PN}-Asm.zip )
+"
+
+LICENCES='MIT'
+SLOT='0'
+PLATFORMS='~x86'
+
+DEPENDENCIES='
+	media-libs/SDL:2[opengl]
+'
+
+src_unpack()
+{
+	default
+
+	edo mv "${WORKBASE}"/${PN}-ASM-master/* "${WORK}"/src/Asm
+}
+
+src_compile()
+{
+	TGT=/usr/$( exhost --target )/
+	local TGT_LIBDIR=${TGT}lib/
+
+	#CPU_FLAGS='-mno-sse2 -mno-sse -mno-mmx'
+
+	edo $(exhost --tool-prefix)cc ${CFLAGS} -DSTACK_REALIGN -c $( find . -name '*.c' -printf '%p ' )
+
+	# edo $( exhost --tool-prefix )?
+	edo yasm -f elf32 src/Asm/NFS2SE.asm -o NFS2SE.Linux.o
+
+	edo $( exhost --tool-prefix )ld -m elf_i386 -dynamic-linker ${TGT_LIBDIR}/ld-2.24.so -o "Need For Speed II SE/nfs2se" *.o -L${TGT_LIBDIR} -lc -lSDL2 -lGL ${STRIP} -rpath=\$ORIGIN -e start
+}
+NFSIISE_remove_locale()
+{
+	local lingua_file_name="text.${l:0:3}"
+	local lingua_file="${SUBDIR}${lingua_file_name}"
+
+	if optionq linguas:${l}
+	then
+		doins "${lingua_file}"
+		dosym ${PKG_SHAREDIR}/${lingua_file_name} ${PKG_BINDIR}
+
+		LINGUAS_STR+="${l}, "
+	else
+		edo rm -f "${lingua_file}"
+	fi
+}
+src_install()
+{
+	local	SUBDIR="Need For Speed II SE"/
+			PKG_SHAREDIR=/usr/share/${PN}/
+	local	PKG_BINDIR=${TGT}share/${PN}
+			PKG_LOWER=nfs2se
+
+	for i in ${linguas}
+	do
+		if optionq linguas:${i}
+		then
+			edo sed -e 's/4nnenglish/4nn'"${i}"'/' -i "${SUBDIR}"install.win
+
+			break
+		fi
+	done
+
+	exeinto ${PKG_BINDIR}
+		doexe "${SUBDIR}"${PKG_LOWER}
+
+	insinto ${PKG_SHAREDIR}
+		doins "${SUBDIR}"{${PKG_LOWER}.conf.template,install.win}
+		dosym ${PKG_SHAREDIR}${PKG_LOWER}.conf.template ${PKG_BINDIR}
+		dosym ${PKG_SHAREDIR}install.win ${PKG_BINDIR}
+		lang-helper-linguas-loop 'NFSIISE_remove_locale'
+
+	dosym ${PKG_SHAREDIR}fedata	${PKG_BINDIR}
+	dosym ${PKG_SHAREDIR}gamedata	${PKG_BINDIR}
+
+	exeinto ${PKG_SHAREDIR}
+		doexe "${SUBDIR}"convert_to_lowercase
+
+	dodir ${TGT}bin
+	dosym ${PKG_SHAREDIR}convert_to_lowercase ${TGT}bin/${PKG_LOWER}_convert_to_lowercase
+
+	doicon "${SUBDIR}"${PKG_LOWER}.png
+	domenu "${SUBDIR}"${PKG_LOWER}.desktop
+
+	local WRAP=${TEMP}/${PKG_LOWER}
+
+	echo '#!/bin/bash' > ${WRAP}
+	echo "cd ${PKG_BINDIR} && exec ${PKG_BINDIR}/${PKG_LOWER}" >> ${WRAP}
+
+	dobin ${WRAP}
+}
+pkg_postinst()
+{
+	einfo "You must copy fedata and gamedata directories from the Need For Speed™ II SE original CD-ROM into ${PKG_SHAREDIR}"
+	einfo 'All files and directories copied from CD-ROM must have small letters on Unix-like systems!!!'
+	einfo "Please run ${PKG_LOWER}_convert_to_lowercase script if you have UPPERCASE names."
+	einfo 'If you want to change the language, edit install.win file and change the first line.'
+	einfo 'Leave 4nn as is and modify only language name. Possible languages are:'
+	einfo "${LINGUAS_STR%, }"
+
+	einfo "The game settings files are located in ~/.${PKG_LOWER}. At the first run the nfs2se.conf.template"
+	einfo 'will be copied there. You can modify the file if you want to configure the game.'
+}
