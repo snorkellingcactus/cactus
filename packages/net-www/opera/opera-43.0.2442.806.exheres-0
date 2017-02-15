@@ -80,11 +80,11 @@ src_install() {
 
 	ARCHDIR+='-linux-gnu'
 
-	mkdir -p "${IMAGE}"${TGT}
+	mkdir -p "${IMAGE}"${LIBDIR}
 
-	mv "${WORK}"/usr/lib/${ARCHDIR}/${PN} "${IMAGE}"${LIBDIR}
+	edo mv usr/lib/${ARCHDIR}/${PN} "${IMAGE}"${LIBDIR}
 
-	mv "${WORK}"/usr/share "${IMAGE}"/usr
+	edo mv usr/share "${IMAGE}"/usr
 
 	mkdir "${IMAGE}"${BINDIR}
 	dosym ../lib/${PN}/${PN} ${BINDIR}/${PN}
@@ -95,13 +95,8 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "You'll need to install your prefered simulation backend"
-	elog "such ngspice or gnucap for simulation to work."
-	elog "As an alternative generate a netlist and use sci-electronics/ngspice"
-	elog "from the command line for simulation."
-
 	freedesktop-desktop_pkg_postinst
-	freedesktop-mime_pkg_postrm
+	freedesktop-mime_pkg_postinst
 	gtk-icon-cache_pkg_postinst
 }
 
