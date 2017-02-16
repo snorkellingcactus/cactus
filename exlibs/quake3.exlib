@@ -3,6 +3,7 @@
 
 myexparam	MAKE_PREFIX=.
 myexparam	REND_SUFFIX=opengl2
+myexparam	BUILD_GAME_SO=false
 myexparam	BASEQ3_PATH=[ baseq3 ]
 
 # The bin suffix is used to prevent a build error
@@ -10,9 +11,10 @@ myexparam	BASEQ3_PATH=[ baseq3 ]
 			CLI_BIN_SUFFIX=-client
 			SRV_BIN_SUFFIX=-server
 
-exparam -v MY_MAKE_PREFIX MAKE_PREFIX
-exparam -v MY_REND_SUFFIX REND_SUFFIX
-exparam -v MY_BASEQ3_PATH BASEQ3_PATH[@]
+exparam -v MY_MAKE_PREFIX	MAKE_PREFIX
+exparam -v MY_REND_SUFFIX	REND_SUFFIX
+exparam -v MY_BUILD_GAME_SO	BUILD_GAME_SO
+exparam -v MY_BASEQ3_PATH	BASEQ3_PATH[@]
 
 require doinsmv
 
@@ -68,31 +70,31 @@ DEPENDENCIES="
 "
 
 DEFAULT_SRC_COMPILE_PARAMS+=(
-    BUILD_RENDERER_OPENGL2=1    # build newer renderer
-    BUILD_STANDALONE=1
-    BUILD_BASEGAME=0            # the following four variables control building of non-essential
-                                # stuff: Quake VMs, libraries, building for 3rd party mods.
-    BUILD_GAME_QVM=0
-    BUILD_GAME_SO=0
-    BUILD_MISSIONPACK=0
-    FULLBINEXT=""
-    GENERATE_DEPENDENCIES=0     # do not add -MMD for the preprocessor
-    NO_STRIP=1                  # let us do the stripping
-    OPTIMIZE=""                 # do add more optimization CFLAGS
-    OPTIMIZEVM=""               # see above
-    USE_CURL_DLOPEN=0           # *_DLOPEN: do not link at runtime
-    USE_INTERNAL_JPEG=0
-    USE_INTERNAL_VORBIS=0
-    USE_INTERNAL_OGG=0
-    USE_INTERNAL_OPUS=0
-    USE_INTERNAL_SPEEX=0
-    USE_INTERNAL_ZLIB=0
-    USE_LOCAL_HEADERS=0         # do not use headers local to ioq3 instead of system ones
-    USE_OPENAL_DLOPEN=0
-    USE_RENDERER_DLOPEN=0
-    USE_FREETYPE=1
-    V=1                         # show cc command line when building
-    release                     # only build release target, do not build debug target
+	BUILD_RENDERER_OPENGL2=1    # build newer renderer
+	BUILD_STANDALONE=1
+	BUILD_BASEGAME=0            # the following four variables control building of non-essential
+	                            # stuff: Quake VMs, libraries, building for 3rd party mods.
+	BUILD_GAME_QVM=0
+
+	BUILD_MISSIONPACK=0
+	FULLBINEXT=""
+	GENERATE_DEPENDENCIES=0     # do not add -MMD for the preprocessor
+	NO_STRIP=1                  # let us do the stripping
+	OPTIMIZE=""                 # do add more optimization CFLAGS
+	OPTIMIZEVM=""               # see above
+	USE_CURL_DLOPEN=0           # *_DLOPEN: do not link at runtime
+	USE_INTERNAL_JPEG=0
+	USE_INTERNAL_VORBIS=0
+	USE_INTERNAL_OGG=0
+	USE_INTERNAL_OPUS=0
+	USE_INTERNAL_SPEEX=0
+	USE_INTERNAL_ZLIB=0
+	USE_LOCAL_HEADERS=0         # do not use headers local to ioq3 instead of system ones
+	USE_OPENAL_DLOPEN=0
+	USE_RENDERER_DLOPEN=0
+	USE_FREETYPE=1
+	V=1                         # show cc command line when building
+	release                     # only build release target, do not build debug target
 )
 
 function dogamebin() {
@@ -100,15 +102,23 @@ function dogamebin() {
     local BIN_NAME=${PN}$1
     local BIN="${INST}"/${BIN_NAME}
 
-    if optionq data
-    then
-        BIN_NAME="${TEMP}"/${BIN_NAME}
+	if optionq data
+	then
+		BIN_NAME="${TEMP}"/${BIN_NAME}
 
-        echo -e '#!/bin/sh'"\n${BIN} "'+set fs_basepath "'${DATA}'" "$@"' > "${BIN_NAME}"
+		local BASEPATH
+		if [ "${MY_BUILD_GAME_SO}" = "0" ]
+		then
+			BASEPATH="${DATA}"
+		else
+			BASEPATH="${INST}"
+		fi
+
+        echo -e '#!/bin/sh'"\n${BIN} "'+set fs_basepath "'${BASEPATH}'" "$@"' > "${BIN_NAME}"
 
         dobin "${BIN_NAME}"
-    else
-        dosym "${BIN}" /usr/$( exhost --target )/bin/${BIN_NAME}
+#    else
+#        dosym "${BIN}" /usr/$( exhost --target )/bin/${BIN_NAME}
     fi
 }
 
@@ -127,6 +137,8 @@ quake3_src_compile(){
 			BUILD_SERVER=$(					option server	1 0	)
 			BUILD_CLIENT=$(					option engine	1 0	)
 			BUILD_CLIENT_SMP=$( 			option smp		1 0	)
+			BUILD_GAME_SO=${MY_BUILD_GAME_SO}
+			BUILD_BASEGAME=${MY_BUILD_GAME_SO}
 			FRAMEBUFFER_AND_GLSL_SUPPORT=$( option fb		1 0	)
 			USE_MUMBLE=$(					option mumble	1 0	)
 #			USE_VOIP=$(						option voip		1 0	)
@@ -152,20 +164,43 @@ quake3_src_install()
 	fi
 	if optionq server || optionq engine
 	then
-		local	OUT=${MY_MAKE_PREFIX}/build/release-linux-${ARCH}/${PN}
+		local	OUT_DIR=${MY_MAKE_PREFIX}/build/release-linux-${ARCH}/
+		local	OUT=${OUT_DIR}/${PN}
 		local	INST=/usr/$( exhost --target )/share/games/${PN}
 
-		mkdir -p "${IMAGE}"/usr/$( exhost --target )/bin
+		dodir /usr/$( exhost --target )/bin
 
 		exeinto ${INST}
 			newexe ${OUT}${CLI_BIN_SUFFIX}_${MY_REND_SUFFIX} ${PN}_${MY_REND_SUFFIX}
 
-		optionq server							&&
-		doexe ${OUT}${SRV_BIN_SUFFIX}			&&
-		dogamebin ${SRV_BIN_SUFFIX}
+			optionq server							&&
+			doexe ${OUT}${SRV_BIN_SUFFIX}			&&
+			dogamebin ${SRV_BIN_SUFFIX}
 
-		optionq engine 							&&
-		newexe ${OUT}${CLI_BIN_SUFFIX} ${PN}	&&
-		dogamebin
+			optionq engine 							&&
+			newexe ${OUT}${CLI_BIN_SUFFIX} ${PN}	&&
+			dogamebin
+
+		echo "${MY_BUILD_GAME_SO} != 0"
+		if [ "${MY_BUILD_GAME_SO}" != "0" ]
+		then
+			echo "for b in ${MY_BASEQ3_PATH[@]}"
+			for b in ${MY_BASEQ3_PATH[@]}
+			do
+				local BASE_NAME=$( basename "${b}" )
+				local BASE_TGT=${INST}/${BASE_NAME}
+				local BASE_DATA=${DATA}/${BASE_NAME}
+
+				dodir ${BASE_TGT}
+
+				exeinto ${BASE_TGT}
+					doexe $( find ${OUT_DIR} -name '*.so' -printf '%p ' )
+
+				for d in "${IMAGE}"${BASE_DATA}/*
+				do
+					dosym "../../../../../${BASE_DATA#/usr}/$( basename ${d} )" ${BASE_TGT}
+				done
+			done
+		fi
 	fi
 }

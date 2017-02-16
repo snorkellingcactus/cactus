@@ -1,0 +1,83 @@
+# make[2]: *** No rule to make 
+# target '../.git/index', needed by
+# 'build/release-linux-x86_64/client/cl_console.o'.  Stop.
+# github
+
+HOMEPAGE='https://github.com/iortcw/iortcw'
+SCM_REPOSITORY="${HOMEPAGE}.git"
+SCM_TAG=${PV}
+
+MAIN_FOLDER=main
+
+require lang-helper [ linguas='deutsch espanol francais italiano' ] scm-git quake3 [ REND_SUFFIX=rend2 BASEQ3_PATH=[ "${WORK}/${MAIN_FOLDER}" ] BUILD_GAME_SO=1 ]
+
+BASE_URI="${HOMEPAGE}/releases/download/${PV}/"
+
+IORTCW_add_linguas_downloads()
+{
+	DOWNLOADS+="
+		linguas:${l}? ( ${BASE_URI}patch-data-SP_${1}.zip )
+	"
+}
+
+SUMMARY='Return to Castle Wolfenstein Single Player updated engine.'
+SLOT='0'
+LICENCES='GPL-3'
+PLATFORMS='~amd64 ~x86'
+
+PAKS_FOLDER=iortcw-${PV}-linux-x86_64
+
+DOWNLOADS+="
+	${BASE_URI}${PAKS_FOLDER}.zip
+	${BASE_URI}patch-data-141.zip
+"
+
+lang-helper-linguas-loop 'IORTCW_add_linguas_downloads'
+
+src_unpack()
+{
+	default
+
+	scm_src_unpack
+}
+
+src_prepare()
+{
+
+	# cp "${DATA}"/{sp_pak{1,2},pak0,mp_pak{0,1,2}}.pk3
+
+	edo mkdir ${MAIN_FOLDER}
+
+	touch ${MAIN_FOLDER}/{sp_pak{1,2},pak0,mp_pak{0,1,2}}.pk3
+
+	edo rm "${WORKBASE}"/${MAIN_FOLDER}/{*.so,*.dll}
+	edo cp -r "${WORKBASE}"/{${MAIN_FOLDER}/*,${PAKS_FOLDER}/${MAIN_FOLDER}/*.pk3} ${MAIN_FOLDER}
+
+	pushd SP
+		quake3_src_prepare
+	popd
+}
+
+src_compile()
+{
+	pushd SP
+		quake3_src_compile
+	popd
+}
+
+src_install()
+{
+	pushd SP
+		quake3_src_install
+	popd
+}
+pkg_postinst()
+{
+	local DATA=/usr/share/games/${PN}/main
+
+	einfo "You need to copy some .pk3 files from game's Main/ to ${DATA}"
+	einfo "You can do this like:"
+	einfo "cp ${RTCW_INSTALL_DIR}/Main/{sp_pak{1,2},pak0,mp_pak{0,1,2}}.pk3 ${DATA}"
+	einfo "These files are not directly accessible from the cdrom so you may want to"
+	einfo "install the game with ( for example ) wine."
+}
