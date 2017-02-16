@@ -171,17 +171,21 @@ quake3_src_install()
 		dodir /usr/$( exhost --target )/bin
 
 		exeinto ${INST}
-			newexe ${OUT}${CLI_BIN_SUFFIX}_${MY_REND_SUFFIX} ${PN}_${MY_REND_SUFFIX}
 
-			optionq server							&&
-			doexe ${OUT}${SRV_BIN_SUFFIX}			&&
-			dogamebin ${SRV_BIN_SUFFIX}
+			if optionq server
+			then
+				doexe ${OUT}${SRV_BIN_SUFFIX}
+				dogamebin ${SRV_BIN_SUFFIX}
+			fi
 
-			optionq engine 							&&
-			newexe ${OUT}${CLI_BIN_SUFFIX} ${PN}	&&
-			dogamebin
+			if optionq engine
+			then
+				newexe ${OUT}${CLI_BIN_SUFFIX} ${PN}_render1
+				newexe ${OUT}${CLI_BIN_SUFFIX}_${MY_REND_SUFFIX} ${PN}
+				dogamebin _render1
+				dogamebin
+			fi
 
-		echo "${MY_BUILD_GAME_SO} != 0"
 		if [ "${MY_BUILD_GAME_SO}" != "0" ]
 		then
 			echo "for b in ${MY_BASEQ3_PATH[@]}"

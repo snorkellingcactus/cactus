@@ -48,7 +48,8 @@ src_prepare()
 
 	edo mkdir ${MAIN_FOLDER}
 
-	touch ${MAIN_FOLDER}/{sp_pak{1,2},pak0,mp_pak{0,1,2}}.pk3
+	# TODO: This may cause user's data overwrite.
+	edo touch ${MAIN_FOLDER}/{sp_pak{1,2},pak0,mp_pak{0,1,2}}.pk3
 
 	edo rm "${WORKBASE}"/${MAIN_FOLDER}/{*.so,*.dll}
 	edo cp -r "${WORKBASE}"/{${MAIN_FOLDER}/*,${PAKS_FOLDER}/${MAIN_FOLDER}/*.pk3} ${MAIN_FOLDER}
@@ -65,6 +66,7 @@ src_compile()
 	popd
 }
 
+# TODO: desktop, MP.
 src_install()
 {
 	pushd SP
