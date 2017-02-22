@@ -1,0 +1,15 @@
+# Copyright 2015-2016 Mykola Orliuk
+# Distributed under the terms of the GNU General Public License v2
+
+require vivaldi
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES="
+    build+run:
+        !net-www/vivaldi-stable [[ resolution = uninstall-blocked-before ]]
+    run:
+        x11-dri/mesa [[ description = [ for included libEGL.so ] ]]
+"
+# TODO: consider removing $HERE/*.so because they are not included in LD_LIBRARY_PATH

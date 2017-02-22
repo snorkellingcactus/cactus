@@ -1,0 +1,149 @@
+# Copyright 2015-2016 Mykola Orliuk
+# Distributed under the terms of the GNU General Public License v2
+
+VIVALDI_CHANNEL=${PN#vivaldi-}
+
+MY_INST_PN=${PN%-stable}
+MY_PN=${PN%-*}
+MY_PV="${PV/_/-}"
+MY_PNV="${PN}_${MY_PV}"
+
+require gtk-icon-cache freedesktop-desktop newicon doinsmv lang-helper [ linguas='en-GB bn gu he ml da ar am zh-CN id es te hu sv fi en-US fa pt-BR pt-PT hi zh-TW mr it et tr sk kn th ko lt fil vi sl ro uk lv ja de cs pl el sw ta ms fr nl es-419 bg hr sr ca nb ru sr_Latn gd mk ku nn bar es_MX ka sq eo fy ca@valencia sc pt_PT es_PE en zh_CN ln gl jbo io eu hy pt_BR zh_TW be is bs' ]
+
+export_exlib_phases src_unpack src_install pkg_postinst pkg_postrm
+
+SUMMARY='A browser for our friends created by former Opera developers.'
+DESCRIPTION='
+The web browser you will love! Powerful, customizable, secure, and free web browser from Vivaldi
+technologies.
+'
+HOMEPAGE="https://${MY_PN}.com"
+MYOPTIONS='
+	platform:
+		amd64
+		x86
+'
+
+UPSTREAM_CHANGELOG="https://${MY_PN}.net/en-US [[ lang = en ]]"
+UPSTREAM_DOCUMENTATION="
+    https://${MY_PN}.net/forum [[ lang = en description = [ Vivaldi Community ] ]]
+    https://help.${MY_PN}.com [[ lang = en description = [ Vivaldi Help ] ]]
+"
+BASE_URI="https://downloads.${MY_PN}.com/${VIVALDI_CHANNEL}/${MY_PNV}_"
+DOWNLOADS="
+	platform:amd64? (	${BASE_URI}amd64.deb	)
+	platform:x86?	(	${BASE_URI}i386.deb		)
+"
+
+LICENCES="${MY_PN}-eula"
+
+DEPENDENCIES='
+	run:
+		dev-libs/atk
+		dev-libs/expat
+		dev-libs/glib:2
+		dev-libs/nspr
+		dev-libs/nss
+		gnome-platform/GConf:2
+		media-libs/fontconfig
+		media-libs/freetype:2
+		net-print/cups
+		sys-apps/dbus
+		sys-sound/alsa-lib
+		x11-libs/cairo
+		x11-libs/gdk-pixbuf:2.0
+		x11-libs/gtk+:2
+		x11-libs/libX11
+		x11-libs/libXScrnSaver
+		x11-libs/libXcomposite
+		x11-libs/libXcursor
+		x11-libs/libXdamage
+		x11-libs/libXext
+		x11-libs/libXfixes
+		x11-libs/libXi
+		x11-libs/libXrandr
+		x11-libs/libXrender
+		x11-libs/libXtst
+		x11-libs/libxcb
+		x11-libs/pango
+'
+
+WORK="${WORKBASE}"
+
+vivaldi_src_unpack() {
+    default
+
+    edo tar xf data.tar.*
+}
+
+function vivaldi_remove_locale()
+{
+	! optionq linguas:${1} && edo rm -rf resources/${MY_PN}/{_locales/${1},default-bookmarks/${1}.json} locales/${1}.pak
+}
+
+vivaldi_src_install() {
+	edo mv usr/share/doc/{${PN},${PNVR}}
+
+	local TGT=/usr/$( exhost --target )/
+
+	local MY_INTO_TGT=${TGT}share/${MY_INST_PN}
+
+	insinto /usr
+		doinsmv usr/share
+
+	pushd opt/${MY_INST_PN}
+		lang-helper-linguas-loop vivaldi_remove_locale
+
+		rm -df resources/${MY_PN}/{_locales,default-bookmarks} locales
+
+		chmod 4755 ${MY_PN}-sandbox
+
+		edo rm ${MY_PN}
+
+		insinto ${MY_INTO_TGT}
+			for i in ${MY_PN}{-${VIVALDI_CHANNEL},-bin,-sandbox} *.bin *.so lib
+			do
+				doinsmv ${i}
+			done
+
+		local icon
+		local icon_ext=.png
+		for i in 16 22 24 32 48 64 128 256
+		do
+			icon=product_logo_${i}${icon_ext}
+
+			newicon -s ${i} ${icon} ${MY_INST_PN}${icon_ext}
+
+			edo rm ${icon}
+		done
+
+		MY_INTO=/usr/share/${MY_INST_PN}/
+		insinto ${MY_INTO}
+			for i in *
+			do
+				dosym ${MY_INTO}${i} ${MY_INTO_TGT}
+
+				doinsmv ${i}
+			done
+	popd
+
+	local TGT_BIN=${TGT}bin/
+	dodir ${TGT_BIN}
+
+	dosym ${MY_INTO_TGT}/${MY_INST_PN} ${TGT_BIN}
+}
+vivaldi_pkg_postinst()
+{
+	freedesktop-desktop_pkg_postinst
+	gtk-icon-cache_pkg_postinst
+
+	einfo "You may experience issues with running ${PN} on some linux configurations (kernel lower"
+	einfo "than 3.17 or disabled \"user namespaces\") without suid bit on vivaldi-sandbox."
+	einfo "See next link:"
+	einfo "https://${MY_PN}.net/teamblog/79-sandbox-issues-when-installing-to-non-standard-locations-on-linux"
+}
+vivaldi_pkg_postrm()
+{
+	freedesktop-desktop_pkg_postrm
+	gtk-icon-cache_pkg_postrm
+}
