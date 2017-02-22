@@ -20,13 +20,16 @@ DEPENDENCIES="
 		x11-libs/cairo
 		x11-libs/pango
 		x11-libs/wxGTK[>=2.6.3]
-		libav? (
-			media/libav
-		)
+
+	providers:ffmpeg?	(	media/ffmpeg[>=0.10.0]	)
+	providers:libav?	(	media/libav[>=0.8.0]	)
 "
+
 MYOPTIONS='
-	libav
 	( platform: x86 amd64 )
+	providers:
+		ffmpeg
+		libav
 '
 
 require wx my_default_src_configure_params
@@ -34,7 +37,8 @@ require wx my_default_src_configure_params
 WORK="${WORKBASE}"/wxsvg-${PV}
 
 DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=(
-	'libav'
+	'providers:libav	libav'
+	'providers:ffmpeg	libav'
 )
 
 src_configure()

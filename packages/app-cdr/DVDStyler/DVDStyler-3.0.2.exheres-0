@@ -30,7 +30,7 @@ DEPENDENCIES='
 	providers:libav? ( media/libav[>=0.8.0] )
 	sys-devel/gettext[>=0.17]
 	x11-libs/wxGTK[>=2.8.7]
-	x11-libs/wxSVG[>=1.1.7]
+	x11-libs/wxSVG[>=1.1.7][providers:*=]
 
 	ecc? ( app-cdr/dvdisaster )
 
