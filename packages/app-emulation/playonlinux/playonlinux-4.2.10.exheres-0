@@ -8,7 +8,7 @@ require python [ blacklist='3' ] desktop-utils newicon
 MY_PN='PlayOnLinux'
 
 DESCRIPTION='Set of scripts to easily install and use Windows games and software'
-HOMEPAGE="http://${PN}.com"
+HOMEPAGE="http://www.${PN}.com"
 DOWNLOADS="${HOMEPAGE}/script_files/${MY_PN}/${PV}/${MY_PN}_${PV}.tar.gz"
 
 LICENCES='GPL-3'
