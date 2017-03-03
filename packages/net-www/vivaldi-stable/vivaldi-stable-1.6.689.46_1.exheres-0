@@ -1,0 +1,14 @@
+# Copyright 2016 Irvin Choi
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'vivaldi-snapshot' from ::exony, which is:
+#     Copyright (c) 2015 Mykola Orliuk <virkony@gmail.com>
+
+require vivaldi
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES="
+    build+run:
+        !net-www/vivaldi-snapshot [[ resolution = uninstall-blocked-before ]]
+"
