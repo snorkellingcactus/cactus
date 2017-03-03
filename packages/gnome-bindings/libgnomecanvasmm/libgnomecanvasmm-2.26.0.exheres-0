@@ -1,0 +1,27 @@
+# Copyright 2009 Elias Pipping <elias@pipping.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require gnome.org flag-o-matic
+
+SUMMARY='[DEPRECATED] C++ bindings for libgnomecanvas'
+HOMEPAGE='http://www.gnome.org/'
+
+LICENCES='LGPL-2.1'
+SLOT='2.6'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+	build+run:
+		gnome-bindings/glibmm:2.4
+		gnome-bindings/gtkmm:2.4[>=2.4.0]
+		gnome-platform/libgnomecanvas[>=2.6.0]
+	build:
+		virtual/pkg-config
+'
+
+src_configure()
+{
+	append-flags -std=c++11
+
+	default
+}
