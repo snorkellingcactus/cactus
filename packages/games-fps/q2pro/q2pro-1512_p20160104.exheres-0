@@ -1,0 +1,63 @@
+HOMEPAGE="https://github.com/hifi/q2pro"
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+SCM_REVISION='902337243068b072f06383c5f47c1777de1b62e3'
+
+DOWNLOADS="${HOMEPAGE}/archive/${SCM_REVISION}.zip"
+
+TGT=/usr/$( exhost --target )/
+GAME_DATA_DIR=/usr/share/games/${PN}/
+GAME_LIB_DIR=${TGT}lib/
+GAME_BIN_DIR=${TGT}share/${PN}/
+GAME_LIB=${PN}_gamex86.so
+
+WORK="${WORKBASE}"/${PN}-${SCM_REVISION}
+
+do_cfg_line()
+{
+	echo "${1}" >> .config
+}
+
+src_compile()
+{
+	do_cfg_line VER=r1512~9023372
+	do_cfg_line REV=1512
+	do_cfg_line CONFIG_PATH_LIB=${GAME_LIB_DIR}
+	do_cfg_line CONFIG_PATH_DATA=${GAME_DATA_DIR}
+	do_cfg_line TARG_g=${GAME_LIB}
+
+	edo sed -e '/TARG_g := game/d' -i Makefile
+
+	default
+}
+
+do_bin_wrap()
+{
+	echo "#!/bin/sh" > ${1}
+	echo "exec ${GAME_BIN_DIR}/${PN} +set basedir ${GAME_DATA_DIR} +set sys_forcegamelib ${GAME_LIB_DIR}${GAME_LIB}" >> ${1}
+
+	dobin ${1}
+}
+
+src_install()
+{
+	exeinto ${GAME_BIN_DIR}
+		doexe ${PN} q2proded
+
+	do_bin_wrap ${PN}
+	do_bin_wrap ${PN}ded
+
+	dolib ${GAME_LIB}
+
+	BASE=${GAME_DATA_DIR}/baseq2
+
+	insinto ${BASE}
+		doins src/client/ui/${PN}.menu 
+}
+
+pkg_postinst()
+{
+	einfo "Remember to copy the game data"
+	einfo "cp -a /path/to/quake2/baseq2/pak*.pak ${GAME_DATA_DIR}/baseq2/"
+}
