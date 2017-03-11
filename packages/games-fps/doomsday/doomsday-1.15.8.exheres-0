@@ -1,0 +1,5 @@
+DEFAULT_SRC_PREPARE_PATCHES+=(
+	"${FILES}"/fix-x11-qurl-headers-colission.patch
+)
+
+require ${PN}

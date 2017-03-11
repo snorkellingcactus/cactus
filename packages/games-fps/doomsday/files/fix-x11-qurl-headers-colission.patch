@@ -1,0 +1,25 @@
+diff --git a/libgui/src/displaymode_x11.cpp b/tmp/displaymode_x11.cpp
+index 54ba4f4..53683f9 100644
+--- a/libgui/src/displaymode_x11.cpp
++++ b/tmp/displaymode_x11.cpp
+@@ -23,9 +23,6 @@
+ #include <QX11Info>
+ #include <QApplication>
+ #include <QScreen>
+-#include <X11/Xlib.h>
+-#include <X11/extensions/Xrandr.h>
+-#include <X11/extensions/xf86vmode.h>
+ 
+ #include "de/gui/displaymode_native.h"
+ 
+@@ -33,6 +30,10 @@
+ #include <vector>
+ #include <de/Log>
+ 
++#include <X11/Xlib.h>
++#include <X11/extensions/Xrandr.h>
++#include <X11/extensions/xf86vmode.h>
++
+ namespace de {
+ 
+ typedef std::vector<DisplayMode> DisplayModes;

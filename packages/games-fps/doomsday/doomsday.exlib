@@ -1,0 +1,219 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'doomsday-1.15.8.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+# TODO: fmod support broken (deng_fmod)
+
+SUMMARY='A modern gaming engine for Doom, Heretic, and Hexen'
+HOMEPAGE="http://www.dengine.net/"
+DOWNLOADS="mirror://sourceforge/deng/Doomsday%20Engine/${PV}/${PN}-stable-${PV}.tar.gz"
+
+LICENCES='GPL-3+ LGPL-3+'
+SLOT='1.58'
+PLATFORMS='~amd64 ~x86'
+MYOPTIONS='
+	dedicated
+	fluidsynth
+	openal
+	snowberry
+	doom
+	demo
+	freedoom
+	heretic
+	hexen
+	resources
+	tools
+'
+
+# we need python at build time, so
+# snowberry? ( ${PYTHON_REQUIRED_USE} )
+# could break the build
+
+# run: snowberry? ( ${PYTHON_DEPS} )
+# run: ${PYTHON_DEPS}
+
+
+# demo?		[[ requires = [ doom ] ]]
+# freedoom?	[[ requires = [ doom ] ]]
+# resources?	[[ requires = [ doom ] ]]
+# media-libs/assimp
+
+# run:
+#		!dedicated? (
+#			snowberry? (
+#				dev-lang/python-exec:2[${PYTHON_USEDEP}]
+#				dev-python/wxpython[${PYTHON_USEDEP}]
+#			)
+#		)
+DEPENDENCIES='
+	build+run:
+		x11-libs/qtbase:5[gui]
+		x11-libs/qtx11extras:5
+		net-misc/curl
+		sys-libs/zlib
+
+		!dedicated? (
+			media-libs/SDL:2
+			media-libs/SDL_mixer:2
+			media-libs/libpng
+			x11-dri/mesa
+			x11-dri/glu
+			x11-libs/libX11
+			x11-libs/libXrandr
+			x11-libs/libXxf86vm
+		)
+
+		fluidsynth? ( media-sound/fluidsynth )
+		openal? ( media-libs/openal )
+		tools? ( sys-libs/ncurses:0 )
+	build:
+		virtual/pkg-config
+	post:
+		!dedicated? (
+			demo? ( games-fps/doom-data )
+			freedoom? ( games-fps/freedoom )
+			resources? ( games-fps/doomsday-resources )
+		)
+'
+
+require python newicon desktop-utils qmake [ slot=5 ] flag-o-matic
+
+export_exlib_phases src_prepare src_install
+
+
+WORK=${WORKBASE}/${PN}-stable-${PV}/${PN}
+GAMES_DATADIR=/usr/share/games/
+
+doomsday_src_prepare() {
+	default
+
+	edo sed -i \
+		-e '/readme.path/s#$$PREFIX#/usr#' \
+		client/client.pro server/server.pro
+
+	edo sed -i \
+		-e "/DENG_BASE_DIR =/s:\$\$PREFIX/share:${GAMES_DATADIR}:" \
+		config_unix.pri
+
+	edo sed -e "s/compare(\"\*\")/compare(QChar('*'))/" -i libcore/src/data/pathtreenode.cpp
+
+	edo sed -e 's|prefix/lib64|prefix/lib|g' -i macros.pri -i doomsday_sdk.pri
+
+	{
+		echo "CONFIG += nostrip"
+		echo "PREFIX=/usr/$( exhost --target )"
+		echo "PKG_CONFIG=$( exhost --tool-prefix )pkg-config"
+
+		if optionq dedicated
+		then
+			echo "CONFIG += deng_noclient"
+			echo "CONFIG += deng_nosnowberry"
+		else
+			echo "CONFIG += deng_$(option snowberry '' no)snowberry"
+		fi
+
+		# https://forum.qt.io/topic/25371/solved-qt5-make-fails-on-qurl
+		echo "DEFINES += MESA_EGL_NO_X11_HEADERS"
+
+		optionq fluidsynth	&& echo "CONFIG += deng_fluidsynth"
+
+		optionq tools		|| echo "CONFIG += deng_notools"
+
+		optionq openal		&& echo "CONFIG += deng_openal"
+
+		true
+
+	} > config_user.pri || die
+}
+
+#Usage: doom_make_wrapper <name> <game> <icon> <desktop entry title> [args]
+doom_make_wrapper() {
+	local name=$1 game=$2 icon=$3 de_title=$4
+	shift 4
+
+	echo "!#/bin/sh" > ${name}
+	echo "exec ${GAMES_DATADIR}/${PN} -game ${game} $@"' "$@"' > ${name}
+
+	dobin ${name}
+
+	install_desktop_entry "Exec=$name" "Name=${de_title}" "Icon=${icon}" "Categories=Game;Shooter"
+}
+
+doomsday_src_install() {
+	default
+
+	dodoc ../README.md
+
+	edo mv "${IMAGE}${GAMES_DATADIR}"/{${PN}/data/jdoom,doom-data}
+	dosym "${GAMES_DATADIR}"/doom-data "${GAMES_DATADIR}"/${PN}/data/jdoom
+
+	if ! optionq dedicated ; then
+		if optionq snowberry ; then
+			#python_replicate_script "${IMAGE}"/"${GAMES_BINDIR}"/launch-doomsday
+
+			installmodules() {
+				# relocate snowberry module directory recursively into site-packages
+				mv "${IMAGE}/{${GAMES_DATADIR}"/${PN}/snowberry,$( python_get_sitedir )}
+
+				# hack around improper path handling
+				edo sed -i \
+					-e "s:os.chdir.*$:os.chdir('$( python_get_sitedir )/snowberry'):" \
+					"${IMAGE%/}$( python_get_sitedir )"/launch-doomsday
+			}
+
+			#python_foreach_impl installmodules
+
+			# remove old module dir
+			#edo rm -r "${IMAGE}/${GAMES_DATADIR}"/${PN}/snowberry
+
+			# Categories.
+			install_desktop_entry "Name=Snowberry DoomsDay" "Exec=snowberry"
+
+			doicon ../snowberry/graphics/snowberry.png
+		fi
+
+		if optionq doom; then
+			local res_arg
+
+			if optionq resources; then
+				res_arg="-def \"${GAMES_DATADIR}\"/${PN}/defs/jdoom/jDRP.ded"
+			fi
+
+			doicon ../snowberry/graphics/orb-doom.png
+
+			doom_make_wrapper jdoom doom1 orb-doom "DoomsDay Engine: Doom 1" "${res_arg}"
+
+			elog "Created jdoom launcher. To play Doom place your doom.wad to"
+			elog "\"${GAMES_DATADIR}\"/doom-data"
+			elog
+
+			if optionq demo; then
+				doom_make_wrapper jdoom-demo doom1-share orb-doom "DoomsDay Engine: Doom 1 Demo" \
+					"-iwad \"${GAMES_DATADIR}\"/doom-data/doom1.wad ${res_arg}"
+			fi
+			if optionq freedoom; then
+				doom_make_wrapper jdoom-freedoom doom1-share orb-doom "DoomsDay Engine: FreeDoom" \
+					"-iwad \"${GAMES_DATADIR}\"/doom-data/freedoom/doom1.wad"
+			fi
+		fi
+		if optionq hexen; then
+			doicon ../snowberry/graphics/orb-hexen.png
+
+			doom_make_wrapper jhexen hexen orb-hexen "DoomsDay Engine: Hexen"
+
+			elog "Created jhexen launcher. To play Hexen place your hexen.wad to"
+			elog "\"${GAMES_DATADIR}\"/${PN}/data/jhexen"
+			elog
+		fi
+		if optionq heretic; then
+			doicon ../snowberry/graphics/orb-heretic.png
+
+			doom_make_wrapper jheretic heretic orb-heretic "DoomsDay Engine: Heretic"
+
+			elog "Created jheretic launcher. To play Heretic place your heretic.wad to"
+			elog "\"${GAMES_DATADIR}\"/${PN}/data/jheretic"
+			elog
+		fi
+	fi
+}

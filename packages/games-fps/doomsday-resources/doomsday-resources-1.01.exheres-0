@@ -1,0 +1,42 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'doomsday-resources-1.01-r1.ebuild', which is:
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='Improved models & textures for doomsday'
+HOMEPAGE='http://www.doomsdayhq.com/'
+DOWNLOADS="
+	mirror://sourceforge/deng/jdoom-resource-pack-${PV}.zip
+	mirror://sourceforge/deng/jdoom-details.zip
+"
+
+LICENCES='free-noncomm'		#505636
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+
+DEPENDENCIES='
+	build:
+		app-arch/unzip
+	run:
+		games-fps/doomsday[>=1.9.8]
+'
+
+WORK="${WORKBASE}"
+GAMES_DATADIR=/usr/share/games
+
+src_install() {
+
+	insinto "${GAMES_DATADIR}"/doom-data/auto
+		doins data/jDoom/* *.pk3
+
+	# The definitions file cannot be auto-loaded
+	insinto "${GAMES_DATADIR}"/doomsday/defs/jdoom
+		doins defs/jDoom/*
+
+	dodoc *.txt docs/*
+}
+
+pkg_postinst() {
+	elog "Add the following to the jdoom/doomsday command-line options:"
+	elog "  -def ${GAMES_DATADIR}/doomsday/defs/jdoom/jDRP.ded"
+}

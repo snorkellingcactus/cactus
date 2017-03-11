@@ -1,0 +1,59 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'assimp-3.2-r3.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+require cmake [ api=2 ]
+
+SUMMARY='Importer library to import assets from 3D files'
+HOMEPAGE="https://github.com/${PN}/${PN}"
+DOWNLOADS="${HOMEPAGE}/archive/v${PV}.tar.gz -> ${PNV}.tar.gz"
+
+LICENCES='BSD'
+PLATFORMS="~amd64 ~arm ~x86"
+MYOPTIONS='boost samples static test tools'
+SLOT='0'
+
+DEPENDENCIES='
+	run:
+		boost? ( dev-libs/boost )
+		samples? ( x11-libs/libX11 x11-dri/mesa media-libs/freeglut )
+		sys-libs/zlib
+	build:
+		test? ( dev-cpp/gtest )
+'
+
+src_prepare() {
+	epatch "${FILESDIR}"/test-cmakelists.patch
+	epatch "${FILESDIR}"/findassimp.patch
+}
+
+CMAKE_SRC_CONFIGURE_OPTION_BUILDS+=(
+	'samples ASSIMP_SAMPLES'
+	'tools ASSIMP_TOOLS'
+	'!boost BOOST_WORKAROUND'
+	'test TESTS'
+)
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCMAKE_DEBUG_POSTFIX=""
+)
+
+src_prepare()
+{
+	cmake_src_prepare
+
+	edo sed -e 's/local/ehehhe/' -i cmake-modules/Findassimp.cmake
+	edo sed -e '/INCLUDE( AddGTest )/d' -i test/CMakeLists.txt
+}
+
+src_install() {
+	cmake_src_install
+
+	insinto /usr/share/cmake/Modules
+		doins "${WORKBASE}/${PNV}"/cmake-modules/Findassimp.cmake
+}
+
+src_test() {
+	edo "${BUILD_DIR}/test/unit"
+}
