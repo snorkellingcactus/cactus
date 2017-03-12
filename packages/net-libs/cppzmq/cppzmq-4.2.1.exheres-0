@@ -1,0 +1,21 @@
+# Copyright 2011 NAKAMURA Yoshitaka
+# Copyright 2013 Markus Rothe
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="CPP binding of libzmq."
+HOMEPAGE="http://www.zeromq.org/"
+
+LICENCES='LGPL-3'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+	build+run:
+		net-libs/libzmq
+'
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCPPZMQ_CMAKECONFIG_INSTALL_DIR=/usr/share/cmake/cppzmq
+)
+
+require github [ user=zeromq tag=v${PV} ] autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ] cmake [ api=2 ]

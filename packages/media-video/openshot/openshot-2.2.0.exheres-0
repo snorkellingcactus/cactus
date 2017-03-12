@@ -1,0 +1,66 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'openshot-2.1.0.ebuild', which is:
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+MY_PN="${PN}-qt"
+MY_P="${MY_PN}-${PV}"
+
+SUMMARY='Free, open-source, non-linear video editor to create and edit videos and movies'
+HOMEPAGE="http://www.${PN}.org/"
+
+LICENCES='GPL-3+'
+SLOT='0'
+PLATFORMS='~amd64 ~x86'
+
+MYOPTIONS+='
+	( providers: libav ffmpeg ) [[ number-selected = exactly-one ]]
+'
+
+# dev-python/PyQt5[svg]
+# 
+# dev-python/httplib2[${PYTHON_USEDEP}]
+# dev-python/pyzmq[${PYTHON_USEDEP}]
+# dev-python/setuptools[${PYTHON_USEDEP}]
+DEPENDENCIES="
+	run:
+		media-libs/libopenshot[python_abis:*(-)?]
+		dev-python/PyQt5[webkit][python_abis:*(-)?]
+		dev-python/pyzmq[python_abis:*(-)?]
+		dev-python/httplib2[python_abis:*(-)?]
+		providers:ffmpeg? ( media/ffmpeg[>=0.10.0] )
+	   	providers:libav? ( media/libav[>=0.8.0] )
+"
+
+require github [ user=OpenShot pn=${PN}-qt tag=v${PV} ] setup-py [ blacklist=2 import=setuptools multibuild=false ] lang-helper [ linguas='ar br de et fr_CA hu ka lt nap pl si ta uz ady ber cs en_GB fil he it ku mn nn ru sr tt zh_TW ast bs el eu fy hy kk lv nb pt sk te vi af bg cy eo fo hi ja ky ms oc se sr@latin ug az ca en_AU fa gaa id kn mk ne pt_BR sl th zh_CN am bn da es fr hr jv la my pa shn sv uk be ca@valencia en_CA fi gl is ko ml nl ro sq tr zh_HK' ] freedesktop-mime freedesktop-desktop gtk-icon-cache my_python_get_abi
+
+WORK="${WORKBASE}"/${PN}-qt-${PV}
+
+src_prepare()
+{
+	# prevent setup.py from trying to update MIME databases
+	edo sed -e 's/^ROOT =.*/ROOT = False/' -e 's|lib/mime|'"$( exhost --target )"'/lib/mime|' -i setup.py || die
+
+	setup-py_src_prepare
+}
+
+src_install()
+{
+	setup-py_src_install
+
+	lang-helper-remove-locales "${IMAGE}"/usr/$( exhost --target )/lib/python$( my_python_get_abi )/site-packages/${PN}_qt/locale/ $@
+}
+
+pkg_postinst()
+{
+	freedesktop-mime_pkg_postinst
+	freedesktop-desktop_pkg_postinst
+	gtk-icon-cache_pkg_postinst
+}
+
+pkg_postrm() {
+	freedesktop-mime_pkg_postrm
+	freedesktop-desktop_pkg_postrm
+	gtk-icon-cache_pkg_postrm
+}
+
