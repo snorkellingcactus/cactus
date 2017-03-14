@@ -1,0 +1,13 @@
+diff --git a/src/CMakeLists.txt b/tmp/CMakeLists.txt
+index b377fa4..3e92fa1 100644
+--- a/src/CMakeLists.txt
++++ b/tmp/CMakeLists.txt
+@@ -295,6 +295,8 @@ SET ( REQUIRED_LIBRARIES
+ 			SET ( REQUIRED_LIBRARIES ${REQUIRED_LIBRARIES} "imagehlp" )
+ 		ENDIF(WIN32)
+ 
++link_directories(src)
++
+ # Link all referenced libraries
+ target_link_libraries(openshot ${REQUIRED_LIBRARIES})
+ 

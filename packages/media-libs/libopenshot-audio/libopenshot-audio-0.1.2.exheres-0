@@ -1,0 +1,30 @@
+DESCRIPTION='Audio library used by OpenShot'
+HOMEPAGE='http://www.openshot.org/'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+# x11-libs/libICE?
+DEPENDENCIES='
+	build:
+		app-doc/doxygen
+	build+run:
+		x11-libs/libXext
+		x11-libs/libX11
+		x11-libs/libICE
+'
+
+require github [ user=OpenShot tag=v${PV} ] cmake [ api=2 ]
+
+src_prepare()
+{
+	cmake_src_prepare
+
+	edo sed -e 's/DESTINATION share/DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/g' -i CMakeLists.txt
+}
+
+src_install()
+{
+	cmake_src_install
+
+	edo find "${IMAGE}" -type d -empty -delete
+}

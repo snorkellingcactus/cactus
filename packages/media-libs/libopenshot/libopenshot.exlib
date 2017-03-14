@@ -1,0 +1,90 @@
+DESCRIPTION='Audio library used by OpenShot'
+HOMEPAGE='http://www.openshot.org/'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+# providers: ImageMagick BlackMagick
+# -DCMAKE_DISABLE_FIND_PACKAGE_ImageMagick=
+MYOPTIONS='
+	( providers: libav ffmpeg ) [[ number-selected = exactly-one ]]
+	system-jsoncpp
+	python
+	ruby
+'
+
+#https://github.com/OpenShot/openshot-qt/wiki/Dependencies-for-OpenShot-Qt
+# Seems openmp not required, but fails without it,
+# sys-libs/openmp  (used for multi-core processing)
+# sys-libs/libgomp
+# sys-libs/libiomp
+# dev-libs/UnitTest++?
+# build:
+#		dev-libs/UnitTest++
+DEPENDENCIES='
+	build+run:
+		media-libs/libopenshot-audio
+		media-gfx/ImageMagick
+		net-libs/cppzmq
+		sys-libs/libgomp
+		x11-libs/qtbase
+		x11-libs/qtmultimedia
+
+		python? (
+			dev-lang/swig[>=2.0]
+			dev-lang/python
+			dev-python/simplejson
+			dev-python/PyQt5[multimedia][sql][webkit][python_abis:*(-)?]
+		)
+		ruby? (
+			dev-lang/ruby
+		)
+		providers:ffmpeg? ( media/ffmpeg[>=0.10.0] )
+		providers:libav? ( media/libav[>=0.8.0] )
+		system-jsoncpp? ( dev-libs/jsoncpp )
+'
+# Set the Quantum Depth that ImageMagick was built with (default to 16 bits)
+# MAGICKCORE_QUANTUM_DEPTH
+
+# MAGICKCORE_HDRI_ENABLE
+# OPENSHOT_IMAGEMAGICK_COMPATIBILITY
+
+CMAKE_SRC_CONFIGURE_OPTION_ENABLES=(
+	'python PYTHON'
+	'ruby RUBY'
+)
+
+CMAKE_SRC_CONFIGURE_OPTION_USES=(
+	'system-jsoncpp SYSTEM_JSONCPP'
+)
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	-DENABLE_BLACKMAGIC:BOOL=FALSE
+	-DCMAKE_BUILD_TYPE:STRING=Release
+)
+
+DEFAULT_SRC_CONFIGURE_TESTS=(
+	ENABLE_TESTS DISABLE_TESTS
+)
+
+require github [ user=OpenShot tag=v${PV} ] python [ blacklist=2 ] cmake [ api=2 ] my_python_get_abi
+
+export_exlib_phases src_prepare src_compile src_install
+
+libopenshot_src_prepare()
+{
+	cmake_src_prepare
+
+	! expecting_tests	&& edo sed -e 's/add_subdirectory(tests)//' -i CMakeLists.txt
+
+	optionq python		&& edo sed  -e 's/PythonLibs 3/PythonLibs '"$( my_python_get_abi )"'/' -e 's/PythonInterp 3/PythonInterp '"$( my_python_get_abi )"'/' -e 's|SET(PYTHON_MODULE_PATH ${_REL_PYTHON_MODULE_PATH}|SET(PYTHON_MODULE_PATH '"/usr/$( exhost --target )/lib/python$( my_python_get_abi )/site-packages"'|' -i  src/bindings/python/CMakeLists.txt
+}
+libopenshot_src_compile()
+{
+	emake
+}
+libopenshot_src_install()
+{
+	cmake_src_install
+
+	# optionq python && python_bytecompile
+}
