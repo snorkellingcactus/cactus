@@ -1,0 +1,23 @@
+
+SUMMARY='OpenGLide is a Glide to OpenGL wrapper. It emulates a Voodoo board so you can run old Windows Glide games by translating Glide calls into OpenGL.'
+HOMEPAGE="https://github.com/voyageur/${PN}"
+SCM_REPOSITORY="${HOMEPAGE}.git"
+SCM_REVISION='3722fc563b737d2d7933df6a771651c2154e6f7b'
+require scm-git autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ] flag-o-matic
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+	media-libs/SDL:0
+'
+
+# TODO
+LICENCES=''
+
+src_configure()
+{
+	append-flags -fPIC
+
+	default
+}

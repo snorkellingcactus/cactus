@@ -1,0 +1,122 @@
+# Copyright 2009 Mike Kelly
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REVISION='3998'
+SCM_REPOSITORY='https://svn.code.sf.net/p/dosbox/code-0/dosbox/'
+require scm-svn autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ] flag-o-matic dorbdep
+
+SUMMARY="a DOS emulator"
+DESCRIPTION="
+    DOSBox is a DOS-emulator that uses the SDL-library which makes DOSBox
+    very easy to port to different platforms. DOSBox has already been ported
+    to many different platforms, such as Windows, BeOS, Linux, MacOS X...
+
+    DOSBox also emulates CPU:286/386 realmode/protected mode, Directory
+    FileSystem/XMS/EMS, Tandy/Hercules/CGA/EGA/VGA/VESA graphics, a
+    SoundBlaster/Gravis Ultra Sound card for excellent sound compatibility
+    with older games...
+
+    You can \"re-live\" the good old days with the help of DOSBox, it can run
+    plenty of the old classics that don't run on your new computer!
+"
+HOMEPAGE="http://www.dosbox.com/"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="alsa [[ description = [ Support for alsa midi support ] ]]"
+
+NAME_OVL=glide2x.ovl
+NAME_PATCH=dosbox_glide.diff
+DOWNLOADS="
+		https://raw.githubusercontent.com/voyageur/openglide/master/platform/dosbox/${NAME_PATCH}
+		https://raw.githubusercontent.com/voyageur/openglide/master/platform/dosbox/${NAME_OVL}
+"
+
+DEPENDENCIES="
+    build+run:
+        media-libs/libpng:=
+        media-libs/SDL:0
+        media-libs/SDL_net:0
+        media-libs/SDL_sound
+        x11-dri/glu
+        x11-dri/mesa
+        x11-libs/libX11
+        alsa? (
+            sys-sound/alsa-lib
+        )
+        dev-games/openglide[=009_p520160913]
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FETCHEDDIR}/"${NAME_PATCH} )
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    # needs sys-libs/ncurses if anybody wants to make it an option
+    --disable-debug
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    'alsa alsa-midi'
+)
+
+DEFAULT_SRC_COMPILE_PARAMS=( AR=${AR} )
+
+src_unpack()
+{
+	scm_src_unpack
+
+	default
+}
+
+src_configure()
+{
+	local GTHREAD_CFLAGS=$( $(exhost --tool-prefix)pkg-config --cflags gthread-2.0)
+	local GTHREAD_LIBS=$( $(exhost --tool-prefix)pkg-config --libs gthread-2.0)
+
+    append-flags "-I /usr/include/openglide/"
+
+    LIBS+='-ldl -lz'
+
+    export LIBS
+
+	default
+}
+
+src_install()
+{
+	local PATH_SHARE=/usr/share/${PN}/
+	local PATH_BIN=/usr/$( exhost --target )/share/${PN}/
+	local NAME_CFG=OpenGLid.ini
+
+	insinto ${PATH_SHARE}
+		doins "${FETCHEDDIR}/"${NAME_OVL} ${FILES}/${NAME_CFG}
+
+	echo "#!/bin/sh" > ${PN}
+	echo "cd ${PATH_BIN} && "'LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:'"${PATH_SHARE}\" ${PATH_BIN}${PN} "' $@' > ${PN}
+
+	PATH_OVL=${PATH_SHARE}${NAME_OVL}
+
+	exeinto ${PATH_BIN}
+		newexe src/dosbox ${PN}
+		dosym ${PATH_OVL} ${PATH_BIN}
+		dosym ${PATH_SHARE}${NAME_CFG} ${PATH_BIN}
+
+	dobin ${PN}
+
+	dorbdep "${PATH_BIN}"
+}
+
+pkg_postinst()
+{
+	einfo "You will need:"
+	einfo "    - A version of the game's executable"
+	einfo "    with specific support for glidos/voodoo or similar."
+	einfo
+	einfo "    - Place ${PATH_OVL} in the game's directory."
+	einfo
+	einfo "    - Switch output to opengl or openglnb in ${PN} config file."
+	einfo
+	einfo "    - Add the following two lines on your ${PN} config file:"
+	einfo "    [glide]"
+	einfo "    glide=true"
+}

@@ -94,7 +94,7 @@ src_install() {
 	dodoc CHANGELOG.md
 
 	echo '#!/bin/sh'			 > ${PN}
-	echo "cd /usr/share/${PN}"	>> ${PN}
+	echo "cd /usr/share/${PN}"' "$@"'	>> ${PN}
 
 	cp ${PN} ${PN}-pkg
 
