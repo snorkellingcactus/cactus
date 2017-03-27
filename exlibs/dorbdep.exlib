@@ -1,0 +1,14 @@
+dorbdep()
+{
+	local DIR=${IMAGE}etc/revdep-rebuild/
+	local FILE=${DIR}${PN}
+
+	mkdir -p ${DIR}
+
+	touch ${FILE}
+
+	for i in ${@}
+	do
+		echo "${i}" >> ${FILE}
+	done
+}
