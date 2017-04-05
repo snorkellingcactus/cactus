@@ -14,6 +14,8 @@ DEPENDENCIES='
 	x11-libs/qtbase[gui][sql]
 	x11-libs/qtdeclarative
 	x11-libs/qtwebengine
+	x11-libs/qtwebchannel
+	x11-libs/qtmultimedia
 '
 
 WORK="${WORKBASE}/${PNV}/Version 2.x"

@@ -1,0 +1,36 @@
+require github [ user='OtterBrowser' tag="v${PV}" ] cmake [ api=2 ]  freedesktop-desktop
+
+SUMMARY='Project aiming to recreate the best aspects of the classic Opera (12.x) UI using Qt5.'
+HOMEPAGE='https://otter-browser.org/'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+LICENCES='GPL 3'
+
+DEPENDENCIES='
+	x11-libs/qtbase[gui]
+	x11-libs/qtwebengine
+	x11-libs/qtmultimedia
+'
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	'-DENABLE_QTWEBENGINE:BOOL=TRUE'
+	'-DENABLE_QTWEBKIT:BOOL=FALSE'
+)
+
+src_prepare()
+{
+	cmake_src_prepare
+
+	edo sed -e 's@${CMAKE_INSTALL_PREFIX}/share@/usr/share@g' -i CMakeLists.txt
+	
+	edo sed -e 's@m_localePath = OTTER_INSTALL_PREFIX@m_localePath = QLatin1String( "/usr/" )@' -i src/core/Application.cpp
+}
+
+pkg_postinst() {
+	freedesktop-desktop_pkg_postinst
+}
+
+pkg_postrm() {
+	freedesktop-desktop_pkg_postrm
+}
