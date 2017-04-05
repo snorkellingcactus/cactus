@@ -7,8 +7,5 @@ dorbdep()
 
 	touch ${FILE}
 
-	for i in ${@}
-	do
-		echo "${i}" >> ${FILE}
-	done
+	echo "SEARCH_DIRS=${@}" >> ${FILE}
 }

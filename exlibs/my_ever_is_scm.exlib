@@ -1,6 +1,10 @@
 my_ever_is_scm()
 {
-	( [ "${PV}" != "$( ever replace_all '.' )" ] || ( ever is_scm ) ) && return 0
+	( my_ever_is_dated_scm || ( ever is_scm ) ) && return 0
 
 	return 1
+}
+my_ever_is_dated_scm()
+{
+	[ "${PV}" != "$( ever replace_all '.' )" ] && return 0
 }

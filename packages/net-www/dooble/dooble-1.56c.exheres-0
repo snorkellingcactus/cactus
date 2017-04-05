@@ -1,0 +1,71 @@
+require github [ user='textbrowser' tag="v${PV}" ] qmake [ slot=5 ] dorbdep domenu freedesktop-desktop
+
+SUMMARY='A privacy full featured browser'
+HOMEPAGE='http://dooble.sourceforge.net/'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+LICENCES='BSD 3'
+
+DEPENDENCIES='
+	dev-libs/libgcrypt
+	dev-libs/libgpg-error
+	dev-db/sqlite
+	x11-libs/qtbase[gui][sql]
+	x11-libs/qtdeclarative
+	x11-libs/qtwebengine
+'
+
+WORK="${WORKBASE}/${PNV}/Version 2.x"
+
+src_install()
+{
+	local DIR_SHARE=/usr/share/${PNV}/
+	local DIR_TGT_SHARE=/usr/$( exhost --target )/share/${PNV}/
+
+	exeinto ${DIR_TGT_SHARE}
+		newexe Dooble ${PN}
+		doexe libSpotOn/libspoton.so
+
+	find Translations -type f -name '*.ts' -delete
+
+	insinto ${DIR_SHARE}
+		for i in CSS Icons Images Resources Tab Translations
+		do
+			doins -r ${i}
+
+			dosym ${DIR_SHARE}/${i} ${DIR_TGT_SHARE}
+		done
+
+	for s in 16 64 48
+	do
+		local size="${s}"'x'"${s}"
+		local DIR=/usr/share/icons/hicolor/${size}/apps/
+
+		dodir ${DIR}
+
+		dosym ${DIR_SHARE}/Icons/${size}/${PN}.png ${DIR}
+	done
+
+	echo '#!/bin/sh' >> ${PNV}
+	echo "cd ${DIR_TGT_SHARE}; LD_LIBRARY_PATH=. exec ./${PN} "'"$@"' >> ${PNV}
+
+	dobin ${PNV}
+
+	local MENU=${PN}.desktop
+
+	sed -e '/Exec/d' -i ${MENU}
+	echo "Exec=${PNV}" >> ${MENU}
+
+	domenu ${MENU}
+
+	dorbdep ${DIR_TGT_SHARE}
+}
+
+pkg_postrm() {
+	freedesktop-desktop_pkg_postrm
+}
+
+pkg_postinst() {
+	freedesktop-desktop_pkg_postinst
+}

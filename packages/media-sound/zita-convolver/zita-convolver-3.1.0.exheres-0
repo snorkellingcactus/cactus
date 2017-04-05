@@ -1,0 +1,31 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='Convolver lv2 plugin.'
+DOWNLOADS="http://kokkinizita.linuxaudio.org/linuxaudio/downloads/${PNV}.tar.bz2"
+SLOT='3'
+PLATFORMS='~x86 ~amd64'
+DEPENDENCIES='
+	sci-libs/fftw[>=3]
+'
+
+src_prepare()
+{
+	default
+
+	local TGT="$( exhost --target )"
+
+	edo sed -e 's/g++/'"$( exhost --tool-prefix )"'g++/g' -e 's@local@'"${TGT}"'@' -e 's@lib$(SUFFIX)@lib@g' -e '/ldconfig/d' -i libs/Makefile
+}
+src_compile()
+{
+	pushd libs
+		default
+	popd
+}
+src_install()
+{
+	pushd libs
+		default
+	popd
+}

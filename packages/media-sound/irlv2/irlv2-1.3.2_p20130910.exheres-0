@@ -1,0 +1,29 @@
+SUMMARY='LV2 Impulse response (convolution) plugin (for reverb and cabinet simulation). This fork adds LV2 State extenstion support for proper storing of internal plugin data. Tested in QTractor, Ardour 3, Ardour 2.'
+HOMEPAGE="https://github.com/Anchakor/${PN}"
+SCM_REPOSITORY="${HOMEPAGE}.git"
+PLATFORMS='~x86 ~amd64'
+SLOT='0'
+
+MY_PN='ir.lv2'
+
+DEPENDENCIES='	
+	media-libs/libsamplerate
+	media-libs/libsndfile
+	media-sound/zita-convolver
+	x11-libs/gtk+:2
+'
+require github [ user='Anchakor' project="${MY_PN}" rev='af1f8aba9b5f8c43381b9fea30103034396bef7b' ]
+
+src_prepare()
+{
+	default
+
+	local TOOL_PFX="$( exhost --tool-prefix )"
+
+	for tool in 'g++' 'pkg-config'
+	do
+		edo sed -e 's/'"${tool}"'/'"${TOOL_PFX}${tool}"'/g' -i Makefile
+	done
+
+	edo sed -e 's@/usr@'"${IMAGE}/usr/$( exhost --target )"'@g' -i Makefile
+}
