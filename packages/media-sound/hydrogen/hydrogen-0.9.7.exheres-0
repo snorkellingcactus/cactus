@@ -1,0 +1,91 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+require github [ user=${PN}-music ] cmake [ api=2 ]
+SUMMARY="Hydrogen is an advanced drum machine for GNU/Linux, Mac and Windows. It's main goal is to bring professional yet simple and intuitive pattern-based drum programming."
+PLATFORMS='~x86 ~amd64'
+SLOT='0'
+# app-arch/libtar	
+# TODO: cmake FindHelper not finding some libs ( as rubberband )
+DEPENDENCIES='
+	build+run:
+		media-libs/libsndfile
+		sys-libs/zlib
+		x11-libs/qt:4
+
+		alsa? (
+			sys-sound/alsa-lib
+		)
+		jack? (
+			media-sound/jack-audio-connection-kit
+		)
+		lash? (
+			media-sound/lash
+		)
+		ladspa? (
+			media-libs/ladspa-sdk
+		)
+		libarchive? (
+			app-arch/libarchive
+		)
+		lrdf? (
+			media-libs/liblrdf
+		)
+		oss? (
+			sys-sound/oss
+		)
+		portaudio? (
+			media-libs/portaudio
+		)
+		portmidi? (
+			media-libs/portmidi
+		)
+		pulseaudio? (
+			media-sound/pulseaudio
+		)
+		rubberband? (
+			media-libs/rubberband
+		)
+'
+
+CMAKE_SRC_CONFIGURE_OPTION_WANTS+=(
+	'debug DEBUG'
+	'jack JACK'
+	'jacksession JACKSESSION'
+	'libarchive LIBARCHIVE'
+	'ladspa LADSPA'
+	'lash LASH'
+	'lrdf LRDF'
+	'nsmsession NSMSESSION'
+	'oss OSS'
+	'portaudio PORTAUDIO'
+	'portmidi PORTMIDI'
+	'pulseaudio PULSEAUDIO'
+	'rubberband RUBBERBAND'
+	'shared SHARED'
+)
+
+
+# Include CppUnit test suite
+# cppunit
+MYOPTIONS='
+	alsa [[ description = [ Include ALSA (Advanced Linux Sound Architecture) support ] ]]
+	debug
+	jack [[ description = [ Include JACK (Jack Audio Connection Kit) support ] ]]
+	jacksession [[ description = [ Enable use of Jack-Session-Handler ] ]]
+	libarchive [[ description = [ Enable use of libarchive instead of libtar ] ]]
+	ladspa [[ description = [ Enable use of LADSPA plugins ] ]]
+	lash [[ description = [ Include LASH (Linux Audio Session Handler) support ] ]]
+	lrdf [[ description = [ Include LRDF (Lightweight Resource Description Framework with special support for LADSPA plugins) support ] ]]
+	nsmsession [[ description = [ Enable NSM Session integration ] ]]
+	oss [[ description = [ Include OSS (Open Sound System) support ] ]]
+	portaudio [[ description = [ Include PortAudio support ] ]]
+	portmidi [[ description = [ Include PortMidi support ] ]]
+	pulseaudio [[ description = [ Include PulseAudio support ] ]]
+	rubberband [[ description = [ Include RubberBand (Audio Time Stretcher Library) support ] ]]
+	shared [[ description = [ Build the core library shared. ] ]]
+'
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+	"${FILES}"/fix-build-lrdf-raptor-h.patch
+)
