@@ -158,7 +158,7 @@ fi
 
 require cmake [ api=2 ] flag-o-matic freedesktop-desktop freedesktop-mime
 
-export_exlib_phases src_prepare src_configure src_install
+export_exlib_phases src_prepare src_configure src_install pkg_postinst pkg_postrm
 
 spring_src_prepare() {
     edo pushd "${CMAKE_SOURCE}"

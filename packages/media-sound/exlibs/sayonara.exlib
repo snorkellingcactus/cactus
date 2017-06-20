@@ -32,7 +32,7 @@ CMAKE_SRC_CONFIGURE_PARAMS=(
 SCM_REPOSITORY='https://git.sayonara-player.com/sayonara.git'
 require scm-git cmake [ api=2 ] freedesktop-desktop gtk-icon-cache lang-helper [ linguas='br cs de en es fr hu it pl pt ro ru ua zh_cn' ]
 
-export_exlib_phases src_prepare src_install
+export_exlib_phases src_prepare src_install pkg_postinst pkg_postrm
 
 sayonara_src_prepare()
 {
