@@ -131,6 +131,8 @@ vivaldi_src_install() {
 	dodir ${TGT_BIN}
 
 	dosym ${MY_INTO_TGT}/${MY_INST_PN} ${TGT_BIN}
+
+	edo find "${IMAGE}" -type d -empty -delete
 }
 vivaldi_pkg_postinst()
 {

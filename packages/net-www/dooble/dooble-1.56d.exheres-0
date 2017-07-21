@@ -1,4 +1,4 @@
-require github [ user='textbrowser' tag="v${PV}" ] qmake [ slot=5 ] dorbdep domenu freedesktop-desktop
+require github [ user='textbrowser' tag="${PV}" ] qmake [ slot=5 ] dorbdep domenu freedesktop-desktop
 
 SUMMARY='A privacy full featured browser'
 HOMEPAGE='http://dooble.sourceforge.net/'

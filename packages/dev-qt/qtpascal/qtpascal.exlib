@@ -55,6 +55,8 @@ EQMAKE_SOURCES=( Qt${my_slot}Pas.pro )
 #	fi
 #}
 
+export_exlib_phases src_install
+
 require qmake [ slot=${my_slot} ]
 
 qtpascal_src_install(){
