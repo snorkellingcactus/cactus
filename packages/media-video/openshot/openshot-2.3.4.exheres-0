@@ -25,9 +25,10 @@ MYOPTIONS+='
 DEPENDENCIES="
 	run:
 		media-libs/libopenshot[python_abis:*(-)?]
+		dev-python/httplib2[python_abis:*(-)?]
+		dev-python/requests[python_abis:*(-)?]
 		dev-python/PyQt5[webkit][python_abis:*(-)?]
 		dev-python/pyzmq[python_abis:*(-)?]
-		dev-python/httplib2[python_abis:*(-)?]
 		providers:ffmpeg? ( media/ffmpeg[>=0.10.0] )
 	   	providers:libav? ( media/libav[>=0.8.0] )
 "

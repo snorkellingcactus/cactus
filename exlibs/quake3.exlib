@@ -2,8 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 
 myexparam	MAKE_PREFIX=.
-myexparam	REND_SUFFIX=opengl2
-myexparam	BUILD_GAME_SO=false
+myexparam	RENDERERS=
+myexparam	DEFAULT_RENDERER=
+myexparam	BUILD_GAME_SO=0
 myexparam	BASEQ3_PATH=[ baseq3 ]
 
 # The bin suffix is used to prevent a build error
@@ -11,10 +12,11 @@ myexparam	BASEQ3_PATH=[ baseq3 ]
 			CLI_BIN_SUFFIX=-client
 			SRV_BIN_SUFFIX=-server
 
-exparam -v MY_MAKE_PREFIX	MAKE_PREFIX
-exparam -v MY_REND_SUFFIX	REND_SUFFIX
-exparam -v MY_BUILD_GAME_SO	BUILD_GAME_SO
-exparam -v MY_BASEQ3_PATH	BASEQ3_PATH[@]
+exparam -v MY_MAKE_PREFIX		MAKE_PREFIX
+exparam -v MY_RENDERERS			RENDERERS
+exparam -v MY_DEFAULT_RENDERER	DEFAULT_RENDERER
+exparam -v MY_BUILD_GAME_SO		BUILD_GAME_SO
+exparam -v MY_BASEQ3_PATH		BASEQ3_PATH[@]
 
 require doinsmv
 
@@ -72,7 +74,7 @@ DEPENDENCIES="
 DEFAULT_SRC_COMPILE_PARAMS+=(
 	BUILD_RENDERER_OPENGL2=1    # build newer renderer
 	BUILD_STANDALONE=1
-	BUILD_BASEGAME=0            # the following four variables control building of non-essential
+#	BUILD_BASEGAME=0            # the following four variables control building of non-essential
 	                            # stuff: Quake VMs, libraries, building for 3rd party mods.
 	BUILD_GAME_QVM=0
 
@@ -180,10 +182,14 @@ quake3_src_install()
 
 			if optionq engine
 			then
-				newexe ${OUT}${CLI_BIN_SUFFIX} ${PN}_render1
-				newexe ${OUT}${CLI_BIN_SUFFIX}_${MY_REND_SUFFIX} ${PN}
-				dogamebin _render1
+				newexe ${OUT}${CLI_BIN_SUFFIX}${MY_DEFAULT_RENDERER} ${PN}
 				dogamebin
+
+				for RENDERER in ${MY_RENDERERS[@]}
+				do
+					newexe ${OUT}${CLI_BIN_SUFFIX}_${RENDERER} ${PN}${RENDERER}
+					dogamebin ${RENDERER}
+				done
 			fi
 
 		if [ "${MY_BUILD_GAME_SO}" != "0" ]

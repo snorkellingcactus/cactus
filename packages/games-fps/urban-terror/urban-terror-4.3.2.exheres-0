@@ -1,0 +1,57 @@
+# github
+
+HOMEPAGE='http://www.urbanterror.info'
+SCM_REPOSITORY="https://github.com/danielepantaleone/ioq3-UrT.git"
+#SCM_TAG="release-${PV}"
+#SCM_TAG="v1.3"
+
+MAIN_FOLDER=q3ut4
+
+require scm-git quake3 [ BASEQ3_PATH=[ "${WORK}/${MAIN_FOLDER}" ] ]
+
+SUMMARY='Urban Terror. A Quake3 based game.'
+SLOT='0'
+LICENCES='GPL-3'
+PLATFORMS='~amd64 ~x86'
+
+MY_PV="$(ever delete_all)"
+MY_PV_POP="${MY_PV:0:2}"
+
+PAKS_FOLDER="UrbanTerror${MY_PV_POP}"
+DOWNLOADS+="http://cdn.urbanterror.info/urt/${MY_PV_POP}/releases/zips/UrbanTerror${MY_PV}_full.zip"
+
+src_unpack()
+{
+	default
+
+	scm_src_unpack
+}
+
+src_prepare()
+{
+	if optionq smp
+	then
+		sed -e 's/Quake3-UrT-smp\.$(ARCH)$(BINEXT)/$(CLIENTBIN)/' -i Makefile
+	else
+		sed -e 's/Quake3-UrT\.$(ARCH)$(BINEXT)/$(CLIENTBIN)/' -i Makefile
+	fi
+
+	sed -e 's/Quake3-UrT-Ded\.$(ARCH)$(BINEXT)/$(SERVERBIN)/' -i Makefile
+
+	edo mkdir ${MAIN_FOLDER}
+
+	edo mv "${WORKBASE}"/${PAKS_FOLDER}/${MAIN_FOLDER}/*.pk3 ${MAIN_FOLDER}
+
+	quake3_src_prepare
+}
+
+src_compile()
+{
+	quake3_src_compile
+}
+
+# TODO: desktop
+src_install()
+{
+	quake3_src_install
+}
