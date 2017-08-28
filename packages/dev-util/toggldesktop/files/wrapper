@@ -1,0 +1,16 @@
+#!/bin/sh
+
+XDG=${XDG_CURRENT_DESKTOP}
+
+if [[ 	"${XDG}" = 'X-Cinnamon' ||
+	"${XDG}" = 'XFCE' 	||
+	"${XDG}" = 'Pantheon' 	||
+	"${XDG}" = 'i3' 	||
+	"${XDG}" = 'LXDE' 	||
+	"${XDG}" = 'LXQt'       ||
+	"${XDG}" = 'MATE' ]]
+then
+  dbus-launch %PKG_BIN_PATH "$@"
+else
+  %PKG_BIN_PATH "$@"
+fi

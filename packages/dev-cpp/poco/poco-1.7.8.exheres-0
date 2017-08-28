@@ -1,0 +1,103 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'poco-1.7.6.ebuild', which is:
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='Cross-platform libraries with a network/internet focus.'
+HOMEPAGE='http://pocoproject.org/'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+LICENCES='BOOST-1.0 BSL-1.0'
+
+MYOPTIONS='
+	apacheconnector [[ requires = [ net util ] ]]
+	cppparser
+	crypto
+	data
+	doc [[ requires = [ cppparser util xml ] ]]
+	file2page [[ requires = [ pagecompiler ] ]]
+	iodbc [[ requires = [ odbc ] ]]
+	json
+	mongodb [[ requires = [ data ] ]]
+	mysql [[ requires = [ data ] ]]
+	odbc [[ requires = [ data ] ]]
+	net
+	netssl
+	pagecompiler [[ requires = [ json net util xml ] ]]
+	pdf
+	sevenzip
+	sqlite [[ requires = [ data ] ]]
+	static
+	util
+	xml
+	zip
+	( providers: libressl openssl ) [[ number-selected = exactly-one ]]
+'
+
+# TODO:
+# providers: ssl
+# providers: odbc? (
+#			iodbc? ( dev-db/libiodbc )
+#			!iodbc? ( dev-db/unixODBC )
+#		)
+# test? ( data? ( sqlite ) json util xml )
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+	build+run:
+		apacheconnector? (
+			dev-libs/apr
+			dev-libs/apr-util
+			www-servers/apache
+		)
+		mongodb? ( dev-db/mongodb )
+		mysql? ( dev-db/mysql )
+		sqlite? ( dev-db/sqlite:3 )
+		sevenzip? ( app-arch/p7zip )
+		xml? ( dev-libs/expat )
+		zip? ( sys-libs/zlib )
+	providers:libressl? ( dev-libs/libressl )
+	providers:openssl? ( dev-libs/openssl )
+'
+
+#https://github.com/pocoproject/poco/archive/poco-1.7.8-release.zip
+require github [ user=${PN}project tag=${PN}-1.7.8-release ] cmake [ api=2 ]
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	'-DCMAKE_BUILD_TYPE=Release'
+	'-DPOCO_UNBUNDLED:BOOL=ON'
+)
+
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+	'static POCO_STATIC'
+)
+
+CMAKE_SRC_CONFIGURE_OPTION_ENABLES+=(
+	'apacheconnector APACHECONNECTOR'
+	'cppparser CPPPARSER'
+	'crypto CRYPTO'
+	'data DATA'
+	'doc DOC'
+	'file2page PAGECOMPILER_FILE2PAGE'
+	'json JSON'
+	'mongodb MONGODB'
+	'mysql MYSQL'
+	'net NET'
+	'netssl NETSSL'
+	'odbc ODBC'
+	'pagecompiler PAGECOMPILER'
+	'pdf PDF'
+	'sevenzip SEVENUNZIP'
+	'sqlite SQLITE'
+	'util UTIL'
+	'xml XML'
+	'zip ZIP'
+)
+
+src_configure(){
+	CMAKE_SRC_CONFIGURE_PARAMS+=(
+		-DENABLE_TESTS:BOOL=$( expecting_tests TRUE FALSE )
+	)
+
+	cmake_src_configure
+}

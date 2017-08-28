@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Toggl Desktop
+GenericName=Time tracker
+Comment=Toggl Desktop Client. A time tracking application.
+Exec=TogglDesktop
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Icon=toggldesktop
+Categories=Development;Office
+Keywords=time;
