@@ -39,6 +39,7 @@ export_exlib_phases src_prepare src_install
 
 rakarrack_src_prepare()
 {
+	#edo sed /set_fonts/'s/^/\/\//' -i src/rakarrack.{cxx,fl}
 	edo sed -i -e 's/pkg-config/'"$( exhost --tool-prefix )"'pkg-config/g' configure.ac
 
 	autotools_src_prepare
@@ -58,4 +59,9 @@ rakarrack_src_install() {
 
 	! optionq doc && rm -r "${IMAGE}"/usr/share/doc
 	! optionq man && rm -r "${IMAGE}"/usr/share/man
+}
+
+pkg_postinst()
+{
+	einfo "You need SND_PROC_FS enabled in your kernel"
 }
