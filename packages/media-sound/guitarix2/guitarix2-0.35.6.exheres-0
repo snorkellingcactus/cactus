@@ -1,0 +1,75 @@
+#https://razaoinfo.dl.sourceforge.net/project/guitarix/guitarix/guitarix2-0.35.6.tar.xz
+
+SUMMARY='Guitar effects processor'
+HOMEPAGE='http://guitarix.org/'
+DESCRIPTION='guitarix takes the signal from your guitar as any real amp would do: as a mono-signal from your sound card. The input is processed by a main amp and a rack-section. Both can be routed separately and deliver a processed stereo-signal via Jack. You may fill the rack with effects from more than 25 built-in modules including stuff from a simple noise gate to brain-slashing modulation f/x like flanger, phaser or auto-wah.'
+
+SLOT='2'
+PLATFORMS='~x86 ~amd64'
+LICENCES='GPL-3'
+
+MYOPTIONS='avahi capture debug faust ladspa lv2 meterbridge nls'
+
+#		media-libs/zita-resampler
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+		nls? ( dev-util/intltool )
+	build+run:
+		sci-libs/eigen:3
+		gnome-bindings/glibmm:2.4
+		gnome-bindings/gtkmm:2.4
+		dev-libs/boost
+		dev-libs/glib
+		media-libs/liblrdf
+		media-libs/libsndfile
+		media-libs/lilv:0
+		media-sound/zita-convolver
+		media-sound/jack-audio-connection-kit
+		media-sound/lame
+		sci-libs/fftw[>=3]
+		x11-libs/gtk+:2
+		avahi? ( net-dns/avahi )
+		faust? ( dev-lang/faust )
+		ladspa? ( media-libs/ladspa-sdk )
+		lv2? ( || ( media-libs/lv2core media-libs/lv2 ) )
+		capture? ( media-sound/jack_capture )
+		meterbridge? ( media-sound/meterbridge )
+'
+
+WAF_SRC_CONFIGURE_PARAMS+=(
+	--cxxflags-debug=""
+	--cxxflags-release="-DNDEBUG"
+	--nocache
+	--shared-lib
+	--lib-dev
+	--no-ldconfig
+	--no-desktop-update
+)
+
+WAF_SRC_CONFIGURE_PARAMS+=(
+	"--hates=bindir sbindir htmldir"
+)
+
+WAF_SRC_CONFIGURE_OPTIONS+=(
+	avahi
+	debug
+	faust
+	"ladspa --ladspadir=/usr/share/ladspa --no-ladspa"
+	"!ladspa --no-new-ladspa"
+	"lv2 --lv2dir=/usr/$(exhost --target)/lv2 --no-lv2"
+)
+
+WAF_SRC_CONFIGURE_OPTIONS_ENABLES+=(
+	nls
+)
+
+require sourceforge [ suffix=tar.xz project=guitarix ] waf
+
+WORK="${WORKBASE}"/${PN:0:-1}-${PV}
+
+src_prepare(){
+	default
+
+	edo sed -e 's@pkg-config@'"$(exhost --tool-prefix)"'pkg-config@g' -i wafadmin{,3}/Tools/{qt4,gnome,config_c}.py tools/ampsim/{Makefile,DK/{dk_simulator.py,buildlv2/gx_sceleton.lv2/Makefile}}
+}
