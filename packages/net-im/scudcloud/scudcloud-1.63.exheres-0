@@ -1,0 +1,32 @@
+# https://github.com/raelgc/scudcloud/archive/v1.63.zip
+
+SUMMARY='Unofficial qt5 python slack client'
+DESCRIPTION='ScudCloud improves the Slack integration with Linux desktops featuring:
+
+multiple teams support
+native system notifications
+count of unread direct mentions at launcher/sytray icon
+alert/wobbling on new messages
+channels quicklist (Unity only)
+optional tray notifications and "Close to Tray"
+follow your desktop activity and will stay online while you are logged in (if correct packages are installed)
+'
+
+LICENCES='MIT'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+MYOPTIONS=''
+
+DEPENDENCIES='
+	build:
+		dev-python/jsmin[python_abis:*?]
+	run:
+		x11-libs/libnotify[gobject-introspection]
+		dev-python/PyQt5[python_abis:*?][webkit]
+		dev-python/dbus-python[python_abis:*?]
+'
+
+#setup-py ?
+#distutils [ has_bin=true python_dep=3.4 ]
+require github [ user=raelgc tag=v1.63 ] setup-py [ blacklist='2' import=setuptools has_lib=true has_bin=true ]

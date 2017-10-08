@@ -9,7 +9,7 @@ SCM_TAG=${PV}
 
 MAIN_FOLDER=main
 
-require lang-helper [ linguas='deutsch espanol francais italiano' ] scm-git quake3 [ REND_SUFFIX=rend2 BASEQ3_PATH=[ "${WORK}/${MAIN_FOLDER}" ] BUILD_GAME_SO=1 ]
+require lang-helper [ linguas='deutsch espanol francais italiano' ] scm-git quake3 [ RENDERERS='rend1 rend2' DEFAULT_RENDERER='rend2' BASEQ3_PATH=[ "${WORK}/${MAIN_FOLDER}" ] BUILD_GAME_SO=1 ]
 
 BASE_URI="${HOMEPAGE}/releases/download/${PV}/"
 

@@ -21,6 +21,14 @@ DEPENDENCIES='
 SCM_REPOSITORY='https://github.com/opentomb/OpenTomb.git'
 require scm-git newicon desktop-utils cmake [ api=2 ]
 
+src_prepare(){
+	cmake_src_prepare
+
+	local CONFIG='config-opentomb.h'
+
+	edo ln -s ../${CONFIG} src
+}
+
 src_install()
 {
 	insinto /usr/share/games/${PN}
