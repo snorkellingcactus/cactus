@@ -1,5 +1,6 @@
 SUMMARY='Video plugin for the Mupen64Plus, using OpenGL. Based on the RiceVideoLinux plugin from earlier versions of Mupen64Plus.'
 HOMEPAGE="http://www.mupen64plus.org/"
 
+SCM_REVISION='2879e517fa6cbed483c1b5514a520c00acca8189'
 require mupen64plus-sub
 

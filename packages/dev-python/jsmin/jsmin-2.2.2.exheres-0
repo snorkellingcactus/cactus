@@ -1,0 +1,13 @@
+require pypi
+require setup-py [ import='setuptools' ]
+
+SUMMARY='Javascript minifier'
+
+LICENCES='MIT'
+SLOT='0'
+
+DEPENDENCIES=''
+MYOPTIONS=''
+
+PLATFORMS='~x86 ~amd64'
+

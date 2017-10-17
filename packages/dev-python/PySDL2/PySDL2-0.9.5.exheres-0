@@ -1,0 +1,16 @@
+require pypi
+require setup-py [ import='setuptools' ]
+
+SUMMARY='SDL wrapper'
+
+LICENCES='MIT'
+SLOT='0'
+
+DEPENDENCIES='
+	run:
+		media-libs/SDL:2
+'
+MYOPTIONS=''
+
+PLATFORMS='~x86 ~amd64'
+

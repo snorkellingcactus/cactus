@@ -1,0 +1,3 @@
+SCM_REVISION='18578e3dceab9e16ce2e706d91c9325c61bec1ab'
+
+require ${PN}

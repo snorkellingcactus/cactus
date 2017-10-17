@@ -1,0 +1,63 @@
+SUMMARY='A basic cross-platform launcher. This was adapted from CEN64-Qt '
+HOMEPAGE='https://github.com/dh4/mupen64plus-qt'
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+LICENCES='BSD-3'
+
+MYOPTIONS='( qt4 qt5 ) [[ number-selected = exactly-one ]]'
+
+# core network xml
+# 5? widgets 4? gui
+DEPENDENCIES='
+	build+run:
+		qt4? (
+			x11-libs/qt:4[sql][sqlite]
+			app-arch/quazip[qt4]
+		)
+
+		qt5? (
+			x11-libs/qtbase:5[sql][sqlite]
+			app-arch/quazip[qt5]
+		)
+'
+
+require qmake github [ user=dh4 tag=1.10 ] newicon
+
+src_prepare(){
+	default
+
+	QT_SLOT="$(option qt5 5 4)"
+
+	ln -s /usr/$(exhost --target)/include/quazip${QT_SLOT} quazip
+}
+
+src_configure(){
+	eqmake ${QT_SLOT}
+}
+
+src_install(){
+	local PKG_SHARE=/usr/share/games/${PN}/
+	local PKG_SHARE_TGT=/usr/$(exhost --target)/share/games/${PN}/
+
+	local WRAP=${TEMP}/${PN}
+
+	echo '#!/bin/sh' > ${WRAP}
+	echo "cd ${PKG_SHARE} && exec ${PKG_SHARE_TGT}${PN}"'"$@"' >> ${WRAP}
+
+	dobin ${WRAP}
+
+	insinto ${PKG_SHARE}
+	exeinto ${PKG_SHARE_TGT}
+
+	doexe ${PN}
+
+	pushd resources
+		doins -r images
+
+		newicon -s 128 images/${PN%-qt}.png ${PN}.png
+
+		insinto /usr/share/applications
+			doins ${PN}.desktop
+	popd
+}

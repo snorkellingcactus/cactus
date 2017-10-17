@@ -1,0 +1,25 @@
+
+GITHUB_REVISION=dc5d1cec97cf4d5051860d44d7109910826fda8f
+
+SUMMARY='Qt5 GUI for mupen64plus'
+
+DESCRIPTION="mupen64plus-gui is written in Qt5. It supports everything you'd expect from a mupen64plus frontend (plugin selection, configuration editing, save state management, screenshots, pausing, etc)."
+
+LICENCES='GPL-3'
+
+PLATFORMS='~x86 ~amd64'
+SLOT='0'
+
+DEPENDENCIES='
+	build+run:
+		media-libs/SDL:2
+		sys-libs/zlib
+		x11-libs/qtbase:5
+'
+
+require qmake [ slot=5 ] github [ user=m64p ]
+
+
+src_install(){
+	dobin ${PN}
+}

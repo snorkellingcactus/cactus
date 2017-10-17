@@ -3,6 +3,12 @@ HOMEPAGE="http://www.mupen64plus.org/"
 
 # NEON
 # VFP_HARD
+# ASM: 
+# 	May need something like $(exhost --tool-prefix)nasm ( or maybe there
+#	is no need for it ).
+#
+# 	Or may need ask mupen64plus for gnu as ( GAS ) compatibility
+
 MYOPTIONS='
 	asm [[ description = [ build assembly dynamic recompiler or MMX/SSE code. ] ]]
 	gles [[ description = [ build against GLESv2 instead of OpenGL. ] ]]
@@ -22,10 +28,13 @@ DEPENDENCIES='
 		lirc? ( remote/lirc )
 '
 
-require mupen64plus
+require mupen64plus flag-o-matic
 
 src_compile()
 {
+	append-ldflags -Wl,--no-add-needed -Wl,--no-undefined
+	append-flags -Wl,--no-add-needed -Wl,--no-undefined
+
 	MUPEN_SRC_COMPILE_PARAMS+=(
 		USE_GLES=$( option gles 1 0 )
 		NO_ASM=$( option asm 0 1 )

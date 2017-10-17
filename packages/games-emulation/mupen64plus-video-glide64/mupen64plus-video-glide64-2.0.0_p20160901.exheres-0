@@ -1,3 +1,0 @@
-SCM_REVISION='56be25d5e3f08718c8e9aea36732da071c949fce'
-
-require ${PN}

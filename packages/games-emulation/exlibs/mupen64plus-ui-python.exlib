@@ -6,11 +6,11 @@ SLOT='0'
 SCM_REPOSITORY="https://github.com/${PN%%-*}/${PN}"
 
 DEPENDENCIES='
-	dev-python/PyQt5
-	media-libs/SDL
+	dev-python/PyQt5[python_abis:*(-)?]
+	dev-python/PySDL2[python_abis:*(-)?]
 '
 
-require freedesktop-desktop distutils [ has_bin=true has_lib=true ] my_ever_is_scm
+require freedesktop-desktop setup-py [ import=setuptools has_bin=true has_lib=true ] my_ever_is_scm
 
 if my_ever_is_scm
 then

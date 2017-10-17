@@ -22,13 +22,19 @@ MAKE_SRC='projects/unix/'
 
 MUPEN_SRC_COMPILE_PARAMS+=(
 	"-C ${MAKE_SRC}"
+	"V=1"
+	SDL_CONFIG=sdl2-config
 )
 
 mupen64plus_src_prepare()
 {
 	default
 
-	edo sed -i -e "/^CC *=/s:gcc:$( exhost --tool-prefix )gcc:" -e "/^CXX *=/s:g++:$( exhost --tool-prefix )g++:" -e "/^AS *=/s:nasm:$( exhost --tool-prefix )as:" -e 's/$(INSTALL_STRIP_FLAG)//g' ${MAKE_SRC}/Makefile
+	# TODO
+	# See ASM in mupen64plus-core.exlib
+	# -e "/^AS *=/s:nasm:$( exhost --tool-prefix )as:"
+
+	edo sed -i -e "/^CC *=/s:gcc:$( exhost --tool-prefix )gcc:" -e "/^STRINGS *=/s:strings:$( exhost --tool-prefix )strings:" -e "/^CXX *=/s:g++:$( exhost --tool-prefix )g++:" -e 's/$(INSTALL_STRIP_FLAG)//g' ${MAKE_SRC}/Makefile
 }
 mupen64plus_src_compile()
 {
