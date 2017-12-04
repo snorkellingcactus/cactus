@@ -1,0 +1,52 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="LXQt system control center"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.3.2]
+        virtual/pkg-config [[ note = [ liblxqt-config-cursor ] ]]
+    build+run:
+        kde-frameworks/kwindowsystem:5
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+        lxqt/libqtxdg[>=2.0.0]
+        x11-libs/qtbase:5[gui]
+        x11-libs/qttools:5
+        x11-libs/qtx11extras:5
+        (
+            x11-libs/libXcursor
+            x11-libs/libXfixes
+            x11-libs/libxcb
+        ) [[ *note = [ liblxqt-config-cursor ] ]]
+        x11-libs/libX11 [[ note = [ lxqt-config-input ] ]]
+        (
+            x11-libs/qtsvg:5
+            kde-frameworks/libkscreen:5
+        ) [[ *note = [ lxqt-config-monitor ] ]]
+    suggestion:
+        lxqt/compton-conf [[ description = [ To configure composition and window effects. ] ]]
+        lxqt/lxqt-admin [[ description = [ To manage users, groups and set the date or time. ] ]]
+        lxqt/lxqt-globalkeys [[ description = [ To manage key shortcuts. ] ]]
+        lxqt/lxqt-l10n[${PN}] [[ description = [ For language translations. ] ]]
+        lxqt/lxqt-session [[ description = [ To configure things like apps autostart, xdg dirs and session variables. ] ]]
+        lxqt/obconf-qt [[ description = [ To manage openbox preferences. ] ]]
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+    # It's a hack. See lxqt/lxqt-build-tools.
+    -DEXHERBO_TOOL_PREFIX=$(exhost --tool-prefix)
+    -DCMAKE_MODULE_PATH=/usr/share/cmake/lxqt-build-tools/find-modules/
+)
+
+src_prepare()
+{
+    cmake_src_prepare
+
+    edo sed -e 's@CMAKE_INSTALL_PREFIX}/share@CMAKE_INSTALL_DATAROOTDIR}@g' -i lxqt-config-brightness/CMakeLists.txt
+}

@@ -1,0 +1,16 @@
+--- metadata/repository_mask.conf
++++ metadata/repository_mask.conf
+@@ -9,13 +9,6 @@
+     *description = [ Still under heavy development ]
+ ]]
+ 
+-lxqt/lxqt-panel [[
+-    author = [ Hong Hao <oahong@gmail.com> ]
+-    date = [ 10 May 2014 ]
+-    token = broken
+-    description = [ Broken exheres, someone please fix the dependencies ]
+-]]
+-
+ (
+     x11-libs/libfm[~scm]
+     x11-plugins/lxappearance-obconf[~scm]

@@ -1,0 +1,23 @@
+# Copyright 2014-2015 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="The standalone LXQt About dialog"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.3.2]
+    build+run:
+        kde-frameworks/kwindowsystem:5
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+        lxqt/libqtxdg[>=2.0.0]
+        x11-libs/qtbase:5
+        x11-libs/qttools:5
+        x11-libs/qtx11extras:5
+    suggestion:
+        lxqt/lxqt-l10n[${PN}]
+"

@@ -1,0 +1,16 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt github [ tag=${PV} user=lxde ]
+
+SUMMARY="Common files for LXQt"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.3.2]
+    build+run:
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+"

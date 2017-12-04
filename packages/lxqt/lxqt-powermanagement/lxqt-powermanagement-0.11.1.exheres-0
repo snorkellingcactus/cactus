@@ -1,0 +1,32 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Power management module for LXQt"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    build+run:
+        kde-frameworks/solid:5
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+        lxqt/libqtxdg[>=2.0.0]
+        x11-libs/libX11
+        x11-libs/libxcb
+        x11-libs/qtbase:5
+        x11-libs/qtsvg:5
+        x11-libs/qttools:5
+        x11-libs/qtx11extras:5
+    suggestion:
+        lxqt/lxqt-l10n[${PN}]
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+    # It's a hack. See lxqt/lxqt-build-tools.
+    -DEXHERBO_TOOL_PREFIX=$(exhost --tool-prefix)
+    -DCMAKE_MODULE_PATH=/usr/share/cmake/lxqt-build-tools/find-modules/
+)

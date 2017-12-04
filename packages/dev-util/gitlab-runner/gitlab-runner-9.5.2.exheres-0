@@ -1,0 +1,91 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'gitlab-ci-multi-runner-9.3.0.ebuild', which is:
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+#https://gitlab.com/gitlab-org/gitlab-runner/repository/052e5c66718d40a105daef351e9ffd30fa2c4f53/archive.zip
+EGO_PN="gitlab.com/gitlab-org/${PN}"
+
+#GITLAB_COMMIT='052e5c66718d40a105daef351e9ffd30fa2c4f53'
+GITLAB_COMMIT='v10.2.0'
+
+DESCRIPTION="Official GitLab CI Runner written in Go"
+HOMEPAGE="https://${EGO_PN}"
+#DOWNLOADS="
+#	${HOMEPAGE}/repository/archive.tar.gz?ref=v${PV} -> ${PNV}.tar.gz
+#"
+
+#!docker-build? ( https://dev.gentoo.org/~mrueg/files/${PN}-prebuilt-x86_64.tar.xz )
+
+require gitlab [ rev=${GITLAB_COMMIT} user=gitlab-org ]
+
+PLATFORMS='~x86 ~amd64'
+LICENCES='MIT'
+SLOT='0'
+MYOPTIONS='docker-build'
+
+# Optional: gox go cross compiler
+DEPENDENCIES='
+	build:
+		dev-go/gox
+		docker-build? ( app-emulation/docker[>=1.5] )
+'
+
+DEFAULT_SRC_COMPILE_PARAMS=(
+	RELEASE=true
+	build_current
+)
+
+WORK="${WORKBASE}"/${PN}-${GITLAB_COMMIT}-${GITLAB_COMMIT}
+
+src_prepare() {
+	default
+
+	pushd src/${EGO_PN}
+
+		if ! optionq docker-build
+		then
+#			edo mkdir -p out/docker
+			einfo "You must complete this exheres"
+#			edo cp "${DISTDIR}"/${P}-prebuilt-x86_64.tar.xz out/docker/prebuilt-x86_64.tar.xz
+#			edo cp "${DISTDIR}"/${P}-prebuilt-arm.tar.xz out/docker/prebuilt-arm.tar.xz || die
+#			edo sed -i -e "s/docker info/echo false/" Makefile
+		else
+			einfo "You need to have docker running on your system during build time"
+			einfo "Remember to set DOCKER_HOST if needed."
+			einfo "$(docker info)"
+		fi
+
+		edo sed -i -e "s#./ci/version#echo ${PV}#"\
+			-e "s/git rev-parse --short HEAD/echo ${GITLAB_COMMIT}/"\
+			-e "/^LATEST_STABLE_TAG/d"\
+			-e "s#git show-ref.*\$#echo exherbo)#"\
+			-e "s#git describe.*\$#echo 0), 0)#"\
+			Makefile
+	popd
+}
+
+src_compile() {
+	if [ -z "${DOCKER_HOST}" ]
+	then
+		export DOCKER_HOST='unix:///var/run/docker.sock'
+	fi
+
+	einfo "$(whoami)"
+	esandbox allow_net --connect "${DOCKER_HOST}"
+
+	pushd src/${EGO_PN}
+		default
+	popd
+
+	esandbox disallow_net --connect "${DOCKER_HOST}"
+
+	unset DOCKER_HOST
+}
+
+src_install() {
+	pushd src/${EGO_PN}
+		dobin out/binaries/gitlab-runner
+		dodoc {README,CHANGELOG}.md
+	popd
+}

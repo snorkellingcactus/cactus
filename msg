@@ -1,0 +1,3 @@
+- Added:
+	- otter-browser
+

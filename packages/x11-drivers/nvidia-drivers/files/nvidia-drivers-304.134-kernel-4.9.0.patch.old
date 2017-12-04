@@ -1,0 +1,54 @@
+diff --git a/nv-drm.c b/tmp/nv-drm.c
+index 72b3801..ba9fa61 100644
+--- a/kernel/nv-drm.c
++++ b/tmp/nv-drm.c
+@@ -71,11 +71,7 @@ static const struct file_operations nv_drm_fops = {
+ };
+ 
+ static struct drm_driver nv_drm_driver = {
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0)
+-    .driver_features = DRIVER_GEM | DRIVER_PRIME | DRIVER_LEGACY,
+-#else
+-     .driver_features = DRIVER_GEM | DRIVER_PRIME,
+-#endif
++    .driver_features = 0,
+     .load = nv_drm_load,
+     .unload = nv_drm_unload,
+     .fops = &nv_drm_fops,
+diff --git a/nv-linux.h b/tmp/nv-linux.h
+index 1b2f59e..4482ac6 100644
+--- a/kernel/nv-linux.h
++++ b/tmp/nv-linux.h
+@@ -1889,13 +1889,8 @@ static inline NvU64 nv_node_end_pfn(int nid)
+         }
+     #endif
+ #else
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0)
+-     #define NV_GET_USER_PAGES(start, nr_pages, gup_flags, pages, vmas) \
+-         get_user_pages(current, current->mm, start, nr_pages, gup_flags, pages, vmas)
+-#else
+-     #define NV_GET_USER_PAGES(start, nr_pages, write, force, pages, vmas) \
+-         get_user_pages(current, current->mm, start, nr_pages, write, force, pages, vmas)
+-#endif
++    #define NV_GET_USER_PAGES(start, nr_pages, write, force, pages, vmas) \
++        get_user_pages(current, current->mm, start, nr_pages, write, force, pages, vmas)
+ 
+     #define NV_GET_USER_PAGES_REMOTE    get_user_pages
+ #endif
+diff --git a/nv-mlock.c b/tmp/nv-mlock.c
+index 9e3c5ea..0f795a5 100644
+--- a/kernel/nv-mlock.c
++++ b/tmp/nv-mlock.c
+@@ -50,11 +50,7 @@ RM_STATUS NV_API_CALL nv_lock_user_pages(
+ 
+     down_read(&mm->mmap_sem);
+     ret = NV_GET_USER_PAGES((unsigned long)address,
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0)
+-                             page_count, write ? FOLL_WRITE : 0, force, user_pages, NULL);
+-#else
+-                             page_count, write, force, user_pages, NULL);
+-#endif
++                            page_count, write, force, user_pages, NULL);
+     up_read(&mm->mmap_sem);
+     pinned = ret;
+ 

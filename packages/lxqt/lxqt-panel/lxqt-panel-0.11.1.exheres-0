@@ -1,0 +1,69 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt option-renames [ renames=[ 'pulse pulseaudio' ] ]
+
+SUMMARY="The LXQt desktop panel"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="alsa pulseaudio lm_sensors"
+
+# https://github.com/lxde/lxqt/issues/783
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.3.2]
+        virtual/pkg-config
+        x11-proto/xproto
+    build+run:
+        kde-frameworks/kwindowsystem:5
+        kde-frameworks/solid [[ note = [ plugin-mount ] ]]
+        lxde-base/menu-cache[>=0.3.3] [[ note = [ plugin-mainmenu ] ]]
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+        lxqt/libqtxdg[>=2.0.0]
+        lxqt/lxqt-globalkeys [[ note = [ plugin-desktopswitch ] ]]
+        sys-libs/libstatgrab [[ note = [ cpuload and networkmonitor plugin ] ]]
+        sys-libs/libsysstat[>0.1.0] [[ note = [ plugin-sysstat ] ]]
+        x11-libs/dbusmenu-qt[qt5] [[ note = [ plugin-statusnotifier ] ]]
+        x11-libs/libX11
+        x11-libs/libXext
+        x11-libs/libxcb
+        x11-libs/libxkbcommon[X] [[ note = [ plugin-kbindicator ] ]]
+        x11-libs/qtbase:5
+        x11-libs/qttools:5
+        x11-libs/qtx11extras:5
+        (
+            x11-utils/xcb-util
+            x11-libs/libXcomposite
+            x11-libs/libXdamage
+            x11-libs/libXrender
+        ) [[ *note = [ plugin-tray ] ]]
+        (
+            alsa? ( sys-sound/alsa-lib )
+            pulseaudio? ( media-sound/pulseaudio )
+        ) [[ note = [ volume plugin, needs pulseaudio a/o alsa ] ]]
+        (
+            x11-libs/libXcomposite
+            x11-libs/libXdamage
+            x11-libs/libXrender
+        ) [[ note = [ plugin-tray ] ]]
+        lm_sensors? ( sys-apps/lm_sensors ) [[ note = [ plugin-sensors ] ]]
+    recommendation:
+        lxde-desktop/lxmenu-data [[ note = [ plugin-mainmenu, upstream issue 783 ] ]]
+    suggestion:
+        lxqt/lxqt-l10n[${PN}]
+        pulseaudio? ( lxqt/pavucontrol-qt )
+"
+
+CMAKE_SRC_CONFIGURE_OPTIONS=(
+    'alsa VOLUME_USE_ALSA'
+    'pulseaudio VOLUME_USE_PULSEAUDIO'
+    'lm_sensors SENSORS_PLUGIN'
+)
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+    -DCMAKE_MODULE_PATH=/usr/share/cmake/lxqt-build-tools/find-modules/
+)
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+	"${FILES}"/fix-build-with-qt-5.8-explicit-does-not-name-a-type.patch
+)

@@ -1,0 +1,3 @@
+MY_PV="release-branch.go${PV}"
+
+require go-golang

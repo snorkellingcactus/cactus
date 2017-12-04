@@ -1,0 +1,37 @@
+# Copyright 2011, 2012 Ali Polatel <alip@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Fast, small and powerful file manager"
+HOMEPAGE="http://xffm.foo-projects.org/"
+DOWNLOADS="mirror://sourceforge/project/xffm/${PV}/${PNV}.tar.bz2"
+
+LICENCES="GPL-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="
+    experimental [[ description = [ Enable experimental plugins ] ]]
+"
+
+# http://xffm.foo-projects.org/#packages
+DEPENDENCIES="
+    build:
+        dev-util/intltool[>=0.40]
+    build+run:
+        dev-libs/glib:2[>=2.20.5]
+        dev-libs/libxml2:2.0[>=2.4.0]
+        gnome-desktop/librsvg:2[>=2.26.0]
+        sys-apps/file
+        x11-libs/cairo[>=1.8.10]
+        x11-libs/gtk+:2[>=2.20.0]
+    suggestion:
+        app-admin/sudo          [[ description = [ Run properties plugin with priviliged rights ] ]]
+        app-text/ghostscript    [[ description = [ pdf and postscript previews ] ]]
+        app-arch/libzip[>=0.9]  [[ description = [ Unpack zip files ] ]]
+"
+
+BUGS_TO="alip@exherbo.org"
+UPSTREAM_DOCUMENTATION="http://xffm.foo-projects.org/RTFM/RTFM.html [[ lang = en  ]]"
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( experimental )
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --with-gtk2 )

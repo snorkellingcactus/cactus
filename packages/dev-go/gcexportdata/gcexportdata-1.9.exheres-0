@@ -1,0 +1,9 @@
+SUMMARY='Provides functions for locating, reading, and writing export data files containing type information produced by the gc compiler.'
+SLOT='0'
+
+require go-golang [ category='tools/go' ]
+
+DEPENDENCIES+="
+	build+run:
+		dev-go/gcimporter15[>=${PV}]
+"

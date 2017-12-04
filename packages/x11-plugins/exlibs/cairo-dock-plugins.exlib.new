@@ -1,0 +1,199 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'cairo-dock-plugins-2.2.0.4.exheres-0' from Exherbo, which is:
+# Copyright 2009 Jan Meier jan@codejunky.org
+# Distributed under the terms of the GNU General Public License v2
+
+# https://www.archlinux.org/packages/community/x86_64/cairo-dock-plug-ins/
+# TODO: per-dir enabled modules install (cd <module> && make install). 
+# http://bazaar.launchpad.net/~indicators-gtk2-team/indicators-gtk2/ido-gtk2/files libido
+
+SUMMARY='Plug-ins part of Cairo-Dock project.'
+HOMEPAGE='http://www.glx-dock.org https://launchpad.net/cairo-dock-plug-ins'
+SCM_REPOSITORY='https://github.com/Cairo-Dock/cairo-dock-plug-ins'
+PLATFORMS='~amd64 ~x86'
+LICENCES='GPL-2 GPL-3'
+SLOT='0'
+
+DESCRIPTIONS=
+DEPS=
+#TODO:
+#	doncky doncky-0.0.9
+#	libido
+
+OPTIONS=(
+	wifi
+	force-icon-in-menus
+	dbusmenu
+	indicator
+	upower
+	alsa-mixer
+	ical
+	python
+	ruby
+	mono
+	vala
+	disks
+	global-menu
+	gmenu
+	gnome
+	impulse
+	kde2
+	kde
+	keyboard-indicator
+	mail
+	memenu
+	network-monitor
+	recent-events
+	scooby-do
+	xrandr
+	exif
+	sound-effects
+	alsa-mixer
+	sensors
+	terminal
+	weblets
+	xfce
+	xgamma
+)
+
+#Me-Menu, Messaging-Menu, Indicator-Generic libindicator
+
+#indicator->dbusmenu[gtk2]?
+#indicator3[0.4]
+#dbusmenu[0.4]
+#upower[0.99]
+#python= python interface for dbus applet
+#kdecore=kde/kdelibs?
+#status notifier require dbusmenugtk
+#xfce->Thunar[vfs]
+#gnome-desktop/gvfs
+#TODO: 
+#		libido? (
+#			libido3-0.1 
+#		)
+
+DESC_ical="Enables the Clock applet."
+DESC_python="Enables python interface to dbus applet."
+DESC_ruby="Enables ruby interface to dbus applet."
+DESC_mono="Enables mono interface to dbus applet."
+DESC_vala="Enables vala interface to dbus applet."
+DESC_kde="KDE integration."
+DESC_kde2="KDE experimental ( unstable ) integration."
+DESC_scooby-do="Note: Unstable."
+DESC_xrandr="Enables the Show Desktop applet."
+DESC_exif="Allow for rotating images in the Slider applet."
+DESC_sensors="Allow to show fan speed and CPU temperature in the System Monitor applet."
+
+DEPS_vala="dev-lang/vala"
+DEPS_dbusmenu="dev-libs/libdbusmenu:0.4"
+DEPS_python="dev-lang/python"
+DEPS_ruby="dev-lang/ruby"
+DEPS_mono="dev-dotnet/dbus-sharp:2
+			dev-dotnet/dbus-sharp-glib:2"
+DEPS_indicator="dev-libs/libdbusmenu:0.4
+			dev-libs/libindicator:0.4"
+DEPS_ical="office-libs/libical"
+DEPS_impulse="sci-libs/fftw
+			media-sound/pulseaudio"
+DEPS_keyboard-indicator="x11-libs/libxklavier"
+DEPS_mail="mail-libs/libetpan"
+DEPS_upower="sys-apps/upower[>=0.99]"
+DEPS_recent-events="dev-libs/zeitgeist"
+DEPS_exif="media-libs/libexif"
+DEPS_sound-effects="sys-sound/alsa-lib"
+DEPS_alsamixer="sys-sound/alsa-lib"
+DEPS_sensors="sys-apps/lm_sensors"
+DEPS_terminal="dev-libs/vte:3.0"
+DEPS_weblets="net-libs/webkit-gtk"
+DEPS_wifi="net-wireless/wireless_tools"
+DEPS_xrandr="x11-apps/xrandr"
+DEPS_gmenu="gnome-desktop/gnome-menus"
+DEPS_gnome="gnome-desktop/gvfs"
+DEPS_kde="gnome-desktop/gvfs"
+DEPS_kde2="x11-libs/qt:4
+			kde/kdelibs
+			kde-frameworks/kio"
+DEPS_xfce="gnome-desktop/gvfs"
+DEPS_xgamma="x11-apps/xgamma"
+
+DIR_animated_icons='Animated-Icons'
+DIR_cairo_penguin='Cairo-Penguin'
+DIR_clipper='Clipper'
+DIR_clock='clock'
+DIR_composite_manager=Composite-Manager
+DIR_dbus='Dbus'
+DIR_disks='Disks'
+DIR_dnd2share='dnd2share'
+DIR_folders='Folders'
+DIR_global_menu='Global-Menu'
+DIR_gmenu='GMenu'
+DIR_kde='gvfs-integration'
+DIR_kde2='gvfs-integration'
+DIR_gnome='gvfs-integration'
+DIR_impulse='Impulse'
+
+
+
+# Other options:
+#	force_old_indicator_names
+#	force_indicator_applicationadded_have_hint
+# TODO:
+#	'doncky enable-doncky'
+#	'libido enable-libido-support'
+CMAKE_SRC_CONFIGURE_OPTION_ENABLE+=(
+	'dbusmenu dbusmenu-support'
+	'indicator indicator-support'
+	'upower upower-support'
+	'alsa-mixer'
+	'ical ical-support'
+	'python python-interface'
+	'ruby ruby-interface'
+	'mono mono-interface'
+	'vala vala-interface'
+	'disks'
+	'global-menu'
+	'gmenu'
+	'gnome gnome-integration'
+	'impulse'
+	'kde kde-integration'
+	'kde2 kde-integration2'
+	'keyboard-indicator'
+	'mail'
+	'memenu'
+	'network-monitor'
+	'recent-events'
+	'scooby-do'
+	'xrandr xrandr-support'
+	'exif exif-support'
+	'sound-effects'
+	'sensors sensors-support'
+	'terminal'
+	'weblets'
+	'xfce xfce-integration'
+	'xgamma'
+)
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+	'force-icon-in-menus force-icon-in-menus'
+)
+
+require lang-helper [ linguas='ar ca cs da de el en es et eu fr he hr hu id it ja ko lt nl pl pt pt_BR ru sk sr sr@latin sv tr uk uz zh_CN zh_TW' ] scm-git cmake
+
+export_exlib_phases src_prepare src_install
+
+cairo-dock-plugins_src_prepare() {
+    edo find . -name *.c > po/POTFILES.in
+    edo sed -i -e 's/pkg-config/'"$( exhost --tool-prefix )pkg-config"'/' -e 's/localedir "${prefix}\//localedir "/' CMakeLists.txt
+}
+cairo-dock_src_install()
+{
+	for i in ${OPTIONS[@]}
+	do
+		[ ! -z "${i}" ]
+	done
+}
+cairo-dock-plugins_src_install()
+{
+	cmake_src_install
+
+	lang-helper-remove-locales-usr
+}

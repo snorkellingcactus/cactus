@@ -1,0 +1,24 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Daemon used to register global keyboard shortcuts"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.3.2]
+        x11-proto/xproto
+    build+run:
+        kde-frameworks/kwindowsystem:5
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+        lxqt/libqtxdg[>=2.0.0]
+        x11-libs/libX11
+        x11-libs/qtbase:5
+        x11-libs/qttools:5
+    suggestion:
+        lxqt/lxqt-l10n[${PN}]
+"

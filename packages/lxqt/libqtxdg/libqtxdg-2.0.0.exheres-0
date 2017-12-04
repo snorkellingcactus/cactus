@@ -1,0 +1,24 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Qt implementation of freedesktop.org xdg specs"
+DOWNLOADS="http://downloads.lxqt.org/${PN}/${PV}/${PNV}.tar.xz"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/qtbase:5[gui]
+        x11-libs/qtsvg:5
+"
+
+DEFAULT_SRC_INSTALL_EXCLUDE=( release.sh )
+CMAKE_SOURCE=${WORKBASE}/${PNV}
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+    -DBUILD_TESTS:bool=OFF
+)
+

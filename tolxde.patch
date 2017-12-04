@@ -1,0 +1,249 @@
+diff --git a/packages/lxqt/compton-conf/compton-conf-0.2.1.exheres-0 b/packages/lxqt/compton-conf/compton-conf-0.2.1.exheres-0
+new file mode 100644
+index 0000000..fa9c833
+--- /dev/null
++++ b/packages/lxqt/compton-conf/compton-conf-0.2.1.exheres-0
+@@ -0,0 +1,16 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++require lxqt
++
++SUMMARY='Configuration tool for the Compton X composite manager.'
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++
++DEPENDENCIES='
++	build:
++		lxqt/liblxqt
++	run:
++		x11-libs/qtbase:5
++		dev-libs/libconfig
++'
+\ No newline at end of file
+diff --git a/packages/lxqt/lxhotkey/lxhotkey-scm.exheres-0 b/packages/lxqt/lxhotkey/lxhotkey-scm.exheres-0
+new file mode 100644
+index 0000000..4a085cf
+--- /dev/null
++++ b/packages/lxqt/lxhotkey/lxhotkey-scm.exheres-0
+@@ -0,0 +1,16 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++SUMMARY='Universal application for the LXDE which allows view and change global keyboard shortcuts for Window Manager actions, including ones to start applications.'
++HOMEPAGE="https://github.com/lxde/${PN}"
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++
++SCM_REPOSITORY="${HOMEPAGE}.git"
++
++require scm-git autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ]
++
++DEPENDENCIES='
++	lxqt/liblxqt
++	lxqt/lxqt-l10n
++'
+\ No newline at end of file
+diff --git a/packages/lxqt/lxqt-admin/lxqt-admin-0.11.1.exheres-0 b/packages/lxqt/lxqt-admin/lxqt-admin-0.11.1.exheres-0
+new file mode 100644
+index 0000000..bdd1faa
+--- /dev/null
++++ b/packages/lxqt/lxqt-admin/lxqt-admin-0.11.1.exheres-0
+@@ -0,0 +1,13 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++require lxqt
++
++SUMMARY='GUI tools to adjust settings of the operating system LXQt is running on.'
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++
++DEPENDENCIES='
++	lxqt/liblxqt
++	lxqt/lxqt-policykit
++'
+\ No newline at end of file
+diff --git a/packages/lxqt/lxqt-build-tools/lxqt-build-tools-0.3.2.exheres-0 b/packages/lxqt/lxqt-build-tools/lxqt-build-tools-0.3.2.exheres-0
+new file mode 100644
+index 0000000..4e4bb91
+--- /dev/null
++++ b/packages/lxqt/lxqt-build-tools/lxqt-build-tools-0.3.2.exheres-0
+@@ -0,0 +1,35 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++SUMMARY="The terminal widget for QTerminal."
++SLOT="0"
++PLATFORMS="~x86 ~amd64"
++HOMEPAGE="https://github.com/lxde/${PN}"
++DOWNLOADS="${HOMEPAGE}/archive/${PV}.zip -> ${PNV}.zip"
++LICENCES="LGPL-2.1"
++
++CMAKE_SRC_CONFIGURE_PARAMS+=(
++	-DCMAKE_BUILD_TYPE=Release
++)
++
++require cmake [ api=2 ]
++
++DEPENDENCIES="
++	build+run:
++		x11-libs/qtbase:5
++		lxqt/liblxqt
++"
++
++src_prepare()
++{
++	cmake_src_prepare
++
++	# A hack to prevent banned commands of dependent packages.
++	# This ${EXHERBO_TOOL_PREFIX} will let us append a prefix
++	# to the banned toolchain comands ( gcc-ar and gcc-ranlib )
++	# through -DEXHERBO_TOOL_PREFIX=$( exhost --tool-prefix ).
++	edo sed -e 's/set(CMAKE_AR "gcc/set(CMAKE_AR "${EXHERBO_TOOL_PREFIX}gcc/' -e 's/set(CMAKE_RANLIB "gcc/set(CMAKE_RANLIB "${EXHERBO_TOOL_PREFIX}gcc/' -i cmake/modules/LXQtCompilerSettings.cmake
++
++	# Disable pul translations at compile phase of dependent packages.
++	edo sed -e 's/if (TR_PULL_TRANSLATIONS/if (0/' -i cmake/modules/LXQtTranslateTs.cmake
++}
+\ No newline at end of file
+diff --git a/packages/lxqt/lxqt-l10n/lxqt-l10n-0.11.2.exheres-0 b/packages/lxqt/lxqt-l10n/lxqt-l10n-0.11.2.exheres-0
+new file mode 100644
+index 0000000..1172667
+--- /dev/null
++++ b/packages/lxqt/lxqt-l10n/lxqt-l10n-0.11.2.exheres-0
+@@ -0,0 +1,24 @@
++SUMMARY='A lightweight Qt-based terminal emulator.'
++DESCRIPTION='Opensource project based on KDE4 Konsole application.
++The main goal of this project is to provide unicode-enabled, embeddable
++QT4 widget for using as a built-in console (or terminal emulation widget).'
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++HOMEPAGE="https://github.com/lxde"
++DOWNLOADS="${HOMEPAGE}/${PN}/archive/${PV}.zip -> ${PNV}.zip"
++LICENCES="LGPL-2.1"
++
++CMAKE_SRC_CONFIGURE_PARAMS+=(
++	-DCMAKE_BUILD_TYPE=Release
++)
++
++require cmake [ api=2 ]
++
++# lxqt-l10n
++DEPENDENCIES='
++	build:
++		lxqt/libqtxdg
++	build+run:
++		lxqt/liblxqt
++'
++
+diff --git a/packages/lxqt/lxqt-sudo/lxqt-sudo-0.11.1.exheres-0 b/packages/lxqt/lxqt-sudo/lxqt-sudo-0.11.1.exheres-0
+new file mode 100644
+index 0000000..87ee6de
+--- /dev/null
++++ b/packages/lxqt/lxqt-sudo/lxqt-sudo-0.11.1.exheres-0
+@@ -0,0 +1,12 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++require lxqt
++
++SUMMARY='lxqt-sudo is a graphical front-end of commands sudo and su respectively. As such it enables regular users to launch applications with permissions of other users including root.'
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++
++DEPENDENCIES='
++	lxqt/liblxqt
++'
+\ No newline at end of file
+diff --git a/packages/lxqt/obconf-qt/obconf-qt-0.11.1.exheres-0 b/packages/lxqt/obconf-qt/obconf-qt-0.11.1.exheres-0
+new file mode 100644
+index 0000000..5364dcc
+--- /dev/null
++++ b/packages/lxqt/obconf-qt/obconf-qt-0.11.1.exheres-0
+@@ -0,0 +1,15 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++require lxqt
++
++SUMMARY='ObConf-Qt is a Qt port of ObConf, a configuration editor for window manager OpenBox.'
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++
++DEPENDENCIES='
++	lxqt/liblxqt
++	lxqt/lxqt-l10n
++'
++
++DOWNLOADS="https://github.com/lxde/${PN}/archive/${PV}.zip -> ${PNV}.zip"
+\ No newline at end of file
+diff --git a/packages/lxqt/pavucontrol-qt/pavucontrol-qt-0.2.0.exheres-0 b/packages/lxqt/pavucontrol-qt/pavucontrol-qt-0.2.0.exheres-0
+new file mode 100644
+index 0000000..0e3e66a
+--- /dev/null
++++ b/packages/lxqt/pavucontrol-qt/pavucontrol-qt-0.2.0.exheres-0
+@@ -0,0 +1,12 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++require lxqt
++
++SUMMARY='Qt port of volume control pavucontrol of sound server PulseAudio.'
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++
++DEPENDENCIES='
++	lxqt/liblxqt
++'
+\ No newline at end of file
+diff --git a/packages/lxqt/qterminal/qterminal-0.7.1.exheres-0 b/packages/lxqt/qterminal/qterminal-0.7.1.exheres-0
+new file mode 100644
+index 0000000..ddc45bb
+--- /dev/null
++++ b/packages/lxqt/qterminal/qterminal-0.7.1.exheres-0
+@@ -0,0 +1,24 @@
++# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
++# Distributed under the terms of the GNU General Public License v2
++
++SUMMARY="A lightweight Qt-based terminal emulator.'
++DESCRIPTION='Opensource project based on KDE4 Konsole application.
++The main goal of this project is to provide unicode-enabled, embeddable
++QT4 widget for using as a built-in console (or terminal emulation widget)."
++SLOT="0"
++PLATFORMS="~x86 ~amd64"
++HOMEPAGE="https://github.com/lxde"
++DOWNLOADS="${HOMEPAGE}/${PN}/archive/${PV}.zip -> ${PNV}.zip"
++LICENCES="LGPL-2.1"
++
++require cmake [ api=2 ]
++
++# lxqt-l10n
++DEPENDENCIES="
++	build+run:
++		lxqt/qtermwidget
++		lxqt/lxqt-build-tools
++		lxqt/lxqt-l10n
++	run:
++		x11-libs/qtx11extras
++"
+\ No newline at end of file
+diff --git a/packages/lxqt/qtermwidget/qtermwidget-0.7.1.exheres-0 b/packages/lxqt/qtermwidget/qtermwidget-0.7.1.exheres-0
+new file mode 100644
+index 0000000..3c9c576
+--- /dev/null
++++ b/packages/lxqt/qtermwidget/qtermwidget-0.7.1.exheres-0
+@@ -0,0 +1,13 @@
++SUMMARY='The terminal widget for QTerminal.'
++SLOT='0'
++PLATFORMS='~x86 ~amd64'
++HOMEPAGE="https://github.com/lxde/${PN}"
++DOWNLOADS="${HOMEPAGE}/archive/${PV}.zip -> ${PNV}.zip"
++LICENCES='GPL-2'
++
++require cmake [ api=2 ]
++
++# TODO: qtbase[gui]?
++DEPENDENCIES="
++	x11-libs/qtbase:5
++"
+\ No newline at end of file

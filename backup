@@ -1,0 +1,12 @@
+_GODIR=${TEMP}/go/src/
+	_GITLAB_HELPER_DIR="${_GODIR}/_${WORK}"
+	_GITLAB_RUNNER_DIR="${_GODIR}/gitlab.com/gitlab-org/gitlab-runner/"
+
+	edo mkdir -p "${_GITLAB_HELPER_DIR}" "${_GITLAB_RUNNER_DIR}"
+
+	edo ln -s "${WORK}/apps" "${_GITLAB_HELPER_DIR}"
+
+	for _GOLIB in common
+	do
+		edo ln -s "${WORK}/${_GOLIB}" "${_GITLAB_RUNNER_DIR}"
+	done

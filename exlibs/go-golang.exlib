@@ -1,0 +1,11 @@
+PLATFORMS='~x86 ~amd64'
+
+_CATEGORY=${PN//-/\/}
+
+_REPO_PROJECT=${_CATEGORY%%/*}
+
+_DIR=${_CATEGORY#*/}
+
+require go [ import="golang.org/x/${_CATEGORY}" user='golang' repo_project="${_REPO_PROJECT}" ]
+
+WORK="${WORK}"/${_DIR}

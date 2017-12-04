@@ -1,0 +1,11 @@
+SUMMARY='Themes for fvwm window manager.'
+HOMEPAGE='http://fvwm-themes.sourceforge.net/'
+SLOT='0'
+PLATFORMS='x86 amd64'
+
+require sourceforge [ pn=fvwm-themes pnv=${PNV} ]
+
+DEFAULT_SRC_CONFIGURE_PARAMS+=(
+	--hates=datarootdir
+	--hates=docdir
+)

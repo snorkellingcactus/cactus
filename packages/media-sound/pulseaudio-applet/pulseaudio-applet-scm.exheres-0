@@ -1,0 +1,25 @@
+# Copyright 2013 Thomas Witt
+# Distributed under the terms of the GNU General Public License v2
+
+MY_PN='pa-applet'
+require github [ user=nicolasavru ] autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.13 ] ]
+
+SUMMARY='A panel applet to control pulseaudio'
+DESCRIPTION='pa-applet is a systray-applet that allows you to control the volume level of the default sink and mute or unmute it. It also allows you to change the active profile of the default sink, which can be useful to tell ulseAudio to redirect audio to the HDMI output instead of outputting to the built-in speakers in a computer connected to an HDMI device.'
+
+LICENCES='BSD-2'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+    build+run:
+        media-sound/pulseaudio
+'
+
+src_prepare()
+{
+	#https://github.com/fernandotcl/pa-applet/issues/11
+	edo sed "s/c99 -D_GNU_SOURCE -Wall -Werror/c99 -D_GNU_SOURCE -Wall/g" -i "${WORK}"/src/Makefile.am
+
+	autotools_src_prepare
+}

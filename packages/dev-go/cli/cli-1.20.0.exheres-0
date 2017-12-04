@@ -1,0 +1,7 @@
+SUMMARY='A simple, fast, and fun package for building command line apps in Go.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+MY_PV="v${PV}"
+
+require go [ user='urfave' ]

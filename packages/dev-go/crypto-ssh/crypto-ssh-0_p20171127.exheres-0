@@ -1,0 +1,17 @@
+#SUMMARY=''
+SLOT='0'
+
+MY_PV='94eea52f7b742c7cbe0b03b22f0c4c8631ece122'
+
+require go-golang
+
+#DEPENDENCIES='
+#	build+run:
+#		dev-go/sys-unix
+#'
+
+DEPENDENCIES='
+	build+run:
+		dev-go/crypto-ed25519
+		dev-go/crypto-curve25519
+'

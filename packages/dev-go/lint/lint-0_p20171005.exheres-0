@@ -1,0 +1,11 @@
+SUMMARY='Go cross compilation tool.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+MY_PV='6aaf7c34af0f4c36a57e0c429bace4d706d8e931'
+
+require go [ user='golang' ]
+
+DEPENDENCIES='
+	dev-go/gcexportdata
+'

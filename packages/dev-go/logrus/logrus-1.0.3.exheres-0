@@ -1,0 +1,11 @@
+SUMMARY='Structured, pluggable logging for Go.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+MY_PV="v${PV}"
+
+require go [ user='Sirupsen' ]
+
+DEPENDENCIES='
+	dev-go/crypto-ssh-terminal
+'

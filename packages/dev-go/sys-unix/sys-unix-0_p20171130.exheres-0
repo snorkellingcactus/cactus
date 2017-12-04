@@ -1,0 +1,6 @@
+SUMMARY='Various functions for reading gc-generated object files that can be used to implement the Importer interface defined by the Go 1.5 standard library package.'
+SLOT='0'
+
+MY_PV='8b4580aae2a0dd0c231a45d3ccb8434ff533b840'
+
+require go-golang

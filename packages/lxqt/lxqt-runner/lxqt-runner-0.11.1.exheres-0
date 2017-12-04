@@ -1,0 +1,35 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Tool used to launch programs quickly by typing their names"
+
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.3.2]
+        virtual/pkg-config
+    build+run:
+        kde-frameworks/kwindowsystem:5
+        lxde-base/menu-cache[>=0.3.3]
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+        lxqt/libqtxdg[>=2.0.0]
+        lxqt/lxqt-globalkeys
+        x11-libs/qtbase:5
+        x11-libs/qtscript:5
+        x11-libs/qttools:5
+        x11-libs/qtx11extras
+    suggestion:
+        lxqt/lxqt-l10n[${PN}]
+"
+
+# TODO: RUNNER_MATH option needs muParser package.
+CMAKE_SRC_CONFIGURE_PARAMS=(
+    -DUSE_MENU_CACHE:BOOL=TRUE
+    -DRUNNER_MATH:BOOL=FALSE
+    -DRUNNER_VBOX:BOOL=TRUE
+)
+

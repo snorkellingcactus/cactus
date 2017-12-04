@@ -1,0 +1,13 @@
+SUMMARY='Various functions for reading gc-generated object files that can be used to implement the Importer interface defined by the Go 1.5 standard library package.'
+SLOT='0'
+
+MY_PV='94eea52f7b742c7cbe0b03b22f0c4c8631ece122'
+
+require go-golang
+
+# Fails if there is no Go files under crypto/ssh, so require it.
+DEPENDENCIES='
+	build+run:
+		dev-go/sys-unix
+		dev-go/crypto-ssh
+'

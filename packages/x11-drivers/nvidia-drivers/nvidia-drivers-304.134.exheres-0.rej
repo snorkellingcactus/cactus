@@ -1,0 +1,13 @@
+--- packages/x11-drivers/nvidia-drivers/nvidia-drivers-304.134.exheres-0
++++ packages/x11-drivers/nvidia-drivers/nvidia-drivers-304.134.exheres-0
+@@ -0,0 +1,10 @@
++# Copyright 2010 Ingmar Vanhassel <ingmar@exherbo.org>
++# Distributed under the terms of the GNU General Public License v2
++
++require cactus-nvidia-drivers
++
++PLATFORMS="~amd64 ~x86"
++
++DEFAULT_SRC_PREPARE_PATCHES=(
++	"${FILES}"/${PNV}-kernel-4.9.0.patch
++)
