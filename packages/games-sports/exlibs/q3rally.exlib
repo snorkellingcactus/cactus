@@ -10,7 +10,7 @@ PLATFORMS='x86 amd64'
 LICENCES='GPL-2 Quake3-EULA'
 SLOT='0'
 
-require scm-svn quake3 [ BASEQ3_PATH=[ 'baseq3r' ] RENDERERS='rend1 rend2' DEFAULT_RENDERER='rend2' MAKE_PREFIX='engine' ]
+require scm-svn quake3 [ BASEQ3_PATH=[ 'baseq3r' ] RENDERERS='opengl2' MAKE_PREFIX='engine' ]
 
 if [ $( ever range 5 ) -ge 169 ]
 then

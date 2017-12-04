@@ -1,0 +1,8 @@
+SUMMARY='treating io readers and writers like channels. This is useful when sometimes you wish to use io.Reader and such in select statements.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+LICENCES='MIT'
+
+MY_PV='87b45ffd0e9581375c491fef3d32130bb15c5bd7'
+
+require go [ user='mitchellh' ]

@@ -2,4 +2,5 @@ DEFAULT_SRC_PREPARE_PATCHES+=(
 	"${FILES}"/fix-x11-qurl-headers-colission.patch
 )
 
+SLOT='1.58'
 require ${PN}

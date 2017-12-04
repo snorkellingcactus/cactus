@@ -1,17 +1,25 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the GNU General Public License v2
-# Based in part upon 'default.nix' from Nix, which is:
-# Copyright (c) 2003-2016 Eelco Dolstra and the Nixpkgs/NixOS contributors
 
 SLOT='2.1.2'
-DOWNLOADS="https://bitbucket.org/Torr_Samaho/zandronum/get/ZA_${PV}.tar.bz2"
 
-require ${PN}
+# Fix server gcc:
+# SCM_REVISION='17b8c40f6bf12910b426764bd567c48cce0f45dd'
+
+# Most Used:
+# SCM_REVISION='e5565dd30df5ecea4799dac6e24a00905b5d760b'
+
+# 2.1.2: 
+SCM_REVISION='a3663b0061d5c0cf84b73dd62876cd900cfe064d'
+
+SCM_REPOSITORY="https://bitbucket.org/Torr_Samaho/${PN}"
+
+require scm-hg ${PN}
 
 src_prepare()
 {
-	zandronum_src_prepare
-
 	#https://github.com/NixOS/nixpkgs/pull/16739/commits/97dd3b3e6294e38a8a5b52c647e1d4d5b68ae9c1
 	sed -ie 's| restrict| _restrict|g' "${WORK}"/dumb/include/dumb.h "${WORK}"/dumb/src/it/*.c
+
+	zandronum_src_prepare
 }

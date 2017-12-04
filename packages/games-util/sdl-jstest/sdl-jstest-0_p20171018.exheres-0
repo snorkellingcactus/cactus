@@ -1,0 +1,19 @@
+GITHUB_REVISION='df3a9592fea522c26b3a70e573fed8be2893e5da'
+#https://github.com/Grumbel/sdl-jstest/archive/df3a9592fea522c26b3a70e573fed8be2893e5da.zip
+
+SUMMARY='Joystick testing tool'
+DESCRIPTION='sdl-jstest and sdl2-jstest are simple programs that lets you find out how many joysticks SDL or SDL2 detected on your system, how many axes, buttons, hats and balls they have each. They also lets you test the joysticks by displaying the events they send or by displaying their current button, axis, hat or ball state. sdl-jstest is especially useful if you want to test your SDL_LINUX_JOYSTICK configuration.'
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+	build+run:
+		media-libs/SDL:0
+		media-libs/SDL:2
+		sys-libs/ncurses[parts:development]
+'
+
+require github [ user=Grumbel ] cmake [ api=2 ]

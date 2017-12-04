@@ -29,11 +29,11 @@ MYOPTIONS='
 		data
 	) [[ number-selected = at-least-one ]]
 '
-
+# media-libs/SDL:2 [opengl]
 DEPENDENCIES='
 	client? (
 		media-libs/freetype:2
-		media-libs/SDL:2[opengl]
+		media-libs/SDL:2
 		media-libs/SDL_image
 		media-libs/SDL_mixer:2[mad][ogg]
 		media-libs/glew

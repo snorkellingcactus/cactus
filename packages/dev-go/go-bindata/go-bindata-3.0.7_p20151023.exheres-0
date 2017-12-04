@@ -1,0 +1,15 @@
+SUMMARY='Small utility which generates Go code from any file. Useful for embedding binary data in a Go program.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+MY_PV='a0ff2567cfb70903282db057e799fd826784d41d'
+
+require go [ user='jteeuwen' ]
+
+src_compile(){
+	go_src_compile
+
+	pushd "${PN}"
+		go_src_compile "${_IMPORT}/${PN}"
+	popd
+}

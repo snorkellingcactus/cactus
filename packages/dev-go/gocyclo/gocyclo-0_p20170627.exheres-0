@@ -1,0 +1,7 @@
+SUMMARY='Calculates cyclomatic complexities of functions in Go source code.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+MY_PV='6acd4345c835499920e8426c7e4e8d7a34f1bb83'
+
+require go [ user='fzipp' ]

@@ -1,0 +1,113 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'gitlab-ci-multi-runner-9.3.0.ebuild', which is:
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+EGO_PN="gitlab.com/gitlab-org/${PN}"
+
+GITLAB_COMMIT='0a75cdd19694787682d38143b3aaf11d641c3117'
+
+DESCRIPTION='Official GitLab CI Runner written in Go'
+HOMEPAGE="https://${EGO_PN}"
+
+require gitlab [ rev=${GITLAB_COMMIT} user=gitlab-org ]
+
+PLATFORMS='~amd64'
+LICENCES='MIT'
+SLOT='0'
+MYOPTIONS='docker'
+
+# TODO systemd, runit. gitlab-runner install / sv directory
+DEPENDENCIES='
+	build:
+		dev-go/gox
+		dev-go/go-bindata
+		dev-go/gocyclo
+		docker? ( app-virtualization/moby )
+'
+
+DEFAULT_SRC_COMPILE_PARAMS=(
+	RELEASE=true
+	build_current
+)
+
+WORK="${WORKBASE}"/${PN}-v${PV}-${GITLAB_COMMIT}
+
+src_prepare() {
+	default
+
+		if ! optionq docker
+		then
+			einfo "You must complete this exheres"
+
+#			edo mkdir -p out/docker
+#			edo cp "${DISTDIR}"/${P}-prebuilt-x86_64.tar.xz out/docker/prebuilt-x86_64.tar.xz
+#			edo cp "${DISTDIR}"/${P}-prebuilt-arm.tar.xz out/docker/prebuilt-arm.tar.xz || die
+#			edo sed -i -e "s/docker info/echo false/" Makefile
+		else
+			einfo 'You need to have dockerd running on your system during build time'
+			einfo 'You also need to add paludisbuild to docker group. (Sorry)'
+			einfo 'Remember to set DOCKER_HOST env var if needed.'
+		fi
+
+		edo sed -i -e "s#./ci/version#echo ${PV}#"\
+			-e "s/shell git rev-parse --short=8 HEAD/echo ${GITLAB_COMMIT}/"\
+			-e "/^LATEST_STABLE_TAG/d"\
+			-e "s#git show-ref.*\$#echo exherbo)#"\
+			-e "s#git describe.*\$#echo 0), 0)#"\
+			-e 's@out/docker/prebuilt-arm.tar.xz\s*$@@' \
+			-e 's/^.*-docker rm -f.*//' \
+			Makefile
+
+	export GOPATH=${TEMP}/go/
+
+	_GODIR=${GOPATH}src/
+	_GITLAB_HELPER_DIR="${_GODIR}/_${WORK}"
+	_GITLAB_RUNNER_DIR="${_GODIR}/${EGO_PN}"
+
+	edo mkdir -p "${_GITLAB_HELPER_DIR}"
+
+	edo ln -s "${WORK}/apps" "${_GITLAB_HELPER_DIR}"
+
+	for _GOLIB in "${WORK}"/vendor/*
+	do
+		edo ln -s "${_GOLIB}" "${_GODIR}"
+	done
+
+	[ ! -e "${_GITLAB_RUNNER_DIR}" ] && $(mkdir -p "${_GITLAB_RUNNER_DIR}")
+
+	for _GOLIB in "${WORK}"/{common,commands,helpers,network,executors,shells}
+	do
+		edo ln -s "${_GOLIB}" "${_GITLAB_RUNNER_DIR}"/
+	done
+}
+
+src_compile() {
+	if optionq docker
+	then
+		if [ -z "${DOCKER_HOST}" ]
+		then
+			DOCKER_HOST='unix:///var/run/docker.sock'
+		fi
+
+		export DOCKER_HOST
+
+		esandbox allow_net --connect "${DOCKER_HOST}"
+	fi
+
+	default
+
+	if optionq docker
+	then
+		esandbox disallow_net --connect "${DOCKER_HOST}"
+
+		unset DOCKER_HOST
+	fi
+}
+
+src_install() {
+	dobin out/binaries/${PN}
+	dodoc {README,CHANGELOG}.md
+
+	#dodir /etc/${PN}
+}
