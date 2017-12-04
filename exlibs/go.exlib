@@ -1,0 +1,70 @@
+myexparam host=
+myexparam user="${PN}"
+myexparam project="${PN}"
+myexparam repo_project="${PN}"
+
+exparam -v _HOST host
+exparam -v _USER user
+exparam -v _PROJECT project
+exparam -v _REPO_PROJECT repo_project
+
+if [ -z "${_HOST}" ]
+then
+	_HOST_NAME='github.com'
+
+	require github [ user="${_USER}" project="${_REPO_PROJECT}" ]
+fi
+
+myexparam import=${_HOST_NAME}/${_USER}/${_PROJECT}
+exparam -v _IMPORT import
+
+DEPENDENCIES='
+    build:
+        dev-lang/go
+'
+
+export_exlib_phases src_{prepare,compile,install}
+
+go_src_prepare(){
+	local TGT=/usr/$(exhost --target)/
+
+	export GOROOT="${TGT}lib/go"
+	export GOBIN="${IMAGE}${TGT}/bin"
+	export GOPATH="${TEMP}"/.gopath
+	export GOPATHPKG="${TEMP}"/pkg/
+
+	_PROJECT_PATH="${GOPATH}"/src/${_IMPORT}
+
+ 	edo mkdir -p "$( dirname ${_PROJECT_PATH})"
+
+ 	edo ln -s "${WORK}" "${_PROJECT_PATH}"
+}
+
+go_src_compile() {
+    #edo go build -pkgdir="${GOPATHPKG}" -i -tags production
+
+    local IMPORT=${_IMPORT}
+
+    if [ -n "${1}" ]
+    then
+    	IMPORT=${1}
+    fi
+
+#    pushd ${GOPATH}
+    	edo go install -pkgdir="${GOPATHPKG}" -tags production ${IMPORT}
+#    popd
+}
+
+go_src_install() {
+    edo go clean -x -pkgdir="${GOPATHPKG}"
+
+    # TODO parts: development binaries
+    #edo rm -rf ${GOPATH}/src
+    
+    edo rm "${_PROJECT_PATH}"
+    edo mkdir "${_PROJECT_PATH}"
+    edo mv * "${_PROJECT_PATH}"
+
+    insinto ${GOROOT}
+    	doins -r ${GOPATH}/*
+}

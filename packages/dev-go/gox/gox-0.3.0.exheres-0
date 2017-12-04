@@ -1,0 +1,13 @@
+SUMMARY='Go cross compilation tool.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+#LICENCES='Mozilla Public License 2.0'
+
+MY_PV="v${PV}"
+
+require go [ user='mitchellh' ]
+
+DEPENDENCIES="
+	build+run:
+		dev-go/iochan
+"

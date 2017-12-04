@@ -58,6 +58,7 @@ MYOPTIONS='
 # media-libs/SDL[sound][joystick][video]
 # dev-libs/xerces-c[icu]
 # x11-libs/wxGTK:3.0[X][opengl]
+# media-libs/SDL [opengl]
 DEPENDENCIES='
 	engine? (
 		dev-lang/lua[>=5.1]
@@ -87,7 +88,7 @@ DEPENDENCIES='
 	providers:ijg-jpeg?		( media-libs/jpeg:=			)
 	providers:jpeg-turbo?	( media-libs/libjpeg-turbo	)
 	sdl? ( media-libs/SDL:0[X][opengl] )
-	sdl2? ( media-libs/SDL:2[X][opengl] )
+	sdl2? ( media-libs/SDL:2[X] )
 	videos? ( media/vlc )
 build:
 	sys-apps/help2man	
