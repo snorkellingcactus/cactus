@@ -41,8 +41,6 @@ go_src_prepare(){
 }
 
 go_src_compile() {
-    #edo go build -pkgdir="${GOPATHPKG}" -i -tags production
-
     local IMPORT=${_IMPORT}
 
     if [ -n "${1}" ]
@@ -50,9 +48,7 @@ go_src_compile() {
     	IMPORT=${1}
     fi
 
-#    pushd ${GOPATH}
-    	edo go install -pkgdir="${GOPATHPKG}" -tags production ${IMPORT}
-#    popd
+    edo go install -pkgdir="${GOPATHPKG}" -tags production ${IMPORT}
 }
 
 go_src_install() {
