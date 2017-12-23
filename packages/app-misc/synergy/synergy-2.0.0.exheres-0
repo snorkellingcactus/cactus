@@ -1,0 +1,43 @@
+
+#https://github.com/symless/synergy-core/archive/v2.0.0-stable.zip
+
+SUMMARY='Open source core of Synergy, the keyboard and mouse sharing tool'
+LICENCES='GPL-2'
+PLATFORMS='~x86 ~amd64'
+SLOT='0'
+
+GITLAB_COMMIT=0bd448d5
+
+#TODO: openssl / libressl
+DEPENDENCIES='
+	build+run:
+		net-misc/curl
+		x11-libs/libXrandr
+		x11-libs/libX11
+		x11-libs/libXext
+		x11-libs/libXinerama
+		x11-libs/libXi
+		x11-libs/libXtst
+		x11-libs/libSM
+		x11-libs/libICE
+		dev-libs/openssl
+'
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	'-DSYNERGY_CORE_INSTALL:BOOL=True'
+	'-DCMAKE_BUILD_TYPE="Release"'
+)
+
+require github [ user='symless' project="${PN}-core" tag="v${PV}-stable" ] cmake [ api=2 ] [ cmake_minimum_version=3.4 ]
+
+src_prepare(){
+	cmake_src_prepare
+	
+	edo sed -e 's/git rev-parse --short=8 HEAD/echo '"${GITLAB_COMMIT}"'/' -i cmake/Version.cmake
+}
+
+src_install(){
+	cmake_src_install
+
+	dobin bin/*
+}
