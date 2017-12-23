@@ -49,9 +49,12 @@ sayonara_src_prepare()
 }
 
 sayonara_remove_locale()
-{	
-	rm -f "${1}${PN}_lang_${2}.qm" &>/dev/null
-	rm -f "${1}icons/${2}.png" &>/dev/null
+{
+	if ! optionq linguas:${2}
+	then
+		rm -f "${1}${PN}_lang_${2}.qm" 
+		rm -f "${1}icons/${2}.png" 
+	fi
 }
 
 sayonara_src_install()

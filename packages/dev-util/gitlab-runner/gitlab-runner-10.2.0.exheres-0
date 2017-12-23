@@ -32,7 +32,7 @@ DEFAULT_SRC_COMPILE_PARAMS=(
 	build_current
 )
 
-WORK="${WORKBASE}"/${PN}-v${PV}-${GITLAB_COMMIT}
+WORK="${WORKBASE}"/${PN}-${GITLAB_COMMIT}-${GITLAB_COMMIT}
 
 pkg_pretend(){
 	einfo 'You need to have dockerd running on your system during build time'

@@ -28,7 +28,7 @@ DATA="${WORKBASE}/smoking_guns_data/"
 
 SCM_REPOSITORY='https://github.com/smokin-guns/SmokinGuns.git'
 
-require quake3 [ BASEQ3_PATH=[ "${DATA}/baseq3" "${DATA}/${PN}" ] RENDERERS='render1' DEFAULT_RENDERER='opengl2' ] scm-git
+require quake3 [ BASEQ3_PATH=[ "${DATA}/baseq3" "${DATA}/${PN}" ] RENDERERS='render1' DEFAULT_RENDERER='_opengl2' ] scm-git
 
 src_unpack()
 {

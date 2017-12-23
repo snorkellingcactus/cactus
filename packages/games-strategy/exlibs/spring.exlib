@@ -97,7 +97,7 @@ DEPENDENCIES="
 		app-arch/p7zip
 		dev-libs/boost[>=1.35.0]
 		sys-libs/zlib[>=1.2.7-r1] [[ note = [ for minizip ] ]]
-		media-libs/DevIL[opengl]
+		media-libs/DevIL
 	build+run:
 		default? ( ${GUI_DEPEND} )
 		java? ( virtual/jdk[>=1.6] )
