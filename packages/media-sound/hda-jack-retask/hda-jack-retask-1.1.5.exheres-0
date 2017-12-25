@@ -1,0 +1,19 @@
+SUMMARY='Change the purpose of your audio jacks'
+DESCRIPTION='Most HDA Intel soundcards are to some degree retaskable,
+i e can be used for more than one thing. This tool is a GUI
+to make it easy to retask your jacks - e g, turn your 
+Mic jack into an extra Headphone, or why not make them both
+line outs and connect them to your surround receiver?'
+
+# GPL-2+
+LICENCES='GPL-2'
+
+SLOT='0'
+
+DEPENDENCIES='x11-libs/gtk+:3'
+
+PLATFORMS='~x86 ~amd64'
+
+DOWNLOADS="ftp://ftp.alsa-project.org/pub/tools/alsa-tools-${PV}.tar.bz2"
+
+WORK="${WORKBASE}/alsa-tools-${PV}/${PN//-/}"
