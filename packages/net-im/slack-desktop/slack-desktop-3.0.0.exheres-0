@@ -1,0 +1,39 @@
+SLOT='0'
+SUMMARY='Slack official desktop binary client'
+DOWNLOADS="https://downloads.slack-edge.com/linux_releases/${PNV}-amd64.deb"
+PLATFORMS='~amd64'
+
+# TODO: eudev | systemd, glibc | musl
+DEPENDENCIES='
+	run:
+		gnome-platform/GConf
+		x11-libs/gtk+:2
+		net-misc/curl
+		x11-apps/xdg-utils
+		x11-libs/libnotify
+		x11-libs/libXtst
+		dev-libs/nss
+		gnome-desktop/gnome-keyring
+		dev-libs/libsecret
+		dev-lang/python
+		dev-libs/libappindicator[gtk2]
+		gnome-desktop/gvfs
+'
+
+WORK="${WORKBASE}"
+
+src_unpack() {
+    default
+
+    edo tar xf data.tar.*
+}
+
+src_install(){
+	local TGT="usr/$(exhost --target)"
+
+	mkdir ${TGT}
+
+	mv usr/{bin,lib} ${TGT}
+
+	mv usr "${IMAGE}"
+}

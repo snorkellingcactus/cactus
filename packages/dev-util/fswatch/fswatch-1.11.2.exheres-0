@@ -1,0 +1,13 @@
+SUMMARY='cross-platform file change monitor with multiple backends'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+#LICENCES=''
+
+require github [ user=emcrisostomo suffix=tar.gz release=${PV} ]
+
+AM_OPTS='--no-nls --disable-nls --with-nls=no'
+
+# TODO: musl, doc, tests
+DEPENDENCIES='
+	sys-libs/glibc
+'
