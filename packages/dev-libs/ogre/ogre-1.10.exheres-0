@@ -57,7 +57,7 @@ RESTRICT="test"
 CMAKE_SOURCE=${WORKBASE}/sinbad-${PN}-dd30349ea667
 
 DEFAULT_SRC_PREPARE_PATCHES=(
-    "${FILES}"/${PNV}-Fix-build-without-samples.patch
+#    "${FILES}"/${PNV}-Fix-build-without-samples.patch
 )
 
 # - TBB, POCO can also be used as thread implementations

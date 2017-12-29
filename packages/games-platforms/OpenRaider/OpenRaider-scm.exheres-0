@@ -4,7 +4,7 @@
 SUMMARY='Fork of the OpenRaider Open Source implementation of the classic Tomb Raider Game Engine'
 SLOT='0'
 PLATFORMS='~x86 ~amd64'
-# TODO:
+# TODO: SDL[opengl]
 # LICENCES=''
 
 MYOPTIONS='audio'
@@ -25,11 +25,11 @@ DEFAULT_SRC_PREPARE_PATCHES+=(
 )
 
 DEPENDENCIES='
-	sound? (
+	audio? (
 		media-libs/openal
 		media-libs/freealut
 	)
-	media-libs/SDL:2[opengl]
+	media-libs/SDL:2
 	dev-libs/glm[>=0.9.6]
-	dev-libs/glbinding[=1.1.0]
+	dev-libs/glbinding
 '

@@ -1,0 +1,28 @@
+# Copyright 2017 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="GUI tools to adjust settings of the operating system LXQt is running on."
+PLATFORMS="~amd64 ~x86"
+
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.3.2]
+    build+run:
+        kde-frameworks/kwindowsystem:5
+        lxqt/liblxqt[>=$( ever range 1-2 ${PV} )]
+        lxqt/lxqt-policykit[>=$( ever range 1-2 ${PV} )]
+        x11-libs/qtbase:5
+        x11-libs/qttools:5
+        x11-libs/qtx11extras:5
+    suggestion:
+        lxqt/lxqt-l10n
+"
+
+src_prepare()
+{
+    cmake_src_prepare
+
+    edo sed -e 's@CMAKE_INSTALL_PREFIX}/share@CMAKE_INSTALL_DATAROOTDIR}@' -e 's/DESTINATION "share/DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/g' -i lxqt-admin-user/CMakeLists.txt -i lxqt-admin-time/CMakeLists.txt
+}

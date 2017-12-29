@@ -19,6 +19,6 @@ function doicon()
 
 	for i in "$@"
 	do
-		edo ${CMDBASE} "${i}" $( basename "${i}" )
+		edo ${CMDBASE} "${i}" $( basename "${i%.*}" )
 	done
 }

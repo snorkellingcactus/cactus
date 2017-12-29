@@ -1,0 +1,51 @@
+SUMMARY='qpdfview is a tabbed document viewer.'
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+DOWNLOADS="http://bazaar.launchpad.net/~adamreichold/qpdfview/trunk/tarball/2055?start_revid=2055 -> ${PN}.tgz"
+
+MYOPTIONS='
+	djvu
+	( providers: qt4 qt5 ) [[ number-selected = exactly-one ]]
+'
+
+DEPENDENCIES='
+	build:
+		djvu? ( app-text/djvu )
+		providers:qt5? ( app-text/poppler[qt5] )
+		app-text/libspectre
+		
+'
+
+EQMAKE_PARAMS+=(
+	'CONFIG+=without_djvu'
+	"TARGET_INSTALL_PATH=/usr/$(exhost --target)/bin"
+	"PLUGIN_INSTALL_PATH=/usr/$(exhost --target)/lib/${PN}"
+)
+
+require qmake [ slot=5 ] newicon desktop-utils freedesktop-desktop
+
+src_unpack(){
+	default
+
+	edo mv \~adamreichold/${PN}/trunk ${PNV}
+}
+
+src_prepare()
+{
+	default
+
+	edo sed -e 's/pkg-config/'"$(exhost --tool-prefix)"'pkg-config/' -i pdf-plugin.pro -i application.pro
+}
+
+src_install(){
+	default
+
+	
+	insinto /usr/share/icons/hicolor/scalable/apps
+		doins icons/"${PN}".svg
+
+	insinto /usr/share/applications/
+		doins miscellaneous/qpdfview.desktop
+}
