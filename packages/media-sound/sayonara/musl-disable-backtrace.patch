@@ -1,0 +1,24 @@
+diff --git a/src/Main.cpp b/src/Main.cpp
+index 8529ad1f..9581ba04 100644
+--- a/src/Main.cpp
++++ b/src/Main.cpp
+@@ -43,7 +43,7 @@
+ #include <algorithm>
+ 
+ #ifdef Q_OS_LINUX
+-	#include <execinfo.h>		// backtrace
++//	#include <execinfo.h>		// backtrace
+ 	#include <csignal>			// kill/signal
+ 	#include <sys/types.h>		// kill
+ 	#include <cstring>			// memcpy
+@@ -161,8 +161,8 @@ void segfault_handler(int sig)
+ 	size_t size;
+ 
+ 	// get void*'s for all entries on the stack
+-	size = backtrace(array, 20);
+-	backtrace_symbols_fd(array, size, STDERR_FILENO);
++//	size = backtrace(array, 20);
++//	backtrace_symbols_fd(array, size, STDERR_FILENO);
+ 
+ #endif
+ 

@@ -72,4 +72,6 @@ src_prepare(){
 	default
 
 	edo sed -e 's@pkg-config@'"$(exhost --tool-prefix)"'pkg-config@g' -i wafadmin{,3}/Tools/{qt4,gnome,config_c}.py tools/ampsim/{Makefile,DK/{dk_simulator.py,buildlv2/gx_sceleton.lv2/Makefile}}
+
+	expatch "${FILES}"/musl-strerror_r.patch
 }

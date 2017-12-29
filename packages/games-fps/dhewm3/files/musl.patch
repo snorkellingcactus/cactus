@@ -1,0 +1,21 @@
+diff --git a/neo/sys/posix/posix_net.cpp.old b/neo/sys/posix/posix_net.cpp
+index db83fa9..b1561a2 100644
+--- a/neo/sys/posix/posix_net.cpp.old
++++ b/neo/sys/posix/posix_net.cpp
+@@ -49,6 +49,16 @@ If you have questions concerning this license or the applicable additional terms
+ 
+ #include "sys/posix/posix_public.h"
+ 
++/* taken from glibc unistd.h and fixes musl */
++#ifndef TEMP_FAILURE_RETRY
++#define TEMP_FAILURE_RETRY(expression) \
++  (__extension__                                                              \
++    ({ long int __result;                                                     \
++       do __result = (long int) (expression);                                 \
++       while (__result == -1L && errno == EINTR);                             \
++       __result; }))
++#endif
++
+ idPort clientPort, serverPort;
+ 
+ idCVar net_ip( "net_ip", "localhost", CVAR_SYSTEM, "local IP address" );

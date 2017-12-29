@@ -22,13 +22,18 @@ PLATFORMS='amd64 x86'
 
 DEFAULT_SRC_PREPARE_PATCHES=(
 	"${FILES}"/${PNV}-use-system-libs.patch
+	"${FILES}"/musl-include-unistd.h.patch
 )
 
 DATA="${WORKBASE}/smoking_guns_data/"
 
 SCM_REPOSITORY='https://github.com/smokin-guns/SmokinGuns.git'
 
-require quake3 [ BASEQ3_PATH=[ "${DATA}/baseq3" "${DATA}/${PN}" ] RENDERERS='render1' DEFAULT_RENDERER='_opengl2' ] scm-git
+require quake3 [ BASEQ3_PATH=[ "${DATA}/baseq3" "${DATA}/${PN}" ] RENDERERS='opengl2' DEFAULT_RENDERER='' ] scm-git
+
+DEPENDENCIES+='
+    media-libs/SDL:0
+'
 
 src_unpack()
 {

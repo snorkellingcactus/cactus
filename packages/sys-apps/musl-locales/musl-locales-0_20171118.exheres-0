@@ -1,0 +1,19 @@
+SUMMARY='Locale program for musl libc'
+DESCRIPTION='This is /usr/bin/locale, which works on musl libc (with limitations in musl itself). To install, use cmake . && 
+make && sudo make install on musl-capable distro. English and Russian included, also .pot file'
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+GITHUB_REVISION='74a7557cfe5d8dafde979be4c5b04fb5a382b2bf'
+
+require github [ user=rilian-la-te ] cmake [ api=2 cmake_minimum_version=2.8 ]
+
+DEPENDENCIES='
+	build+run:
+		sys-devel/gettext
+		dev-util/intltool	
+'
+
+
+WORK="${WORKBASE}/${PN}-${GITHUB_REVISION}"
