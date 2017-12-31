@@ -1,0 +1,25 @@
+HOMEPAGE='https://www.haguichi.net/'
+SUMMARY='Graphical frontend for Hamachi'
+SLOT='0'
+LICENCES='GPL-3'
+PLATFORMS='~x86 ~amd64'
+
+require github [ user=ztefn ] gsettings meson 
+
+# gtk+:3[gobject-introspection] ?? :(
+DEPENDENCIES='
+	build:
+		dev-lang/vala
+	build+run:
+		x11-libs/gtk+:3
+		dev-libs/glib:2
+		x11-libs/libnotify
+		dev-libs/granite
+'
+
+src_prepare(){
+	meson_src_prepare
+
+	edo sed -e "s/meson.project_name(),/'haguichi\',/" -i meson.build
+    edo sed -e 's/com.github.ztefn.haguichi/haguichi/' -i data/com.github.ztefn.haguichi.desktop
+}

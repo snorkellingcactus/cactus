@@ -1,0 +1,29 @@
+SUMMARY=Library that extends Gtk+
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+
+MYOPTIONS='demo doc'
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+		dev-lang/vala
+	build+run:
+		base/libgee[gobject-introspection]
+		
+		x11-libs/gtk+:3
+'
+
+require github [ user=elementary ] cmake [ api=2 cmake_minimum_version=2.8 ]
+
+src_prepare(){
+	cmake_src_prepare
+
+	edo sed -e 's@share/locale@/usr/share/locale@' -i cmake/Translations.cmake 
+
+	edo sed -e 's@DESTINATION share@DESTINATION /usr/share@' -i icons/CMakeLists.txt -i demo/CMakeLists.txt
+
+	! optionq demo && $(edo sed -e '/add_subdirectory (demo)/d' -i CMakeLists.txt)
+
+	! optionq doc && $(edo sed -e '/add_subdirectory (doc)/d' -i CMakeLists.txt)
+}
