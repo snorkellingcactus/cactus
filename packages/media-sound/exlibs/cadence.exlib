@@ -35,6 +35,14 @@ require doinsmv scm-git python [ blacklist='2 4' ] my_python_get_abi
 
 export_exlib_phases src_prepare src_compile src_install
 
+fix_shebang()
+{
+	for file in "${@}"
+	do
+		edo sed -i -e "s/python3/python$( my_python_get_abi )/g"  "${file}"
+	done
+}
+
 cadence_src_prepare()
 {
 	default
@@ -42,6 +50,15 @@ cadence_src_prepare()
 	TGT=$( exhost --target )
 
 	edo sed -i -e 's/pkg-config/'"$( exhost --tool-prefix )"'pkg-config/g' $( grep -l pkg-config `find . -type f` )
+
+	edo sed -e 's@X-PREFIX-X?$(PREFIX)@X-PREFIX-X?'"/usr/${TGT}"'@' -i Makefile
+
+	local SCRIPTS=
+
+	fix_shebang ./src/*.py
+	sed -i -e 's/INSTALL_PREFIX="\/usr/INSTALL_PREFIX="\/usr\/'"${TGT}"'/' ./src/*.py
+
+	fix_shebang `find data -maxdepth 1 -type f`
 }
 
 cadence_src_compile()
@@ -57,7 +74,7 @@ cadence_src_install()
 
 	local TO_MOVE="${IMAGE}"usr/bin
 
-	edo sed -i -e "s/python3/python$( my_python_get_abi )/g" -e 's/INSTALL_PREFIX="\/usr/INSTALL_PREFIX="\/usr\/'"${TGT}"'/' "${TO_MOVE}"/${PN}
+	einfo $( my_python_get_abi )
 
 	insinto "${PREFIX}"
 		doinsmv "${TO_MOVE}"

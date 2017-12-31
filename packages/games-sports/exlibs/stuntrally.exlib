@@ -44,7 +44,7 @@ DEPENDENCIES='
 		net-libs/enet[>=1.3.0]
 		sys-libs/libstdc++
 	run:
-		'${CATEGORY}/${PN}-tracks[=${PV}]'
+		'${CATEGORY}/${PN}-tracks'
 '
 
 CMAKE_SRC_CONFIGURE_OPTION_BUILDS+=(
@@ -59,10 +59,14 @@ require ${REQUIRE_SCM} cmake [ api=2 ]
 export_exlib_phases src_prepare src_install
 
 stuntrally_src_prepare(){
-	# Fix bullet linking.
-	edo nonfatal sed -i -r 's/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\}\)/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\} BulletFileLoader LinearMath\)/g' "${WORKBASE}"/${PNV}/CMakeLists.txt
-
 	cmake_src_prepare
+
+	# Fix bullet linking.
+	edo sed -i -r 's/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\}\)/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\} BulletFileLoader LinearMath\)/g' "${WORKBASE}"/${PNV}/CMakeLists.txt
+
+	edo sed -e 's/OGRE_EXCEPT(0/OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR/' -e 's/OGRE_EXCEPT(1/OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR/' -i source/paged-geom/{BatchedGeometry,PagedGeometry,TreeLoader{3,2}D,PropertyMaps}.cpp
+
+	edo sed -e 's/std::isnan/isnan/' -i source/vdrift/cartire.cpp
 }
 
 stuntrally_src_install()

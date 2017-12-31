@@ -7,7 +7,7 @@ HOMEPAGE='https://sayonara-player.com'
 LICENCES='GPL-2'
 SLOT='0'
 PLATFORMS='~x86 ~amd64'
-MYOPTIONS+='mtp lame ugly'
+MYOPTIONS+='lame ugly'
 
 DEPENDENCIES+='
     build:
@@ -21,7 +21,6 @@ DEPENDENCIES+='
 		media-plugins/gst-plugins-good:1.0
 		dev-util/desktop-file-utils
         lame? ( media-sound/lame )
-		mtp? ( media-libs/libmtp )
 		ugly? ( media-plugins/gst-plugins-ugly:1.0 )
 '
 

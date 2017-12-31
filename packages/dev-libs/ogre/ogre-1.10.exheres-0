@@ -54,7 +54,7 @@ DEPENDENCIES="
 # 1.9.0 - Tests require ogre built with OPTION archives
 RESTRICT="test"
 
-CMAKE_SOURCE=${WORKBASE}/sinbad-${PN}-dd30349ea667
+CMAKE_SOURCE=${WORKBASE}/sinbad-${PN}-d1fd73368d5d
 
 DEFAULT_SRC_PREPARE_PATCHES=(
 #    "${FILES}"/${PNV}-Fix-build-without-samples.patch
