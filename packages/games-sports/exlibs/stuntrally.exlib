@@ -31,7 +31,7 @@ fi
 DEPENDENCIES='
 	build+run:
 		game? (
-			dev-libs/ogre[cg][boost][freeimage][opengl][archives]
+			dev-libs/ogre[<1.10][cg][boost][freeimage][opengl][archives]
 			dev-games/mygui[ogre]
 			media-libs/SDL:2
 			media-libs/libvorbis
@@ -64,9 +64,9 @@ stuntrally_src_prepare(){
 	# Fix bullet linking.
 	edo sed -i -r 's/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\}\)/list\(APPEND LIBS \$\{BULLET\_LIBRARIES\} BulletFileLoader LinearMath\)/g' "${WORKBASE}"/${PNV}/CMakeLists.txt
 
-	edo sed -e 's/OGRE_EXCEPT(0/OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR/' -e 's/OGRE_EXCEPT(1/OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR/' -i source/paged-geom/{BatchedGeometry,PagedGeometry,TreeLoader{3,2}D,PropertyMaps}.cpp
+	#edo sed -e 's/OGRE_EXCEPT(0/OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR/' -e 's/OGRE_EXCEPT(1/OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR/' -i source/paged-geom/{BatchedGeometry,PagedGeometry,TreeLoader{3,2}D,PropertyMaps}.cpp
 
-	edo sed -e 's/std::isnan/isnan/' -i source/vdrift/cartire.cpp
+	#edo sed -e 's/std::isnan/isnan/' -i source/vdrift/cartire.cpp
 }
 
 stuntrally_src_install()
@@ -77,4 +77,5 @@ stuntrally_src_install()
 
 	# TODO: Maybe best to do it on game's executable folder.
 	dosym ${LIBDIR}/OGRE/libshiny.OgrePlatform.so ${LIBDIR}/
+	#dolib "${WORKBASE}"/build/source/shiny/libshiny.*
 }
