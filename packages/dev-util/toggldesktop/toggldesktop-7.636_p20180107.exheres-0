@@ -1,0 +1,112 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='Toggl Desktop Client. A time tracking application.'
+
+DESCRIPTION='Toggl Desktop is a small desktop application that will help you track time more conveniently. It’s there when you need it and it’s quickly accessible. It can’t generate reports or manage projects, but it does track time like a pro, even if you’re offline.'
+
+HOMEPAGE='https://github.com/toggl/toggldesktop'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+LICENCES='BSD-3 MIT TOGGL-LLC'
+
+GITHUB_REV=b11085103b28522af6ddf1125bdc4bd841d229fa
+WORK="${WORKBASE}"/${PN}-${GITHUB_REV}
+
+#https://github.com/toggl/toggldesktop/archive/v7.636.zip
+require github [ user=toggl rev=${GITHUB_REV} ] qmake [ slot=5 ] doinsmv dorbdep newicon domenu
+
+# TODO: test? dev-cpp/gtest
+# separate bugsnag-qt ( qtnetwork, qtgui )
+# exparts library, binaries
+# readline ¿development? ¿libraries?
+# complete qt5 options required
+DEPENDENCIES='
+	build:
+		sys-libs/readline
+	build+run:
+		x11-libs/qtbase:5[gui]
+		x11-libs/libX11
+		dev-cpp/poco[util][data][crypto][net][netssl][sqlite][xml][json]
+		dev-lang/lua
+	run:
+		x11-libs/qtsvg
+'
+
+MYOPTIONS='
+	( providers: libressl openssl ) [[ number-selected = exactly-one ]]
+'
+
+src_prepare(){
+	edo sed -e 's@/usr/lib@/usr/'"$(exhost --target)"/lib'@' -i third_party/bugsnag-qt/bugsnag-qt.pro
+
+	default_src_prepare
+}
+
+src_configure(){
+	EQMAKE_SOURCES=( bugsnag-qt.pro )
+
+	edo pushd third_party/bugsnag-qt
+		qmake_src_configure
+	edo popd
+
+	EQMAKE_SOURCES=( TogglDesktopLibrary.pro )
+
+	edo pushd src/lib/linux/TogglDesktopLibrary
+		qmake_src_configure
+	edo popd
+
+	EQMAKE_SOURCES=( TogglDesktop.pro )
+
+	edo pushd src/ui/linux/TogglDesktop/
+		qmake_src_configure
+	edo popd
+}
+
+src_compile(){
+	edo pushd third_party/bugsnag-qt
+		default
+	edo popd
+
+	edo pushd src/lib/linux/TogglDesktopLibrary
+		default
+	edo popd
+
+	edo pushd src/ui/linux/TogglDesktop/
+		default
+	edo popd
+}
+
+src_install(){
+	local PKG_SHARE=/usr/share/${PN}
+	local PKG_SHARE_TGT=/usr/$(exhost --target)/share/${PN}
+
+	dodir ${PKG_SHARE}
+	dodir ${PKG_SHARE_TGT}
+
+	dorbdep ${PKG_SHARE_TGT}
+
+	exeinto ${PKG_SHARE_TGT}
+		doexe src/ui/linux/TogglDesktop/build/release/*
+		# Result in a segfault ( beign or not a symlink )
+		#dosym ../../../share/${PN}/cacert.pem ${PKG_SHARE_TGT}
+
+	insinto ${PKG_SHARE}
+		doinsmv src/ssl/cacert.pem
+
+	for i in src/ui/linux/TogglDesktop/icons/*
+	do
+		s=$(basename ${i})
+		doicon -s ${s/*x/} ${i}/toggldesktop.png
+	done
+
+	dolib src/lib/linux/TogglDesktopLibrary/build/release/*
+
+	dolib third_party/bugsnag-qt/build/release/*
+
+	domenu "${FILES}"/${PN}.desktop
+
+	cat "${FILES}"/wrapper | sed -e 's@%PKG_BIN_PATH@'"${PKG_SHARE_TGT}"'/TogglDesktop@' > "${TEMP}"/TogglDesktop
+
+	dobin "${TEMP}"/TogglDesktop
+}

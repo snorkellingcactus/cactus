@@ -9,35 +9,98 @@ myexparam BLACKLIST=
 exparam -v MY_DEP_SUFFIX DEP_SUFFIX
 exparam -v MY_BLACKLIST BLACKLIST
 
-MYOPTIONS+=' ('
+WX_VERSIONS_ALL=('3.1-gtk3' '3.1-gtk2' '3.0-gtk3' '3.0-gtk2' '2.8-gtk2')
 
-for i in "2.8-gtk2" "3.0-gtk2" "3.0-gtk3"
-do
-	SKIP=
+wx_anotate_metadata(){
+	local OPT="wx-${WX_LOOP_CURRENT}"
 
-	for j in ${MY_BLACKLIST}
+	WX_VERSIONS+=(${WX_LOOP_CURRENT})
+
+	MYOPTIONS+=" ${OPT}"
+
+	DEPENDENCIES+=" ${OPT}? ( x11-libs/wxGTK:${WX_LOOP_CURRENT%-*}[providers:${WX_LOOP_CURRENT#*-}] ) "
+}
+
+wx_fill_metadata(){
+	 wx_whitelisted && wx_anotate_metadata
+}
+
+wx_save_default()
+{
+	[ -z ${WX_SELECTION_DEFAULT} ] && WX_SELECTION_DEFAULT="$( eclectic --no-color wxwidgets show )"
+}
+
+wx_get_default()
+{
+	wx_save_default	
+
+	echo ${WX_SELECTION_DEFAULT}
+}
+
+wx_selected(){
+	[ "${WX_LOOP_CURRENT}" = "$(wx_get_default)" ]
+}
+
+wx_whitelisted(){
+	local SKIP=
+	local BLACKLISTED
+
+	for BLACKLISTED in ${MY_BLACKLIST}
 	do
-		if [ "${i/${j}/}" != "${i}" ]
+		if [ "${WX_LOOP_CURRENT/${BLACKLISTED}/}" != "${WX_LOOP_CURRENT}" ]
 		then
-			SKIP=continue
-			break
+			SKIP=TRUE
+
+			break	
 		fi
 	done
 
-	${SKIP}
+	[ -z "${SKIP}" ]
+}
 
-	OPT="wx-${i}"
+wx_available_on_target(){
+	local FILE="/usr/$(exhost --target)/bin/wx-config-${WX_LOOP_CURRENT}"
 
-	WX_VERSIONS+="${i} "
-	MYOPTIONS+=" ${OPT}"
-	DEPENDENCIES+=" ${OPT}? ( x11-libs/wxGTK:${i%-*}[providers:${i#*-}] ) "
-done
+	[ -L "${FILE}" ]
+}
 
-MYOPTIONS+=' ) [[ number-selected = exactly-one ]]'
+wx_annotate(){
+	WX_LOOP_RESULT+=(${WX_LOOP_CURRENT})
+}
+
+wx_overwite(){
+	WX_LOOP_RESULT=(${WX_LOOP_CURRENT})
+}
+
+wx_annotated(){
+	echo ${WX_LOOP_RESULT[@]}
+}
+
+wx_break(){
+	WX_RETVAL=break
+}
+
+wx_foreach_version(){
+	local CALLBACK=${1}
+
+	WX_LOOP_RESULT=()
+    WX_LOOP_CURRENT=
+
+	for WX_LOOP_CURRENT in ${WX_VERSIONS_ALL[@]}
+	do
+		${CALLBACK}
+
+		${WX_RETVAL}
+
+		unset WX_RETVAL
+	done
+
+	echo "${WX_LOOP_RESULT[@]}"
+}
 
 wx_select()
 {
-	for i in ${WX_VERSIONS}
+	for i in ${WX_VERSIONS[@]}
 	do
 		! optionq "wx-${i}" && continue
 
@@ -46,27 +109,26 @@ wx_select()
 		break
 	done
 }
-wx_save_default()
-{
-	[ -z WX_SELECTION_DEFAULT ] && WX_SELECTION_DEFAULT="$( eclectic --no-color wxwidgets show )"
-}
-wx_get_default()
-{
-	wx_save_default	
 
-	echo ${WX_SELECTION_DEFAULT}
-}
 wx_save_current()
 {
 	[ -z ${WX_SELECTION_CURRENT} ] && wx_select
 }
+
 wx_get_current()
 {
 	wx_save_current
 
 	echo ${WX_SELECTION_CURRENT}
 }
+
 wx_get_config_bin_name()
 {
 	echo "wx-config-$(wx_get_current)"
 }
+
+MYOPTIONS+=' ('
+
+wx_foreach_version wx_fill_metadata
+
+MYOPTIONS+=' ) [[ number-selected = exactly-one ]]'

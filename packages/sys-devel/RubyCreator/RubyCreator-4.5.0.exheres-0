@@ -1,0 +1,32 @@
+SUMMARY='Plugins to add Ruby language support to QtCreator IDE. '
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+GITHUB_TAG="v${PV}"
+
+require qmake [ slot=5 ] github [ user=hugopl ]
+
+QTC_PV=${PV}
+QTC_SOURCE="${WORKBASE}"/qt-creator-opensource-src-${QTC_PV}
+
+DEPENDENCIES="
+	sys-devel/qt-creator[>=$(ever range 1-2 ${QTC_PV})]
+"
+
+DOWNLOADS+="
+	mirror://qt/official_releases/qtcreator/$(ever range 1-2 ${QTC_PV})/${QTC_PV}/qt-creator-opensource-src-${QTC_PV}.tar.xz
+"
+#IDE_OUTPUT_PATH="${IMAGE}/usr/$(exhost --target)"
+EQMAKE_PARAMS+=(
+	QTC_SOURCE="${QTC_SOURCE}"
+	QTC_BUILD="/usr/$(exhost --target)"
+	IDE_OUTPUT_PATH="${IMAGE}/usr/$(exhost --target)"
+)
+
+EQMAKE_SOURCES='ruby.pro'
+
+src_install(){
+	default
+
+	edo rm -rf ${IMAGE}/lib
+}

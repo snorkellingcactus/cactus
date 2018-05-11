@@ -153,9 +153,9 @@ CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DWANT_USE_FontConfig=ON
 )
 
-DEFAULT_SRC_PREPARE_PATCHES+=(
-	"${FILES}"/${PNV}-fix-new-miniupnpc.patch
-)
+#DEFAULT_SRC_PREPARE_PATCHES+=(
+#	"${FILES}"/${PNV}-fix-new-miniupnpc.patch
+#)
 
 src_unpack()
 {

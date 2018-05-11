@@ -27,11 +27,12 @@ export_exlib_phases src_prepare
 doomseeker_src_prepare() {
 	default
 
-	#libs go into libdir, not share
-	sed -i -e "s:DESTINATION share/:DESTINATION /usr/$(exhost --target)/lib/:" "${WORK}"/${PVN}/src/plugins/PluginFooter.txt
-	sed -i -e "s:INSTALL_PREFIX \"/share/doomseeker/\":\"/usr/$(exhost --target)/lib/doomseeker/\":" "${WORK}"/${PVN}/src/core/main.cpp
+	# libs go into libdir, not share
+	edo sed -i -e "s:DESTINATION share/:DESTINATION /usr/$(exhost --target)/lib/:" "${WORK}"/${PVN}/src/plugins/PluginFooter.cmake
+
+	# Data directory.
+	edo sed -i -e "s:INSTALL_PREFIX \"/share/doomseeker/\":\"/usr/$(exhost --target)/lib/doomseeker/\":" src/core/main.cpp
 
 	#fix some paths
-	sed -i -e "s:LIBRARY DESTINATION lib:LIBRARY DESTINATION /usr/$(exhost --target)/lib:" "${WORK}"/${PVN}/src/wadseeker/CMakeLists.txt
-	sed -i -e "s:Icon=/usr/local:Icon=/usr:" "${WORK}"/${PVN}/media/Doomseeker.desktop
+	#edo sed -i -e "s:LIBRARY DESTINATION lib:LIBRARY DESTINATION /usr/$(exhost --target)/lib:" src/wadseeker/CMakeLists.txt
 }

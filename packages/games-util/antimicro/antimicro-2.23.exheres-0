@@ -1,0 +1,48 @@
+SUMMARY='antimicro is a graphical program used to map keyboard keys and mouse controls to a gamepad. '
+PLATFORMS='~x86 ~amd64'
+SLOT='0'
+
+# https://github.com/AntiMicro/antimicro/archive/1e66e4b8737755ad1e5bfd3b1507e9716406ffc9.zip
+# https://github.com/AntiMicro/antimicro/archive/2.23.zip
+
+FORMAT=.zip
+FOLDER=${PNV}
+FILENAME=${FOLDER}${FORMAT}
+
+require cmake [ api=2 ]
+
+DOWNLOADS="https://github.com/AntiMicro/antimicro/archive/ecec251f89b0d85132cb564619665efa35af6a5d${FORMAT} -> ${FILENAME}"
+
+MYOPTIONS='
+	X uinput
+	( xtest ) [[ requires = X ]]
+	providers: qt4 qt5
+'
+
+DEPENDENCIES+='
+	build:
+		virtual/pkg-config
+	build+run:
+		providers:qt5? (
+			x11-libs/qtbase:5[gui]
+		)
+
+		X? (
+			x11-libs/libX11
+			x11-libs/libXtst
+			x11-libs/libXi
+		)
+
+		media-libs/SDL:2
+'
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DUSE_SDL_2:BOOL=TRUE
+	-DAPPDATA:BOOL=FALSE
+)
+
+CMAKE_SRC_CONFIGURE_OPTION_WITHS+=(
+	'X X11'
+	'xtest XTEST'
+	'uinput uinput'
+)

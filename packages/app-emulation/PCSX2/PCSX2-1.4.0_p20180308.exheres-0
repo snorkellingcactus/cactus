@@ -1,0 +1,117 @@
+SUMMARY='PCSX2 - The Playstation 2 Emulator'
+HOMEPAGE='http://pcsx2.net/'
+SLOT='0'
+PLATFORMS='~x86'
+
+#https://codeload.github.com/PCSX2/pcsx2/zip/6d7e2c56d997171727cf88c7380025cd59de7618
+
+GITHUB_REVISION=6d7e2c56d997171727cf88c7380025cd59de7618
+
+require wx [ BLACKLIST='3.1 2.8' ] dorbdep github [ pn=pcsx2 ] cmake [ api=2 cmake_minimum_version=2.8.5 ]
+
+
+# TODO : Too much stuff.
+MYOPTIONS='
+	pgo
+	( providers: ijg-jpeg jpeg-turbo ) [[ number-selected = exactly-one ]]
+'
+
+# TODO : gtk3? wxGTK[gtk3]
+DEPENDENCIES='
+	build:
+		sys-devel/gettext
+
+	build+run:
+		app-arch/xz
+		dev-libs/libaio
+		media-libs/freetype
+		media-libs/glew
+		media-libs/portaudio
+		media-libs/SDL:2
+		media-libs/soundtouch
+		sys-libs/zlib
+		sys-sound/alsa-lib
+		x11-libs/gtk+:2
+		x11-libs/libX11
+		x11-libs/libXxf86vm
+		x11-libs/Cg
+
+		providers:ijg-jpeg? ( media-libs/jpeg:= )
+	   	providers:jpeg-turbo? ( media-libs/libjpeg-turbo )
+'
+
+#-DUSE_PGO_OPTIMIZE=TRUE
+
+
+_SHARE=/usr/share/games/${PN}
+_TGT=/usr/$(exhost --target)
+_LIB=${_TGT}/lib/${PN}
+_PLUGINS=${_LIB}/plugins
+_BIN=${_LIB}
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DCMAKE_BUILD_STRIP:BOOL=FALSE
+	-DCMAKE_BUILD_TYPE:STRING=Release
+	-DPACKAGE_MODE:BOOL=TRUE
+	-DEXTRA_PLUGINS:BOOL=TRUE
+	-DDISABLE_PCSX2_WRAPPER:BOOL=TRUE
+	-DGAMEINDEX_DIR=${_SHARE}
+	-DBIN_DIR=${_BIN}
+	-DPLUGIN_DIR=${_PLUGINS}
+	-DUSE_VTUNE:BOOL=FALSE
+)
+
+#-DwxWidgets_CONFIG_EXECUTABLE=/usr/i686-pc-linux-gnu/bin/wx-config
+#-DwxWidgets_LIBRARIES:PATH=/usr/x86_64-pc-linux-gnu/lib/
+#-DwxWidgets_INCLUDE_DIRS:PATH=/usr/i686-pc-linux-gnu/lib/wx/include/gtk3-unicode-3.0
+
+#/usr/i686-pc-linux-gnu/include/wx-3.0/
+
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+	'wx-3.0-gtk3 GTK3_API'
+)
+
+CMAKE_SRC_CONFIGURE_OPTION_USES=(
+	'pgo PGO_OPTIMIZE'
+	'pgo PGO_GENERATE'
+)
+
+pcsx_wx_selected_or_latest(){
+	if wx_whitelisted && wx_available_on_target
+	then
+		[ -z "$(wx_annotated)" ] && wx_annotate
+
+		if wx_selected
+		then
+			wx_overwite
+			wx_break
+		fi
+	fi
+}
+
+src_prepare(){
+	cmake_src_prepare
+
+	#local WX_CONFIG="/usr/$(exhost --target)/bin/wx-config"
+
+	WX_CONFIG="/usr/$(exhost --target)/bin/wx-config-$(wx_foreach_version pcsx_wx_selected_or_latest)"
+
+	einfo "Using WX_CONFIG=${WX_CONFIG}"
+
+	edo sed -e 's@"/usr/bin/wx-config.*"@"'"${WX_CONFIG}"'"@g' -i cmake/SearchForStuff.cmake
+}
+
+src_install(){
+	cmake_src_install
+
+	local WRAPPER=${TEMP}/${PN}
+
+	{
+		echo '#!/bin/sh'
+		echo 'GDK_BACKEND=x11 LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:'"${_PLUGINS}"' __GL_THREADED_OPTIMIZATIONS=1 mesa_glthread=true MESA_NO_ERROR=1 '"${_BIN}/${PN}"' "$@"'
+	} > ${WRAPPER}
+
+	dobin ${WRAPPER}
+
+	dorbdep ${_BIN} ${PLUGINS}
+}
