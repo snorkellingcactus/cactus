@@ -17,6 +17,7 @@ MYOPTIONS='
 	( platform: x86 amd64 )
 '
 
+# dev-lang/lazarus[qt5]
 DEPENDENCIES="
 	build:
 		dev-lang/fpc
@@ -30,10 +31,9 @@ DEPENDENCIES="
 			x11-libs/gtk+:2
 			x11-libs/pango
 		)
-		qt4? (
+		qt5? (
 			build+run:
-			x11-libs/qt:4
-			dev-qt/qtpascal:4
+			x11-libs/qt:5
 		)
 		app-arch/p7zip
 "

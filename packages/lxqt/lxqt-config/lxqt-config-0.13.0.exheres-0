@@ -1,0 +1,45 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Tools to configure LXQt and the underlying operating system"
+
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    build+run:
+        kde-frameworks/kwindowsystem:5
+        lxqt/liblxqt[~${PV}]
+        lxqt/libqtxdg
+        x11-libs/libX11
+        x11-libs/libXcursor
+        x11-libs/libXfixes
+        x11-libs/libxcb
+        x11-libs/qtbase:5
+        x11-libs/qttools:5
+        x11-libs/qtx11extras:5
+        (
+            kde-frameworks/libkscreen:5
+            x11-libs/qtsvg:5
+        )  [[ *note = [ lxqt-config-monitor ] ]]
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+    -DWITH_INPUT:BOOL=TRUE
+    -DWITH_FILE_ASSOCIATIONS:BOOL=TRUE
+    -DWITH_APPEARANCE:BOOL=TRUE
+    -DWITH_MONITOR:BOOL=TRUE
+    -DWITH_BRIGHTNESS:BOOL=TRUE
+    -DWITH_LOCALE:BOOL=TRUE
+)
+
+src_prepare() {
+    cmake_src_prepare
+    edo sed -e "/project/i \
+        SET(CMAKE_AR ${AR})\nSET(CMAKE_RANLIB ${RANLIB})" -i src/qcategorizedview/CMakeLists.txt
+}
+

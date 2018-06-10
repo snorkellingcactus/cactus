@@ -1,0 +1,17 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="GUI to query passwords on behalf of SSH agents"
+
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        lxqt/liblxqt[~${PV}]
+        x11-libs/qtbase:5
+        x11-libs/qttools:5
+"
+

@@ -1,0 +1,32 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Tool used to launch programs quickly by typing their names"
+
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    build+run:
+        dev-libs/glib:2
+        kde-frameworks/kwindowsystem:5
+        lxde-base/menu-cache[>=0.3.3]
+        lxqt/liblxqt[~${PV}]
+        lxqt/libqtxdg
+        lxqt/lxqt-globalkeys[>=${PV}]
+        x11-libs/qtbase:5
+        x11-libs/qttools:5
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+    -DUSE_MENU_CACHE:BOOL=TRUE
+    # depends on muparser
+    -DRUNNER_MATH:BOOL=FALSE
+    -DRUNNER_VBOX:BOOL=FALSE
+    -DRUNNER_VBOX_HEADLESS:BOOL=TRUE
+)
+

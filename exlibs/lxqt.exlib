@@ -1,0 +1,26 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Purpose License v2
+
+if ever at_least scm ; then
+    SCM_REPOSITORY="https://github.com/lxqt/${PN}"
+    require scm-git
+else
+    DOWNLOADS="https://downloads.lxqt.org/downloads/${PN}/${PV}/${PNV}.tar.xz"
+fi
+
+require cmake [ api=2 ] [ cmake_minimum_version=3.0.2 ] [ out_of_source=true ]
+HOMEPAGE="http://www.lxqt.org"
+
+LICENCES="LGPL-2.1"
+SLOT="0"
+
+DEPENDENCIES="
+    build:
+        lxqt/lxqt-build-tools[>=0.4.0]
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+    -DUPDATE_TRANSLATIONS:BOOL=FALSE
+    -DPULL_TRANSLATIONS:BOOL=FALSE
+)
+

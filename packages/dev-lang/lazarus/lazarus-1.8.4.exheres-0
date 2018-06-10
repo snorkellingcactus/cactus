@@ -30,6 +30,9 @@ DEPENDENCIES="
 			x11-libs/gtk+:2
 			!gnome-base/librsvg[=2.16.1]
 		)
+		qt? (
+			dev-qt/qtpascal:4
+		)
 		sys-devel/binutils[>=2.19.1]
 "
 
@@ -39,7 +42,7 @@ WORK="${WORKBASE}"/${PN}
 
 # DEFAULT_SRC_PREPARE_PATCHES=( "${FILESDIR}"/${PN}-0.9.26-fpcsrc.patch )
 
-DOWNLOADS="https://sourceforge.net/projects/${PN}/files/Lazarus%20Zip%20_%20GZip/Lazarus%20${PV}/lazarus-${PV}-0.tar.gz/download -> ${PNV}.tar.gz"
+DOWNLOADS="https://sourceforge.net/projects/${PN}/files/Lazarus%20Zip%20_%20GZip/Lazarus%20${PV}/lazarus-${PV}.tar.gz/download -> ${PNV}.tar.gz"
 
 #require sourceforge [ project=${PN} pn=Lazarus ]
 

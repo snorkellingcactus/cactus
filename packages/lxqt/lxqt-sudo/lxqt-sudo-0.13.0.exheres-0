@@ -1,0 +1,19 @@
+# Copyright 2017 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="GUI frontend for sudo/su"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        lxqt/liblxqt[~${PV}]
+        x11-libs/qtbase:5
+    run:
+        app-admin/sudo
+"
+

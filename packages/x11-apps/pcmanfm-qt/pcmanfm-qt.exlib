@@ -1,0 +1,40 @@
+# Copyright 2013 Hong Hao <oahong@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+QT_MINIMUM_VERSION=5.2
+require github [ user=lxde ] freedesktop-mime freedesktop-desktop lxqt
+
+export_exlib_phases pkg_postinst pkg_postrm
+
+SUMMARY="PCManFM-Qt is the Qt port of the LXDE file manager PCManFM"
+
+LICENCES="LGPL-2.1"
+MYOPTIONS=""
+SLOT="0"
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/libfm-qt[>=${PV}]
+        x11-libs/qtbase:5[>=${QT_MINIMUM_VERSION}]
+        x11-libs/qttools:5[>=${QT_MINIMUM_VERSION}]
+        x11-libs/qtx11extras:5[>=${QT_MINIMUM_VERSION}]
+        !lxqt/lxqt-common [[
+            description = [ config file conflict ]
+            resolution = [ uninstall-blocked-after ]
+        ]]
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+    -DBUILD_DOCUMENTATION:BOOL=FALSE
+)
+
+pcmanfm-qt_pkg_postinst() {
+    freedesktop-mime_pkg_postinst
+    freedesktop-desktop_pkg_postinst
+}
+
+pcmanfm-qt_pkg_postrm() {
+    freedesktop-mime_pkg_postrm
+    freedesktop-desktop_pkg_postrm
+}
+
