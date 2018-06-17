@@ -28,5 +28,5 @@ DEPENDENCIES='
 		x11-libs/qtsvg
 		x11-libs/qtx11extras
 		x11-libs/libxcb
-		media-sound/drumstick
+		media-sound/drumstick[>=1.1.0]
 '
