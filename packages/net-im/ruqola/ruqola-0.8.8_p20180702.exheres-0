@@ -1,7 +1,4 @@
-#https://codeload.github.com/KDE/ruqola/zip/8f5d4e7a8fad23eb427773a8f4a6fd2c96bdc478
-
 SUMMARY='Rocket.Chat qt5 client'
-#LICENCES=''
 
 SLOT=0
 PLATFORMS='~x86 ~amd64'
