@@ -3,24 +3,26 @@
 SUMMARY='Rocket.Chat qt5 client'
 #LICENCES=''
 
-SLOT='0'
+SLOT=0
 PLATFORMS='~x86 ~amd64'
 
-GITHUB_COMMIT=8f5d4e7a8fad23eb427773a8f4a6fd2c96bdc478
+GITHUB_REVISION=6a722ca5603b679f1b5979061588fa421269050f
 
-require github user=KDE cmake [ api=2 ]
+require github [ user=KDE ] cmake [ api=2 ] [ cmake_minimum_version=3.1 ]
 
 CMAKE_SRC_CONFIGURE_PARAMS+=(
-	-DBUILD_TEST:BOOL=FALSE
+	-DBUILD_TESTING:BOOL=FALSE
+	-DUNITY_SUPPORT:BOOL=FALSE
 )
 
 DEPENDENCIES='
 	kde-frameworks/extra-cmake-modules
-	kde-frameworks/syntax-highlightingx
+	kde-frameworks/syntax-highlighting
 	kde-frameworks/kio
 	kde-frameworks/kirigami
 	kde-frameworks/kwidgetsaddons
-	qtbase:5[>=5.9.0]
+	kde-frameworks/kdoctools
+	x11-libs/qtbase:5[>=5.9.0]
 	x11-libs/qtmultimedia[gstreamer]
 	x11-libs/qtnetworkauth
 	x11-libs/qtwebsockets

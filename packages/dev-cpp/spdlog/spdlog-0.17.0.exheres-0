@@ -1,0 +1,16 @@
+SUMMARY='Fast C++ header-only logging library.'
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+
+require cmake [ cmake_minimum_version=3.0.2 ] github [ user=gabime tag=v${PV} ]
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+'
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	-DCMAKE_BUILD_TYPE:STRING=Release
+	-DSPDLOG_BUILD_EXAMPLES:BOOL=false
+	-DSPDLOG_BUILD_TESTING:BOOL=false
+)

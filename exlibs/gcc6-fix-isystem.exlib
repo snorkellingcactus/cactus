@@ -1,0 +1,5 @@
+gcc6_fix_isystem(){
+	edo sed -e 's@-isystem /usr/$(exhost --target)/include[[:space:]]@@' -i $(grep -l '\-isystem /usr/$(exhost --target)/include[[:space:]]' `find . -type f`)
+
+	#sed -e 's@-isystem /usr/host/include[[:space:]]@@' -i $(grep -l '\-isystem /usr/host/include[[:space:]]' `find . -type f`)
+}

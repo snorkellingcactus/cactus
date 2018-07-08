@@ -1,0 +1,15 @@
+SUMMARY='C++11 wrapper for the LMDB embedded B+ tree database library.'
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+
+GITHUB_REVISION=0b43ca87d8cfabba392dfe884eb1edb83874de02
+
+require github [ user=bendiken ]
+
+DEPENDENCIES='
+	dev-db/lmdb
+'
+
+src_install(){
+	emake DESTDIR=${IMAGE} PREFIX=/usr/$(exhost --target) install
+}

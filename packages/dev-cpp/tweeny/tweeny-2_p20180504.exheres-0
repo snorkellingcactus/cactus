@@ -1,0 +1,12 @@
+SUMMARY='A modern C++ tweening library '
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+
+GITHUB_REVISION=43f4130f7e4a67c19d870b60864bc2862c19b81f
+
+require github [ user=mobius3 ] cmake [ cmake_minimum_version=3.0 ]
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	-DTWEENY_BUILD_EXAMPLES:BOOL=FALSE
+	-DTWEENY_BUILD_DOCUMENTATION:BOOL=FALSE
+)

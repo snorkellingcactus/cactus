@@ -1,0 +1,20 @@
+SUMAMRY='De/Serializable types for events, requests/responses and identifiers'
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+
+GITHUB_REVISION=92a5e99db51301b5abf626aa872a1a87b7727634
+
+require github [ user=mujx ] cmake [ cmake_minimum_version=3.1 ]
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	-DBUILD_TESTS:BOOL=OFF
+	-DBUILD_DOC:BOOL=OFF
+)
+
+src_configure(){
+	esandbox disable_net
+
+	cmake_src_configure
+
+	esandbox enable_net
+}

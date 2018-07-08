@@ -1,0 +1,17 @@
+SUMMARY='An implementation of the Double Ratchet cryptographic ratchet in C++'
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+
+SCM_REPOSITORY=https://git.matrix.org/git/olm.git
+SCM_REVISION=98e8ee1b0da9609c0b504d9582dfedd14db38c00
+
+require scm-git cmake [ cmake_minimum_version=3.1 ]
+
+src_prepare(){
+	edo cp "${FILES}"/CMakeLists.txt .
+
+	edo mkdir cmake
+	edo cp "${FILES}"/OlmConfig.cmake.in cmake
+
+	cmake_src_prepare
+}

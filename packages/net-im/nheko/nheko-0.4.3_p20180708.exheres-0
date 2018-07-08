@@ -1,0 +1,26 @@
+SUMMARY='Desktop client for the Matrix protocol'
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+
+GITHUB_REVISION=278eccc04086f3033c71a753f0fc0ab35a3cbb66
+
+require gcc6-fix-isystem github [ user=mujx ] cmake [ cmake_minimum_version=3.1 ]
+
+DEPENDENCIES='
+	dev-cpp/lmdbxx
+	dev-cpp/tweeny
+	net-im/mtxclient
+'
+
+src_compile(){
+	gcc6-fix-isystem
+
+	cmake_src_compile
+}
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	-DAPPVEYOR_BUILD:BOOL=FALSE
+	-DASAN:BOOL=FALSE
+	-DBUILD_DOCS:BOOL=FALSE
+	-DCMAKE_BUILD_TYPE=Release
+)
