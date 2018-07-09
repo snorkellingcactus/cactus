@@ -1,3 +1,39 @@
+# einfo "Use a command like"
+# einfo "synergy-core --server localhost:8086"
+# einfo "with a properly configured /etc/synergy.conf on the machine which will be controlled (server)"
+# einfo "and a command like"
+# einfo "synergy-core --client server:8086"
+# einfo "on the controller machine"
+
+# # The way you switch between screens is by reaching a screen border.
+# # ie: You are on ScreenA and you move your mouse to your screen's left border
+# # so the mouse will appear on ScreenB.
+
+# # The screen swithing happens on the server, where this config file matters.
+# # The clients only connects and are controlled by the server.
+
+# # So here you will determine on which side will be each client.
+
+# # Here we declare screens.
+# section: screens
+#   ComputerA:
+#   ComputerB:
+# end
+
+# # Maps names to adrresses ( IPs or domain names )
+# section: aliases
+#   ComputerA:
+#     ComputerA.local
+#   ComputerB:
+#     ComputerB.local
+# end
+
+# section: links
+#   ComputerA:
+#     right       = ComputerB
+#   ComputerB:
+#     left        = ComputerA
+# end
 
 #https://github.com/symless/synergy-core/archive/v2.0.0-stable.zip
 
