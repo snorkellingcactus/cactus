@@ -1,0 +1,65 @@
+SUMMARY='FOSS easy vpn p2p client.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+GITHUB_REVISION=1cf517bfc104c97a1eeb5a0f94becd0b8999ceaa
+require github [ user=${PN}-developers ] scons
+
+
+MYOPTIONS='
+	( providers: libressl openssl ) [[ number-selected = exactly-one ]]
+'
+
+DEPENDENCIES='
+	build:
+		sys-apps/help2man
+	build+run:
+		dev-libs/boost
+		net-misc/curl
+		net-libs/miniupnpc
+
+		providers:libressl? ( dev-libs/libressl )
+	   	providers:openssl? ( dev-libs/openssl )
+'
+
+SCONS_SRC_CONFIGURE_PARAMS+=(
+	--mode=release
+	--mongoose=no
+	--upnp=yes
+	prefix=${IMAGE}/usr/
+	bin_prefix=${IMAGE}/usr/$(exhost --target)/
+	apps
+)
+
+SCONS_SRC_COMPILE_PARAMS+=(
+	--mode=release
+	--mongoose=no
+	--upnp=yes
+	prefix=${IMAGE}/usr/
+	bin_prefix=${IMAGE}/usr/$(exhost --target)/
+	apps
+)
+
+SCONS_SRC_INSTALL_PARAMS+=(
+	--mode=release
+	--mongoose=no
+	--upnp=yes
+	prefix=${IMAGE}/usr/
+	bin_prefix=${IMAGE}/usr/$(exhost --target)/
+)
+
+src_prepare(){
+	# environment RANLIB var is not passed to Scons.
+	edo sed -e "s@'CC',@'CC','RANLIB',@" -i SConstruct
+
+	# Trying to generate man file on raw root /usr/share
+	edo sed -e "s@target=os.path.join(str(dirs\['man'\]), name + '.1')@target='${IMAGE}/usr/share/man/' + name + '.1'@" -i apps/freelan/SConscript
+
+	# man beign installed under /usr/$(exhost --target)
+	# and bin file not beign installed.
+	edo sed -e "s@install = env.Install(os.path.join(env.bin_install_prefix, 'man', 'man1'), help)@install.extend(env.Install(os.path.join(env.install_prefix, 'share', 'man', 'man1'), help))@" -i SConstruct
+
+	#edo sed -e "s@env.bin_install_prefix, 'man'@env.install_prefix, 'man'@" -i SConstruct
+
+	default_src_prepare
+}
