@@ -1,0 +1,25 @@
+SUMMARY='WhatsApp protocol implementation for libpurple (pidgin)'
+SLOT=0
+PLATFORMS='~amd64 ~x86'
+
+GITHUB_REVISION=81c7285f79148984af8c4bf0de228b9b117f152c
+
+require github [ user=jakibaki ]
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+	build+run:
+		net-im/pidgin
+'
+
+src_prepare(){
+	for TOOL in gcc pkg-config g++
+	do
+		edo sed -e 's/'"${TOOL}"'/'"$(exhost --tool-prefix)${TOOL}"'/' -i $(find -type f -name Makefile)
+	done
+
+	sed -e 's/AR=ar/AR='"$(exhost --tool-prefix)ar"'/' -i $(find -type f -name Makefile)
+
+	default_src_prepare
+}

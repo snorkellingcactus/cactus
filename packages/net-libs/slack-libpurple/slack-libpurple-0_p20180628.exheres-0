@@ -1,0 +1,23 @@
+SUMMARY='Slack module for libpurple'
+SLOT=0
+PLATFORMS='~amd64 ~x86'
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+	build+run:
+		net-im/pidgin
+'
+
+GITHUB_REVISION=6bf292ca0742443182fcf50249b1ff477662ecb7
+
+require github [ user=dylex ]
+
+src_prepare(){
+	for TOOL in gcc pkg-config
+	do
+		edo sed -e 's/'"${TOOL}"'/'"$(exhost --tool-prefix)${TOOL}"'/' -i Makefile
+	done
+
+	default_src_prepare
+}
