@@ -1,0 +1,33 @@
+diff --git a/configure.ac.old b/configure.ac
+index ee22cf7..81037f0 100644
+--- a/configure.ac.old
++++ b/configure.ac
+@@ -202,13 +202,13 @@ AC_PROG_MAKE_SET
+ AC_PROG_LN_S
+ AC_PROG_AWK
+ 
+-AL_PROG_GNU_M4(AC_MSG_ERROR([dnl
+-SUN m4 does not work for building gtkmm. 
+-Please install GNU m4.]))
++#AL_PROG_GNU_M4(AC_MSG_ERROR([dnl
++#SUN m4 does not work for building gtkmm. 
++#Please install GNU m4.]))
+ 
+-AL_PROG_GNU_MAKE(AC_MSG_ERROR([dnl
+-SUN make does not work for building gtkmm.
+-Please install GNU make.]))
++#AL_PROG_GNU_MAKE(AC_MSG_ERROR([dnl
++#SUN make does not work for building gtkmm.
++#Please install GNU make.]))
+ 
+ # Evaluate the --enable-warnings=level option.
+ GTKMM_ARG_ENABLE_WARNINGS()
+@@ -282,7 +282,7 @@ pangomm_pkg >= pangomm_required_version dnl
+ GTKGLEXT_SUPPORTS_MULTIHEAD=`$PKG_CONFIG --variable=multihead gtkglext-x11-1.0`
+ 
+ # gmmproc
+-GLIBMM_CHECK_PERL([5.6.0])
++#GLIBMM_CHECK_PERL([5.6.0])
+ GMMPROC_DIR=`$PKG_CONFIG --variable=gmmprocdir glibmm_pkg`
+ AC_SUBST(GMMPROC_DIR)
+ GMMPROC=$GMMPROC_DIR/gmmproc

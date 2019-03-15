@@ -1,7 +1,6 @@
 # Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
 # Distributed under the terms of the Gnu General Public License v2
 
-#SCM_REVISION='90fb93bbfef7f192b2939fac095125b1ae07c731'
 SCM_REVISION='d8e8cce838ad6451ef943b6e5be30271ce8758ea'
 SCM_BRANCH=master
 require ${PN}-9.2

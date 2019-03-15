@@ -1,7 +1,7 @@
 # Copyright 2009 Mike Kelly
 # Distributed under the terms of the GNU General Public License v2
 
-SCM_REVISION='3998'
+SCM_REVISION='4180'
 SCM_REPOSITORY='https://svn.code.sf.net/p/dosbox/code-0/dosbox/'
 require scm-svn autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ] flag-o-matic dorbdep
 
@@ -28,9 +28,12 @@ MYOPTIONS="alsa [[ description = [ Support for alsa midi support ] ]]"
 
 NAME_OVL=glide2x.ovl
 NAME_PATCH=dosbox_glide.diff
+
+OPENGLIDE_REPO=https://github.com/voyageur/openglide/raw/c794a6efd48351340a3606f404aaf84d90446f56/platform/dosbox/
+
 DOWNLOADS="
-		https://raw.githubusercontent.com/voyageur/openglide/master/platform/dosbox/${NAME_PATCH}
-		https://raw.githubusercontent.com/voyageur/openglide/master/platform/dosbox/${NAME_OVL}
+	${OPENGLIDE_REPO}${NAME_PATCH}
+	${OPENGLIDE_REPO}${NAME_OVL}
 "
 
 DEPENDENCIES="

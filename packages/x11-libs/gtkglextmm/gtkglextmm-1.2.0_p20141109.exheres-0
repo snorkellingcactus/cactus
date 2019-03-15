@@ -1,0 +1,33 @@
+
+GITHUB_REVISION=a65460dc2b3456b3daf305ef44d5a42c12722b1d
+require github [ user=GNOME ] autotools [ supported_autoconf=[ '2.5' ] supported_automake=[ '1.15' ] ] flag-o-matic
+
+SLOT='1.0'
+PLATFORMS='~x86 ~amd64'
+HOMEPAGE='http://projects.gnome.org/gtkglext/'
+SUMMARY='C++ bindings for gtkglext'
+LICENCES='GPL-2 LGPL-2.1'
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+	build+run:
+		x11-libs/gtkglext
+'
+
+src_prepare(){
+	# fix underquoted definition, bug 552686
+	# expatch "${FILES}/${PN}-aclocal.patch"
+	expatch "${FILES}/${PN}-configure.in.patch"
+
+	autotools_src_prepare
+
+	# Remove docs from SUBDIRS so that docs are not installed, as
+	# we handle it in src_install.	
+	sed -i -e 's|^\(SUBDIRS =.*\)docs\(.*\)|\1\2|' Makefile.in || \
+		die "sed Makefile.in failed"
+
+	append-cppflags -std=c++11 #568024
+
+	edo sed -e 's/pkg-config/'"$(exhost --tool-prefix)"'pkg-config/' -i configure
+}

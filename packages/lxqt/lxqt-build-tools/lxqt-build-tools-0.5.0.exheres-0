@@ -18,6 +18,12 @@ DEPENDENCIES="
         x11-libs/qtbase:5[>=5.6.1]
 "
 
+src_prepare() {
+	cmake_src_prepare
+
+	edo sed -e '/set(CMAKE_AR "gcc-ar")/d' -e '/set(CMAKE_RANLIB "gcc-ranlib")/d' -i cmake/modules/LXQtCompilerSettings.cmake
+}
+
 CMAKE_SRC_CONFIGURE_PARAMS=(
     -DLXQT_ETC_XDG_DIR:PATH=/etc/xdg/lxqt
 )

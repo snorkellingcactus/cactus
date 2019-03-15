@@ -1,0 +1,97 @@
+# Copyright 2014 Nikolay Orliuk <virkony@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+require github [ user=u8sand tag=v${PV} ] qmake [ slot=5 ]
+
+SUMMARY="Cross-platform continuation of godly-devotion's Baka-MPlayer"
+DESCRIPTION="
+Baka MPlayer is a free and open source, cross-platform, libmpv based multimedia player. Its simple
+design reflects the idea for an uncluttered, simple, and enjoyable environment for watching tv
+shows.
+"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~x86 ~amd64"
+
+linguas='de es fr hr it ko nl pt ru zh_CN'
+
+MYOPTIONS="
+    youtube-dl
+    ( linguas: ${linguas} )
+"
+
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    build+run:
+        media/mpv
+        x11-libs/libX11
+        x11-libs/qtbase:5
+        x11-libs/qtdeclarative:5
+        x11-libs/qtsvg:5
+        x11-libs/qttools:5
+        x11-libs/qtx11extras:5
+
+        youtube-dl? (
+	            net-misc/youtube-dl
+        )
+"
+
+EQMAKE_PARAMS+=(
+    "BINDIR=/usr/$( exhost --target )/bin"
+    "CONFIG+=release"
+    "CONFIG+=nostrip" # We do this stuff
+)
+
+EQMAKE_SOURCES=( src/${PN}.pro )
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+    "${FILES}"/fix-missing-math-include.patch
+)
+
+src_configure()
+{
+    EQMAKE_PARAMS+=(
+        "TRANSLATIONS="$(
+            for l in ${linguas}
+                do optionq linguas:${l} && echo "translations/baka-mplayer_${l}.ts "
+            done
+        )
+    )
+
+    qmake_src_configure
+}
+
+src_install() {
+    emagicdocs
+
+    dobin build/baka-mplayer
+
+    local icon_name icon_ext my_pn=baka-mplayer
+
+    insinto /usr/share/applications
+
+    doins etc/${my_pn}.desktop
+
+    pushd etc/logo
+
+    for s in 16 24 32 48 64 96 128 256 512 ${my_pn}
+    do
+        icon_name="${s}"
+
+        if [ "${my_pn}" != "${s}" ]
+        then
+            icon_name+='x'"${s}"
+            icon_ext=png
+        else
+            icon_ext=svg
+        fi
+
+        insinto /usr/share/icons/hicolor/${icon_name}/apps
+
+        newins ${icon_name}.${icon_ext} ${my_pn}.${icon_ext}
+    done
+
+    popd
+}

@@ -18,10 +18,10 @@ MYOPTIONS='
 #TODO: rev jackdbus, per-module install
 DEPENDENCIES="
 	build+run:
-		dev-python/PyQt4[python_abis:*?][dbus]
+		dev-python/PyQt5[python_abis:*?][dbus]
 		dev-python/dbus-python[python_abis:*?]
 		media-sound/jack-audio-connection-kit[>=1.9][dbus]
-		x11-libs/qt:4
+		x11-libs/qtbase:5
 	run:
 		claudia? ( media-sound/ladish )
 	recommendation:

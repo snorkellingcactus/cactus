@@ -2,10 +2,15 @@
 # Distributed under the terms of the GNU General Public License v2
 
 QT_MINIMUM_VERSION=5.2
-require lxqt
+GITHUB_REVISION=b4fda3929cc7e88a2befd2751850e79eac0a1722
 
+require github [ user=lxqt ]
+require cmake [ api=2 ] [ cmake_minimum_version=3.0.2 ] [ out_of_source=true ]
+
+HOMEPAGE="http://www.lxqt.org"
 SUMMARY="Qt binding for libfm"
 
+LICENCES="LGPL-2.1"
 SLOT="0"
 PLATFORMS="~amd64"
 MYOPTIONS=""
@@ -29,13 +34,18 @@ DEPENDENCIES="
         ]]
 "
 
+# WORK="${WORKBASE}"/${PN}-${GITHUB_REVISION}
+
 CMAKE_SRC_CONFIGURE_PARAMS+=(
     #FIXME:
     -DBUILD_DOCUMENTATION:BOOL=FALSE
+    -DUPDATE_TRANSLATIONS:BOOL=FALSE
+    -DPULL_TRANSLATIONS:BOOL=FALSE
 )
 
 src_install() {
     default
-    edo rmdir "${IMAGE}"/usr/$(exhost --target)/include/libfm-qt/tests
+
+    edo find "${IMAGE}" -type d -empty -delete
 }
 

@@ -1,0 +1,16 @@
+Upstream: No. Bug report: https://github.com/u8sand/Baka-MPlayer/issues/249
+Source: Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+Reason: src/ui/mainwindow.cpp:996:82: error: 'ceil' was not declared in this scope
+
+diff --git a/src/ui/mainwindow.cpp b/src/ui/mainwindow.cpp.new
+index 4f051ad..e2145eb 100644
+--- a/src/ui/mainwindow.cpp
++++ b/src/ui/mainwindow.cpp.new
+@@ -13,6 +13,7 @@
+ #include "widgets/dimdialog.h"
+ #include "inputdialog.h"
+ #include "screenshotdialog.h"
++#include <math.h>
+ 
+ MainWindow::MainWindow(QWidget *parent):
+     QMainWindow(parent),

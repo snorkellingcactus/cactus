@@ -1,0 +1,6 @@
+require ${PN}
+
+# "${FILES}"/test.patch
+#DEFAULT_SRC_PREPARE_PATCHES=(
+#	"${FILES}"/${PNV}-fix-tests.patch
+#)

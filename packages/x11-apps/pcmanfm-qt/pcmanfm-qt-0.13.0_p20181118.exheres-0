@@ -1,6 +1,8 @@
 # Copyright 2013 Hong Hao <oahong@gmail.com>
 # Distributed under the terms of the GNU General Public License v2
 
+
+GITHUB_REVISION=d1ddd7595019454d180a962350c99887d45f58d1
 require pcmanfm-qt
 
 PLATFORMS="~amd64"
