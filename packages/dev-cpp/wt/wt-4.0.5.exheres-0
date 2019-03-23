@@ -1,0 +1,97 @@
+SUMMARY='Wt C++ Web Toolkit'
+DESCRIPTION=''
+HOMEPAGE='https://www.webtoolkit.eu'
+SLOT=0
+PLATFORMS='~x86 ~amd64'
+LICENCES='COMMERCIAL GPL-3'
+DOWNLOADS="https://github.com/emweb/wt/archive/${PV}.tar.gz"
+
+#ext
+CMAKE_SRC_CONFIGURE_OPTION_ENABLES=(
+	'openssl SSL'
+	'haru HARU'
+	'pango PANGO'
+	'sqlite SQLITE'
+	'postgres POSTGRES'
+	'firebird FIREBIRD'
+	'mysql MYSQL'
+	'mssqlserver MSSQLSERVER'
+	'libwttest LIBWTTEST'
+	'libwtdbo LIBWTDBO'
+	'opengl OPENGL'
+	'unwind UNWIND'
+)
+
+CMAKE_SRC_CONFIGURE_OPTION_BUILDS=(
+	'examples EXAMPLES'
+)
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+	-DMULTI_THREADED:BOOL=ON
+	-DCMAKE_BUILD_TYPE:STRING=Release
+	-DUSE_SYSTEM_GLEW:BOOL=TRUE
+	-DUSE_SYSTEM_SQLITE3:BOOL=TRUE
+)
+
+CMAKE_SRC_CONFIGURE_OPTIONS=(
+	'examples INSTALL_EXAMPLES'
+	'documentation INSTALL_DOCUMENTATION'
+	'resources INSTALL_RESOURCES'
+	'debug DEBUG'
+)
+
+
+# stdlocale "Build Wt to run on a system without std::locale support"
+# stdstring "Build Wt to run on a system without std::wstring support"
+
+
+MYOPTIONS='
+	debug
+	examples [[ description = [ "Build examples" ] ]]
+	documentation [[ description = [ "Install documentation (tutorials and reference)" ] ]]
+	resources [[ description = [ "Install resources directory" ] ]]
+	openssl [[ description = [ "Enable cryptography functions, using OpenSSL" ] ]]
+	haru [[ description = [ "Enable Haru Free PDF Library, which is used to provide support for painting to PDF (WPdfImage)" ] ]]
+	pango [[ description = [ "Enable Pango Library, which is used for improved font support (WPdfImage and WRasterImage)" ] ]]
+	sqlite [[ description = [ "Build SQLite3 backend for Wt::Dbo" ] ]]
+	postgres [[ description = [ "Build PostgreSQL backend for Wt::Dbo" ] ]]
+	firebird [[ description = [ "Build FirebirdSQL backend for Wt::Dbo" ] ]]
+	mysql [[ description = [ "Build mariadb/mysql backend for Wt::Dbo" ] ]]
+	mssqlserver [[ description = [ "Build Microsoft SQL Server backend for Wt::Dbo" ] ]]
+	qt4 [[ description = [ "Build Qt4 interworking library (libwtwithqt)" ] ]]
+	libwttest [[ description = [ "Build Wt::Test" ] ]]
+	libwtdbo [[ description = [ "Build Wt::Dbo" ] ]]
+	opengl [[ description = [ "Build Wt with support for server-side opengl rendering" ] ]]
+	unwind [[ description = [ "Build Wt with stacktrace support using libunwind" ] ]]
+'
+
+
+# media-gfx/GraphicsMagick
+DEPENDENCIES='
+	dev-libs/boost
+	sys-libs/zlib
+	media-libs/libpng
+
+	ssl? (
+		dev-libs/openssl
+	)
+	documentation? (
+		app-doc/asciidoc
+	)
+
+	haru? (
+		dev-cpp/haru
+	)
+
+	
+
+	pango? (
+		x11-libs/pango
+	)
+
+	unwind? (
+		dev-libs/libunwind
+	)
+'
+
+require cmake [ cmake_minimum_version=3.1 ]

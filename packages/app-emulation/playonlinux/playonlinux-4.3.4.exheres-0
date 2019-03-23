@@ -18,6 +18,7 @@ MYOPTIONS='winbind'
 
 DEPENDENCIES='
 	run:
+		app-text/jq
 		app-admin/sudo
 		app-arch/cabextract
 		app-arch/p7zip
