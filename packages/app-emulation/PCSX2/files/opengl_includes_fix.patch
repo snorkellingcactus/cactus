@@ -1,0 +1,26 @@
+diff --git a/plugins/zzogl-pg/opengl/Util.h b/plugins/zzogl-pg/opengl/Util.h
+index 27fb537..24fbe72 100644
+--- a/plugins/zzogl-pg/opengl/Util.h
++++ b/plugins/zzogl-pg/opengl/Util.h
+@@ -41,8 +41,6 @@
+ #include <sys/stat.h>
+ 
+ #include <GL/glew.h>
+-#include <GL/gl.h>
+-#include <GL/glext.h>
+ #include <gtk/gtk.h>
+ 
+ #include <cstring>
+diff --git a/plugins/zzogl-pg/opengl/ZZGl.h b/plugins/zzogl-pg/opengl/ZZGl.h
+index fd4f3b8..5f2662e 100644
+--- a/plugins/zzogl-pg/opengl/ZZGl.h
++++ b/plugins/zzogl-pg/opengl/ZZGl.h
+@@ -36,8 +36,6 @@
+ 
+ // adding glew support instead of glXGetProcAddress (thanks to scaught)
+ #include <GL/glew.h>
+-#include <GL/gl.h>
+-#include <GL/glext.h>
+ #include <GL/glx.h>
+ 
+ #endif

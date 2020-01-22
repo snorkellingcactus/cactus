@@ -17,13 +17,13 @@ DOWNLOADS="
 		${DOWNLOAD_BASE}x86${FILE_SUFFIX}
 	)
 	platform:amd64? (
-		${DOWNLOAD_BASE}x86_64${FILE_SUFFIX}
+		${DOWNLOAD_BASE}x86${FILE_SUFFIX}
 	)
 "
 
 LICENCES='NVIDIA-r1'
 SLOT='0'
-PLATFORMS='amd64 x86'
+PLATFORMS='~x86'
 MYOPTIONS="
 	doc
 	examples
@@ -64,7 +64,7 @@ install_pkgconfig() {
 
 src_install() {
 	optionq platform:amd64 && BITS=64
-	dolib usr/lib${BITS}/*
+	dolib usr/lib/*
 
 	install_pkgconfig nvidia-cg-toolkit.pc
 	install_pkgconfig nvidia-cg-toolkit-gl.pc
