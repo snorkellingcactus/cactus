@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 QT_MINIMUM_VERSION=5.10
-GITHUB_REVISION=44cd973df7e1a27b9888ee280137e79c0489df5e
+GITHUB_REVISION=f6b3869f26d9890d625dfb3da9c12f1b47e1f802
 require github [ user=lxqt ] freedesktop-mime freedesktop-desktop cmake [ api=2 ] [ cmake_minimum_version=3.0.2 ] [ out_of_source=true ]
 
 HOMEPAGE='http://www.lxqt.org'

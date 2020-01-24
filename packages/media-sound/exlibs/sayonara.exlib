@@ -28,7 +28,7 @@ CMAKE_SRC_CONFIGURE_PARAMS=(
 	-DCMAKE_BUILD_TYPE:STRING='Release'
 )
 
-SCM_REPOSITORY='https://git.sayonara-player.com/sayonara.git'
+SCM_REPOSITORY='https://gitlab.com/luciocarreras/sayonara-player.git'
 require scm-git cmake [ api=2 ] freedesktop-desktop gtk-icon-cache lang-helper [ linguas='br cs de en es fr hu it pl pt ro ru ua zh_cn' ]
 
 export_exlib_phases src_prepare src_install pkg_postinst pkg_postrm
@@ -42,7 +42,7 @@ sayonara_src_prepare()
 	edo sed -e 's/DESTINATION share/DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/g' -i resources/CMakeLists.txt;
     edo sed -e 's/^\s*share/${CMAKE_INSTALL_DATAROOTDIR}/' -i src/Languages/CMakeLists.txt
 
-    edo sed -e 's/"share/"${CMAKE_INSTALL_DATAROOTDIR}/' -i {src/GUI/Resources/{,Icons/},src/3rdParty/Soundcloud/}CMakeLists.txt
+    edo sed -e 's/"share/"${CMAKE_INSTALL_DATAROOTDIR}/' -i src/Gui/Resources/{,Icons/}CMakeLists.txt
 
     edo sed -e 's@"${CMAKE_INSTALL_PREFIX}/share@"${CMAKE_INSTALL_DATAROOTDIR}@' -i CMakeLists.txt
 }
