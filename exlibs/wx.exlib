@@ -94,8 +94,6 @@ wx_foreach_version(){
 
 		unset WX_RETVAL
 	done
-
-	echo "${WX_LOOP_RESULT[@]}"
 }
 
 wx_select()
@@ -130,5 +128,7 @@ wx_get_config_bin_name()
 MYOPTIONS+=' ('
 
 wx_foreach_version wx_fill_metadata
+
+${MYOPTIONS}
 
 MYOPTIONS+=' ) [[ number-selected = exactly-one ]]'
