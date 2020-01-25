@@ -58,7 +58,6 @@ DEPENDENCIES='
 		x11-libs/gtk+:2[>=2.8.1]
 		x11-libs/pango
 		jack? ( media-sound/jack-audio-connection-kit )
-		media-libs/slv2[>=0.6.1]
 		media-libs/lilv
 		media-libs/sratom
 		dev-libs/sord
