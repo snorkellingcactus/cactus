@@ -3,7 +3,10 @@
 
 # TODO: Fix install locations.
 
-require sourceforge [ project=${PN} suffix=zip ] cmake [ api=2 ]
+WORK=${WORK}/desktop
+SCM_REVISION='507'
+SCM_REPOSITORY='https://svn.code.sf.net/p/vmpk/code'
+require scm-svn cmake [ api=2 ]
 
 SUMMARY='Virtual MIDI Piano Keyboard is a MIDI events generator and receiver.'
 DESCRIPTION="It doesn't produce any sound by itself, but can be used to drive a MIDI synthesizer (either hardware or software, internal or external). You can use the computer's keyboard to play MIDI notes, and also the mouse. You can use the Virtual MIDI Piano Keyboard to display the played MIDI notes from another instrument or MIDI file player. To do so, connect the other MIDI port to the input port of VMPK."
@@ -19,6 +22,8 @@ CMAKE_SRC_CONFIGURE_OPTIONS_ENABLE+=(
 	'dbus'
 )
 
+
+
 MYOPTIONS='dbus'
 
 DEPENDENCIES='
@@ -28,5 +33,5 @@ DEPENDENCIES='
 		x11-libs/qtsvg
 		x11-libs/qtx11extras
 		x11-libs/libxcb
-		media-sound/drumstick[>=1.1.0]
+		media-sound/drumstick[>=1.1.2]
 '
