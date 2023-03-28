@@ -1,7 +1,8 @@
 # Copyright 2017 Hong Hao <oahong@oahong.me>
 # Distributed under the terms of the GNU General Public License v2
 
-require github [ user=lxde release=${PV} suffix=tar.xz ] lxqt
+require github [ user=lxqt release=${PV} suffix=tar.xz ]
+require cmake [ api=2 ] [ cmake_minimum_version=3.1.0 ] [ out_of_source=true ]
 
 SUMMARY="Package scripts and tools for LXQt"
 
@@ -15,7 +16,7 @@ DEPENDENCIES="
         virtual/pkg-config
     build+run:
         dev-libs/glib:2[>=2.50]
-        x11-libs/qtbase:5[>=5.6.1]
+        x11-libs/qtbase:5[>=5.15]
 "
 
 src_prepare() {
@@ -23,8 +24,4 @@ src_prepare() {
 
 	edo sed -e '/set(CMAKE_AR "gcc-ar")/d' -e '/set(CMAKE_RANLIB "gcc-ranlib")/d' -i cmake/modules/LXQtCompilerSettings.cmake
 }
-
-CMAKE_SRC_CONFIGURE_PARAMS=(
-    -DLXQT_ETC_XDG_DIR:PATH=/etc/xdg/lxqt
-)
 

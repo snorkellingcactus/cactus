@@ -1,0 +1,15 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Library used to query system info and statistics"
+
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        lxqt/liblxqt[>=0.10.0]
+        x11-libs/qtbase:5[>=5.15]
+"

@@ -4,7 +4,8 @@
 # Distributed under the terms of the GNU General Public License v2
 
 SLOT="${PV:0:1}"
-MY_PN="sublime_text_${SLOT}"
+MY_PN="sublime_text"
+MY_PNV="${MY_PN}_${SLOT}"
 
 DESCRIPTION='Sophisticated text editor for code, markup and prose'
 HOMEPAGE='http://www.sublimetext.com'
@@ -12,8 +13,8 @@ PLATFORMS='~amd64 ~x86'
 BASE_URI="https://download.sublimetext.com/${MY_PN}_build_${PV}_x"
 
 DOWNLOADS="
-	platform:amd64?	( ${BASE_URI}64.tar.bz2 )
-	platform:x86?	( ${BASE_URI}32.tar.bz2 )
+	platform:amd64?	( ${BASE_URI}64.tar.xz )
+	platform:x86?	( ${BASE_URI}32.tar.xz )
 "
 LICENCES='Sublime'
 
@@ -48,7 +49,7 @@ sublime-text_src_install()
 	into ${DEST}
 	exeinto ${DEST}
 
-	doins -r Icon Packages python3.3.zip sublime.py sublime_plugin.py sublime_text plugin_host
+	doins -r Icon Packages Lib sublime_text plugin_host-3.3 plugin_host-3.8
 
 	mkdir -p "${IMAGE}${BINDIR}"
 	dosym "${BIN}" "${SLOT_BIN}"

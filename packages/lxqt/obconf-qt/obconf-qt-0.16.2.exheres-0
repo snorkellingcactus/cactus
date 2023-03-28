@@ -7,9 +7,17 @@ SUMMARY='ObConf-Qt is a Qt port of ObConf, a configuration editor for window man
 SLOT='0'
 PLATFORMS='~x86 ~amd64'
 
+# TODO: sed
 DEPENDENCIES='
+build:
+	virtual/pkg-config
+build+run:
+	dev-libs/glib
 	lxqt/liblxqt
-	lxqt/lxqt-l10n
+	x11-libs/qtbase:5
+	x11-libs/qttools:5
+	x11-libs/qtx11extras:5
+	x11-wm/openbox
 '
 
 DOWNLOADS="https://github.com/lxde/${PN}/archive/${PV}.zip -> ${PNV}.zip"

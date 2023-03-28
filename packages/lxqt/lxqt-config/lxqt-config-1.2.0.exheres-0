@@ -6,26 +6,44 @@ require lxqt
 SUMMARY="Tools to configure LXQt and the underlying operating system"
 
 PLATFORMS="~amd64"
-MYOPTIONS=""
+MYOPTIONS="
+    appearance
+    brightness
+    file_associations
+    input
+    locale
+    monitor
+    touchpad
+    input
+    input? (
+        ( providers: eudev systemd ) [[ number-selected = exactly-one ]]
+    )
+"
 
+# TODO: touchpad ? eudev
 DEPENDENCIES="
     build:
         virtual/pkg-config
     build+run:
-        kde-frameworks/kwindowsystem:5
+        kde-frameworks/kwindowsystem:5[>=5.36]
         lxqt/liblxqt[~${PV}]
         lxqt/libqtxdg
         x11-libs/libX11
         x11-libs/libXcursor
         x11-libs/libXfixes
         x11-libs/libxcb
-        x11-libs/qtbase:5
+        x11-libs/qtbase:5 
         x11-libs/qttools:5
         x11-libs/qtx11extras:5
-        (
-            kde-frameworks/libkscreen:5
-            x11-libs/qtsvg:5
-        )  [[ *note = [ lxqt-config-monitor ] ]]
+        monitor? (
+            (
+                kde-frameworks/libkscreen:5
+                x11-libs/qtsvg:5
+            )  [[ *note = [ lxqt-config-monitor ] ]]
+        )
+
+        providers:eudev? ( sys-apps/eudev )
+        providers:systemd? ( sys-apps/systemd )
 "
 
 CMAKE_SRC_CONFIGURE_PARAMS+=(

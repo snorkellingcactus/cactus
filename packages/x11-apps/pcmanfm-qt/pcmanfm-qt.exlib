@@ -1,32 +1,26 @@
 # Copyright 2013 Hong Hao <oahong@gmail.com>
 # Distributed under the terms of the GNU General Public License v2
 
-QT_MINIMUM_VERSION=5.2
-require github [ user=lxqt ] freedesktop-mime freedesktop-desktop cmake [ api=2 ] [ cmake_minimum_version=3.0.2 ] [ out_of_source=true ]
+QT_MINIMUM_VERSION=5.15
+
+require freedesktop-mime freedesktop-desktop lxqt
 
 export_exlib_phases pkg_postinst pkg_postrm
 
-HOMEPAGE="http://www.lxqt.org"
 SUMMARY="PCManFM-Qt is the Qt port of the LXDE file manager PCManFM"
 
-LICENCES="LGPL-2.1"
 MYOPTIONS=""
 SLOT="0"
 
 DEPENDENCIES="
-	build:
-		lxqt/lxqt-build-tools[>=0.4.0]
     build+run:
         x11-libs/libfm-qt[>=${PV}]
         x11-libs/qtbase:5[>=${QT_MINIMUM_VERSION}]
         x11-libs/qttools:5[>=${QT_MINIMUM_VERSION}]
         x11-libs/qtx11extras:5[>=${QT_MINIMUM_VERSION}]
-        !lxqt/lxqt-common [[
-            description = [ config file conflict ]
-            resolution = [ uninstall-blocked-after ]
-        ]]
 "
 
+# TODO
 CMAKE_SRC_CONFIGURE_PARAMS+=(
     -DBUILD_DOCUMENTATION:BOOL=FALSE
 )

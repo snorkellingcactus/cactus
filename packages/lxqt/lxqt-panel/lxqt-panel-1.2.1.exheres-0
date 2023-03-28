@@ -8,17 +8,19 @@ SUMMARY="LXQt desktop panel"
 PLATFORMS="~amd64"
 MYOPTIONS="alsa pulseaudio lm_sensors"
 
+QT_MINIMUM_VERSION=5.15
+
 # https://github.com/lxde/lxqt/issues/783
 DEPENDENCIES="
     build:
         virtual/pkg-config
         x11-proto/xorgproto
     build+run:
-        kde-frameworks/kwindowsystem:5
-        kde-frameworks/solid [[ note = [ plugin-mount ] ]]
+        kde-frameworks/kwindowsystem:5[>=5.36]
+        kde-frameworks/solid:5[>=5.36] [[ note = [ plugin-mount ] ]]
         lxde-base/menu-cache[>=0.3.3] [[ note = [ plugin-mainmenu ] ]]
         lxqt/liblxqt[~${PV}]
-        lxqt/libqtxdg[>=3.1.0]
+        lxqt/libqtxdg[>=3.1.0] [[ note = [ custom command, directorymenu plugin ] ]]
         lxqt/lxqt-globalkeys
         sys-libs/libstatgrab [[ note = [ cpuload and networkmonitor plugin ] ]]
         sys-libs/libsysstat[>0.1.0] [[ note = [ plugin-sysstat ] ]]
@@ -27,10 +29,10 @@ DEPENDENCIES="
         x11-libs/libXext
         x11-libs/libxcb
         x11-libs/libxkbcommon[X] [[ note = [ plugin-kbindicator ] ]]
-        x11-libs/qtbase:5
-        x11-libs/qtsvg:5
-        x11-libs/qttools:5
-        x11-libs/qtx11extras:5
+        x11-libs/qtbase:5[>=${QT_MINIMUM_VERSION}]
+        x11-libs/qtsvg:5[>=${QT_MINIMUM_VERSION}]
+        x11-libs/qttools:5[>=${QT_MINIMUM_VERSION}]
+        x11-libs/qtx11extras:5[>=${QT_MINIMUM_VERSION}]
         (
             x11-libs/libXcomposite
             x11-libs/libXdamage
@@ -41,11 +43,7 @@ DEPENDENCIES="
             alsa? ( sys-sound/alsa-lib )
             pulseaudio? ( media-sound/pulseaudio )
         ) [[ note = [ volume plugin, needs pulseaudio a/o alsa ] ]]
-        (
-            x11-libs/libXcomposite
-            x11-libs/libXdamage
-            x11-libs/libXrender
-        ) [[ note = [ plugin-tray ] ]]
+
         lm_sensors? ( sys-apps/lm_sensors ) [[ note = [ plugin-sensors ] ]]
     recommendation:
         lxde-desktop/lxmenu-data [[ note = [ plugin-mainmenu, upstream issue 783 ] ]]

@@ -8,24 +8,21 @@ SUMMARY="LXQt PolicyKit agent"
 PLATFORMS="~amd64"
 MYOPTIONS=""
 
+QT_MINIMUM_VERSION=5.15
+
 DEPENDENCIES="
     build:
         virtual/pkg-config
     build+run:
-        kde-frameworks/kwindowsystem:5
         lxqt/liblxqt[~${PV}]
         sys-auth/polkit
         sys-auth/polkit-qt[qt5]
-        x11-libs/qtbase:5
-        x11-libs/qttools:5
-        !lxqt/lxqt-common [[
-            description = [ config file conflict ]
-            resolution = [ uninstall-blocked-after ]
-        ]]
+        x11-libs/qtbase:5[>=${QT_MINIMUM_VERSION}]
+        x11-libs/qttools:5[>=${QT_MINIMUM_VERSION}]
 "
 
-src_prepare() {
-    cmake_src_prepare
-    edo sed -e '/XdgIcon/d' -i "${CMAKE_SOURCE}"/src/main.cpp
-}
+#src_prepare() {
+#    cmake_src_prepare
+#    edo sed -e '/XdgIcon/d' -i "${CMAKE_SOURCE}"/src/main.cpp
+#}
 

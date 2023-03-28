@@ -1,0 +1,30 @@
+require lxqt
+
+SUMMARY='The terminal widget for QTerminal.'
+
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+# TODO: example, python-binding
+MYOPTIONS="
+    utf8proc [[ description = [ Use utf8proc for better utf8 support ] ]]
+    libutempter [[ description = [ Use libutempter for term session record ] ]]
+"
+
+# requires Qt5 Linguist, Widgets
+DEPENDENCIES="
+build+run:
+	x11-libs/qtbase:5[>=5.15][gui]
+    x11-libs/qttools:5[>=5.15]
+    utf8proc? ( dev-libs/utf8proc )
+    libutempter? ( x11-libs/libutempter )
+"
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+    '-DBUILD_EXAMPLE:BOOL=FALSE'
+)
+
+CMAKE_SRC_CONFIGURE_OPTIONS=(
+    "utf8proc USE_UTF8PROC"
+    "libutempter QTERMWIDGET_USE_UTEMPTER"
+)

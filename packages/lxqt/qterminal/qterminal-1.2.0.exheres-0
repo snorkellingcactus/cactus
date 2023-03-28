@@ -1,0 +1,17 @@
+SUMMARY='A lightweight Qt-based terminal emulator.'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+require lxqt
+
+DEPENDENCIES="
+	build+run:
+		lxqt/qtermwidget[>=1.2.0]
+	run:
+		x11-libs/qtx11extras[>=5.15]
+"
+
+# TODO
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DBUILD_TESTS=OFF
+)

@@ -1,4 +1,5 @@
 # Copyright 2014 Hong Hao <oahong@oahong.me>
+# Copyright 2014 Hong Hao <oahong@oahong.me>
 # Distributed under the terms of the GNU General Public License v2
 
 require lxqt
@@ -10,8 +11,9 @@ MYOPTIONS=""
 
 DEPENDENCIES="
     build+run:
-        x11-libs/qtbase:5[>=5.6.1]
-        x11-libs/qtsvg:5[>=5.6.1]
+        dev-libs/glib:2[>=2.41]
+        x11-libs/qtbase:5[>=5.15][gui]
+        x11-libs/qtsvg:5[>=5.15]
 "
 
 DEFAULT_SRC_INSTALL_EXCLUDE=( release.sh )
@@ -19,5 +21,5 @@ DEFAULT_SRC_INSTALL_EXCLUDE=( release.sh )
 CMAKE_SRC_CONFIGURE_PARAMS=(
     -DBUILD_TESTS:BOOL=FALSE
     -DBUILD_DEV_UTILS:BOOL=FALSE
+    -DQTXDG_INSTALL_DEFAPPS_CONFIG:BOOL=ON
 )
-

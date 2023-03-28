@@ -3,7 +3,7 @@
 # Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-require distutils lang-helper [ linguas='cs it ja uk ru el lt zh_CN es sl hy fr pt_BR nl pl de tr' ]
+#require distutils lang-helper [ linguas='cs it ja uk ru el lt zh_CN es sl hy fr pt_BR nl pl de tr' ]
 
 SUMMARY='A hierarchical note taking application'
 HOMEPAGE='http://www.giuspen.com/cherrytree'
