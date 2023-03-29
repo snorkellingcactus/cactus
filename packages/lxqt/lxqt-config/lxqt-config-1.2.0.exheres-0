@@ -46,13 +46,13 @@ DEPENDENCIES="
         providers:systemd? ( sys-apps/systemd )
 "
 
-CMAKE_SRC_CONFIGURE_PARAMS+=(
-    -DWITH_INPUT:BOOL=TRUE
-    -DWITH_FILE_ASSOCIATIONS:BOOL=TRUE
-    -DWITH_APPEARANCE:BOOL=TRUE
-    -DWITH_MONITOR:BOOL=TRUE
-    -DWITH_BRIGHTNESS:BOOL=TRUE
-    -DWITH_LOCALE:BOOL=TRUE
+CMAKE_SRC_CONFIGURE_OPTION_WITHS+=(
+    'input INPUT'
+    'file_associations FILE_ASSOCIATIONS'
+    'appearance APPEARANCE'
+    'monitor MONITOR'
+    'brightness BRIGHTNESS'
+    'locale LOCALE'
 )
 
 src_prepare() {

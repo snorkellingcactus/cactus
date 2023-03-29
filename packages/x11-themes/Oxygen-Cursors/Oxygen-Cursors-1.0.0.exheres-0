@@ -1,0 +1,19 @@
+#SCM_REPOSITORY='https://github.com/wo2ni/Oxygen-Cursors'
+HOMEPAGE="https://github.com/wo2ni/Oxygen-Cursors"
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+#DOWNLOADS="${SCM_REPOSITORY}/archive/refs/heads/main.zip"
+
+require doinsmv github [ user=wo2ni rev=d3a867e45eb8d160cb9311e8f181ac2e25ac37eb ]
+
+src_unpack(){
+	default
+
+#	WORK="${WORKBASE}/${PN}-main"
+}
+
+src_install()
+{
+	insinto /usr/share/icons
+		doinsmv	Oxygen-*
+}

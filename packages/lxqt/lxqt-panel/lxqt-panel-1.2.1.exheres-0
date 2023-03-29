@@ -19,12 +19,12 @@ DEPENDENCIES="
         kde-frameworks/kwindowsystem:5[>=5.36]
         kde-frameworks/solid:5[>=5.36] [[ note = [ plugin-mount ] ]]
         lxde-base/menu-cache[>=0.3.3] [[ note = [ plugin-mainmenu ] ]]
-        lxqt/liblxqt[~${PV}]
+        lxqt/liblxqt
         lxqt/libqtxdg[>=3.1.0] [[ note = [ custom command, directorymenu plugin ] ]]
-        lxqt/lxqt-globalkeys
+        lxqt/lxqt-globalkeys[>=1.2.0]
         sys-libs/libstatgrab [[ note = [ cpuload and networkmonitor plugin ] ]]
         sys-libs/libsysstat[>0.1.0] [[ note = [ plugin-sysstat ] ]]
-        x11-libs/dbusmenu-qt[qt5] [[ note = [ plugin-statusnotifier ] ]]
+        x11-libs/dbusmenu-qt [[ note = [ plugin-statusnotifier ] ]]
         x11-libs/libX11
         x11-libs/libXext
         x11-libs/libxcb
@@ -49,8 +49,9 @@ DEPENDENCIES="
         lxde-desktop/lxmenu-data [[ note = [ plugin-mainmenu, upstream issue 783 ] ]]
 "
 
+# TODO: Breaks build now.
 CMAKE_SRC_CONFIGURE_PARAMS+=(
-	-DUSE_MENU_CACHE:BOOL=ON
+	-DUSE_MENU_CACHE:BOOL=OFF
 )
 
 CMAKE_SRC_CONFIGURE_OPTIONS=(

@@ -16,7 +16,8 @@ DEPENDENCIES='
 		x11-apps/xdriinfo
 '
 
-require scm-git lang-helper [ linguas='de es it ru' ] distutils [ has_lib=true has_bin=true ]
+require scm-git lang-helper [ linguas='de es it ru' ] 
+#distutils [ has_lib=true has_bin=true ]
 
 export_exlib_phases src_install src_prepare
 

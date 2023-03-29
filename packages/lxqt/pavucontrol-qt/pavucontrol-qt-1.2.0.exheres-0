@@ -7,6 +7,15 @@ SUMMARY='Qt port of volume control pavucontrol of sound server PulseAudio.'
 SLOT='0'
 PLATFORMS='~x86 ~amd64'
 
-DEPENDENCIES='
+QT_MINIMUM_VERSION=5.15
+
+DEPENDENCIES="
+build:
+	virtual/pkg-config
+build+run:
+	media-sound/pulseaudio
+	dev-libs/glib:2[>=2.50]
 	lxqt/liblxqt
-'
+	x11-libs/qtbase:5[>=${QT_MINIMUM_VERSION}]
+    x11-libs/qttools:5[>=${QT_MINIMUM_VERSION}]
+"

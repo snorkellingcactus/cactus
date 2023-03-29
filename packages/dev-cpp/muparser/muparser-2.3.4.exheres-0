@@ -1,0 +1,35 @@
+# Copyright 2023 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Based in part upon 'poco-1.7.6.ebuild', which is:
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+require github [ user=beltoforion tag=v${PV} ] cmake [ api=2 ]
+
+SUMMARY='fast math parser library'
+HOMEPAGE='https://github.com/beltoforion/muparser'
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+LICENCES='BSD-2'	
+
+MYOPTIONS='
+	openmp [[ description = [ Enable OpemMP for multithreading ] ]]
+	wide_char [[ description = [ Enable wide character support ] ]]
+	samples [[ description = [ Build the samples ] ]]
+'
+
+DEPENDENCIES='
+	build:
+		virtual/pkg-config
+	build+run:
+		openmp? ( sys-libs/openmp )
+'
+
+CMAKE_SRC_CONFIGURE_OPTION_ENABLES+=(
+	'samples SAMPLES'
+	'openmp OPENMP'
+	'wide_char WIDE_CHAR'
+)
+
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	'-DCMAKE_BUILD_TYPE=Release'
+)

@@ -15,7 +15,7 @@ DEPENDENCIES="
         kde-frameworks/kidletime:5[>=5.36]
         kde-frameworks/solid:5[>=5.36]
 
-        lxqt/lxqt-globalkeys
+        lxqt/lxqt-globalkeys[>=1.2.0]
 
         lxqt/liblxqt[~${PV}]
         lxqt/libqtxdg

@@ -15,7 +15,7 @@ DEPENDENCIES="
     build+run:
         kde-frameworks/kwindowsystem:5
         lxqt/liblxqt[~${PV}]
-        lxqt/libqtxdg
+        lxqt/qtxdg-tools[>=3.10.0]
         x11-libs/libX11
         x11-libs/qtbase:5
         x11-libs/qttools:5

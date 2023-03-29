@@ -6,7 +6,13 @@ require lxqt
 SUMMARY="Tool used to launch programs quickly by typing their names"
 
 PLATFORMS="~amd64"
-MYOPTIONS=""
+
+# TODO: file bug, does not compile unless math enabled
+MYOPTIONS="
+    math [[ description = [ Math operations support through muparser ] ]]
+    vbox [[ description = [ Virtual Box support ] ]]
+    menu-cache [[ description = [ Use libmenu-cache from LXDE to generate the app menu ] ]]
+"
 
 DEPENDENCIES="
     build:
@@ -20,13 +26,17 @@ DEPENDENCIES="
         lxqt/lxqt-globalkeys[>=${PV}]
         x11-libs/qtbase:5
         x11-libs/qttools:5
+        math? ( dev-cpp/muparser )
 "
 
-CMAKE_SRC_CONFIGURE_PARAMS+=(
-    -DUSE_MENU_CACHE:BOOL=TRUE
-    # depends on muparser
-    -DRUNNER_MATH:BOOL=FALSE
-    -DRUNNER_VBOX:BOOL=FALSE
-    -DRUNNER_VBOX_HEADLESS:BOOL=TRUE
+# TODO:
+#    -DRUNNER_VBOX_HEADLESS:BOOL=TRUE
+
+CMAKE_SRC_CONFIGURE_OPTIONS+=(
+    'math RUNNER_MATH'
+    'vbox RUNNER_VBOX'
 )
 
+CMAKE_SRC_CONFIGURE_OPTION_USES+=(
+    'menu-cache MENU_CACHE'
+)

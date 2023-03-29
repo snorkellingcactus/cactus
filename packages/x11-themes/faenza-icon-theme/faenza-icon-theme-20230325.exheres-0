@@ -1,0 +1,11 @@
+HOMEPAGE="https://github.com/shlinux/faenza-icon-theme"
+SLOT='0'
+PLATFORMS='~x86 ~amd64'
+
+require doinsmv github [ user=shlinux rev=f361c7ecef7286e8785544567ae8be6fa2a723ec ]
+
+src_install()
+{
+	insinto /usr/share/icons
+		doinsmv	Faenza*
+}

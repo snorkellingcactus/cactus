@@ -1,0 +1,16 @@
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Copyright 2014 Hong Hao <oahong@oahong.me>
+# Distributed under the terms of the GNU General Public License v2
+
+require lxqt
+
+SUMMARY="Qt implementation of freedesktop.org xdg specs"
+
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        lxqt/libqtxdg[>=${PV}]
+        x11-libs/qtbase:5
+"

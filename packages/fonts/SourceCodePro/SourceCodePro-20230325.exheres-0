@@ -1,0 +1,22 @@
+HOMEPAGE="https://fonts.google.com/specimen/Source+Code+Pro"
+SUMMARY="Google source code pro font"
+SLOT='0'
+PLATFORMS="~amd64"
+
+DOWNLOADS="https://github.com/adobe-fonts/source-code-pro/archive/refs/tags/2.038R-ro/1.058R-it/1.018R-VAR.zip"
+
+src_unpack(){
+	default
+
+	WORK=${WORKBASE}/source-code-pro-2.038R-ro-1.058R-it-1.018R-VAR/
+}
+
+src_install(){
+	local INTO="/usr/share/fonts/${PN}"
+	dodir "${INTO}"
+	insinto "${INTO}"
+
+	edo pushd TTF
+		doins *.ttf
+	edo popd
+}
