@@ -47,6 +47,7 @@ CMAKE_SRC_CONFIGURE_OPTIONS+=(
 )
 CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DCMAKE_BUILD_TYPE=Release
+	-DONATIVE=ON
 )
 
 require scm-git cmake [ api=2 ]
