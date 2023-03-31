@@ -6,7 +6,7 @@ HOMEPAGE="http://${PN}.org/"
 PLATFORMS='~amd64 ~x86'
 
 LICENCES='GPL-2'
-SLOT='5'
+SLOT='7'
 MYOPTIONS='
 	altivec
 	( amd64_cpu_features: sse 3dnow )
@@ -63,7 +63,14 @@ DEPENDENCIES='
 		dev-libs/sord
 		media-libs/suil[>=0.6.10]
 		media-libs/lv2[>=1.4.0]
+build+run:
+	media-sound/fluidsynth
+	dev-libs/hidapi
+	dev-lang/lua
 '
+
+# libltc
+# ptformat
 
 WAF_SRC_CONFIGURE_PARAMS=(
 	'--hates=sbindir'

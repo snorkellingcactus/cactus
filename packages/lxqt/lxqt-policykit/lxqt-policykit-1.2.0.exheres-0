@@ -16,7 +16,7 @@ DEPENDENCIES="
     build+run:
         lxqt/liblxqt[~${PV}]
         sys-auth/polkit
-        sys-auth/polkit-qt[qt5]
+        sys-auth/polkit-qt
         x11-libs/qtbase:5[>=${QT_MINIMUM_VERSION}]
         x11-libs/qttools:5[>=${QT_MINIMUM_VERSION}]
 "

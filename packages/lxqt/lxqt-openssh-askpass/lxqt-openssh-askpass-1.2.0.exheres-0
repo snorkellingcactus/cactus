@@ -10,7 +10,7 @@ MYOPTIONS=""
 
 DEPENDENCIES="
     build+run:
-        lxqt/liblxqt[~${PV}]
+        lxqt/liblxqt[>=1.2.0]
         x11-libs/qtbase:5
         x11-libs/qttools:5
 "
