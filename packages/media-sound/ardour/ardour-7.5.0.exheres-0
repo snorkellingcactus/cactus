@@ -132,6 +132,9 @@ src_prepare()
 
 src_configure()
 {
+	# avoid bug https://bugs.gentoo.org/800067
+	local -x AS="$(exhost --target)-cc"
+
 	has_version "dev-cpp/libsigc++[>=2.0]" && WAF_SRC_CONFIGURE_PARAMS+=( "--cxx11" ) 
 
 	waf_src_configure
