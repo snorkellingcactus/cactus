@@ -1,0 +1,161 @@
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY='Digital Audio Workstation'
+HOMEPAGE="http://${PN}.org/"
+PLATFORMS='~amd64 ~x86'
+
+LICENCES='GPL-2'
+SLOT='7'
+MYOPTIONS='
+	altivec
+	( amd64_cpu_features: sse 3dnow )
+	( x86_cpu_features: sse 3dnow mmx )
+	doc
+	jack
+	lv2
+	nls
+	optimize
+	linuxvst
+'
+
+# fftw[threads]
+DEPENDENCIES='
+	build:
+		jack? ( media-sound/jack-audio-connection-kit[>=0.120] )
+		nls? ( sys-devel/gettext )
+		virtual/pkg-config
+		doc? ( app-doc/doxygen[dot] )
+	run:
+		gnome-bindings/glibmm[>=2.32.0]
+		gnome-bindings/gtkmm:2.4[>=2.16]
+		gnome-bindings/libgnomecanvasmm:2.6[>=2.26]
+		dev-libs/boost:=
+		dev-libs/glib:2[>=2.10.1]
+		dev-cpp/libsigc++:2
+		dev-libs/libxml2:2.0[>=2.6]
+		dev-libs/libxslt
+		gnome-platform/libgnomecanvas[>=2]
+		sys-sound/alsa-lib
+		media-libs/aubio
+		media-libs/flac
+		media-libs/freetype:2
+		gnome-platform/libart_lgpl
+		media-libs/liblo
+		media-libs/liblrdf[>=0.4.0]
+		media-libs/libsamplerate[>=0.1]
+		media-libs/libsndfile[>=1.0.18]
+		media-libs/soundtouch[>=1.6.0]
+		media-libs/raptor
+		media-libs/rubberband[>=1.6.0]
+		media-libs/taglib[>=1.7]
+		media-libs/vamp-plugin-sdk
+		net-misc/curl
+		sys-libs/readline
+		sci-libs/fftw[>=3.0]
+		dev-libs/libusb
+		x11-libs/cairo
+		x11-libs/gtk+:2[>=2.8.1]
+		x11-libs/pango
+		jack? ( media-sound/jack-audio-connection-kit )
+		media-libs/lilv
+		media-libs/sratom
+		dev-libs/sord
+		media-libs/suil[>=0.6.10]
+		media-libs/lv2[>=1.4.0]
+build+run:
+	media-sound/fluidsynth
+	dev-libs/hidapi
+	dev-lang/lua
+'
+
+# libltc
+# ptformat
+
+WAF_SRC_CONFIGURE_PARAMS=(
+	'--hates=sbindir'
+	'--hates=htmldir'
+	'--no-fpu-optimization'
+	'--jobs=1'
+)
+# '--use-external-libs'
+
+WAF_SRC_CONFIGURE_OPTIONS+=(
+	'!jack --with-backends=alsa,jack --libjack=weak'
+	'jack --with-backends=alsa,jack'
+	'doc --docs'
+	'altivec --fpu-optimization'
+	'amd64_cpu_features:sse --fpu-optimization'
+	'lv2 --lv2'
+	'!lv2 --no-lv2'
+	'!linuxvst --no-lxvst'
+	'linuxvst --lxvst'
+	'nls --nls'
+	'!nls --no-nls'
+)
+#'optimize --òptimize'
+
+require flag-o-matic waf my_ever_is_scm newicon
+if my_ever_is_scm
+then
+	SCM_REPOSITORY="http://git.${PN}.org/${PN}/${PN}.git"
+
+	require scm-git
+else
+	require github [ user=Ardour ]
+
+	DOWNLOADS="https://community.ardour.org/src/Ardour-${PV}.tar.bz2"
+
+	WORK="${WORKBASE}"/Ardour-${PV}
+fi
+
+src_prepare()
+{
+	local OPTFLAGS
+
+	for i in mmx sse 3dnow
+	do
+		(
+			(
+				[ "${i}" != "mmx" ] && optionq amd64_cpu_features:${i}	
+			) || optionq x86_cpu_features:${i}
+		) && OPTFLAGS+=" ${i}"
+	done
+
+	# Maybe don't work with edo.
+	sed -e 's/flag_line\ =\ o.*/flag_line\ =\ \": '"${OPTFLAGS}"' just some place holders\"/' -e 's/cpu\ ==\ .*/cpu\ ==\ "LeaveMarchAsIs":/' -e 's/'full-optimization\'\ :\ \\[.*'/'full-optimization\'\ :\ \'\','/' -i wscript
+
+	sed -e "s/= 'cpp'/= '$( exhost --tool-prefix )cpp'/" -i gtk2_ardour/wscript
+
+	append-flags "-lboost_system"
+}
+
+src_configure()
+{
+	has_version "dev-cpp/libsigc++[>=2.0]" && WAF_SRC_CONFIGURE_PARAMS+=( "--cxx11" ) 
+
+	waf_src_configure
+}
+
+src_install()
+{
+	waf_src_install
+
+	local PN_SLOT=${PN}${SLOT}
+
+	mv ${PN}.1 ${PN_SLOT}.1
+
+	doman ${PN_SLOT}.1
+
+	newicon -s 48 "gtk2_ardour/resources/Ardour-icon_48px.png" ${PN_SLOT}.png
+
+	install_desktop_entry "Exec=${PN_SLOT}" "Name=${PN_SLOT}" 'Categories=AudioVideo'
+}
+
+pkg_postinst() {
+	elog "If you are using Ardour and want to keep its development alive"
+	elog "then please consider to make a donation upstream at ${HOMEPAGE}."
+	elog "Please do _not_ report problems with the package to ${PN} upstream."
+	elog "If you think you've found a bug, check the upstream binary package"
+	elog "before you report anything to upstream."
+}
