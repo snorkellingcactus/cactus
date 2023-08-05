@@ -46,6 +46,16 @@ DEPENDENCIES="
         providers:systemd? ( sys-apps/systemd )
 "
 
+# TODO: comment patch, upstream yes
+# https://bugzilla.altlinux.org/45508
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}"/new_libkscreen.patch
+)
+
+CMAKE_SRC_CONFIGURE_PARAMS=(
+    -DCMAKE_CXX_STANDARD=17
+)
+
 CMAKE_SRC_CONFIGURE_OPTION_WITHS+=(
     'input INPUT'
     'file_associations FILE_ASSOCIATIONS'
