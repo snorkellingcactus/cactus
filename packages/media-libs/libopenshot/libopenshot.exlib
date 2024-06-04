@@ -74,9 +74,7 @@ libopenshot_src_prepare()
 {
 	cmake_src_prepare
 
-	! expecting_tests	&& edo sed -e 's/add_subdirectory(tests)//' -i CMakeLists.txt
-
-	optionq python		&& edo sed  -e 's/PythonLibs 3/PythonLibs '"$( my_python_get_abi )"'/' -e 's/PythonInterp 3/PythonInterp '"$( my_python_get_abi )"'/' -e 's|SET(PYTHON_MODULE_PATH ${_REL_PYTHON_MODULE_PATH}|SET(PYTHON_MODULE_PATH '"/usr/$( exhost --target )/lib/python$( my_python_get_abi )/site-packages"'|' -i  src/bindings/python/CMakeLists.txt
+	optionq python		&& edo sed  -e 's/PythonLibs 3/PythonLibs '"$( my_python_get_abi )"'/' -e 's/PythonInterp 3/PythonInterp '"$( my_python_get_abi )"'/' -e 's|SET(PYTHON_MODULE_PATH ${_REL_PYTHON_MODULE_PATH}|SET(PYTHON_MODULE_PATH '"/usr/$( exhost --target )/lib/python$( my_python_get_abi )/site-packages"'|' -i  bindings/python/CMakeLists.txt
 }
 libopenshot_src_compile()
 {

@@ -1,0 +1,11 @@
+# Copyright 2016 Nadal Gonzalo García Zavala <snorkellingcactus@gmail.com>
+# Distributed under the terms of the GNU General Public License v2
+
+# TODO: SLOT:3 ?
+SLOT='3.0'
+
+SCM_REVISION='4178904d769879e6c2919fb647ee6dd2736399e9'
+
+SCM_REPOSITORY="https://foss.heptapod.net/zandronum/zandronum-stable"
+
+require scm-hg ${PN}

@@ -5,7 +5,7 @@ PLATFORMS='~x86'
 
 #https://codeload.github.com/PCSX2/pcsx2/zip/6d7e2c56d997171727cf88c7380025cd59de7618
 
-GITHUB_REVISION=0c5353a7098f802ed2698e2f7ed52674438b446f
+GITHUB_REVISION=a485398029a83ad30f4b1c08fa18b3a36014e7d0
 
 require wx [ BLACKLIST='3.1 2.8' ] dorbdep github [ pn=pcsx2 ] cmake [ api=2 cmake_minimum_version=2.8.5 ]
 
@@ -28,9 +28,11 @@ DEPENDENCIES='
 		dev-libs/libaio
 		media-libs/freetype
 		media-libs/glew
+		media-libs/libpng[>=1.6.40]
 		media-libs/portaudio
-		media-libs/SDL:2
+		media-libs/SDL:2[>=2.30.2]
 		media-libs/soundtouch
+		sys-libs/shaderc
 		sys-libs/zlib
 		sys-sound/alsa-lib
 		x11-libs/gtk+:2
@@ -39,7 +41,7 @@ DEPENDENCIES='
 		x11-libs/Cg
 
 		providers:ijg-jpeg? ( media-libs/jpeg:= )
-	   	providers:jpeg-turbo? ( media-libs/libjpeg-turbo )
+		providers:jpeg-turbo? ( media-libs/libjpeg-turbo )
 '
 
 #-DUSE_PGO_OPTIMIZE=TRUE

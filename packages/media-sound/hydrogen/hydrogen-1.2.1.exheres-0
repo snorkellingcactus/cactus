@@ -6,12 +6,13 @@ SUMMARY="Hydrogen is an advanced drum machine for GNU/Linux, Mac and Windows. It
 PLATFORMS='~x86 ~amd64'
 SLOT='0'
 # app-arch/libtar	
+# TODO: Review against source
 # TODO: cmake FindHelper not finding some libs ( as rubberband )
 DEPENDENCIES='
 	build+run:
 		media-libs/libsndfile
 		sys-libs/zlib
-		x11-libs/qt:4
+		x11-libs/qtbase:5
 
 		alsa? (
 			sys-sound/alsa-lib
@@ -65,6 +66,10 @@ CMAKE_SRC_CONFIGURE_OPTION_WANTS+=(
 	'shared SHARED'
 )
 
+CMAKE_SRC_CONFIGURE_PARAMS+=(
+	-DWANT_CPPUNIT:BOOL=FALSE
+)
+
 
 # Include CppUnit test suite
 # cppunit
@@ -86,6 +91,6 @@ MYOPTIONS='
 	shared [[ description = [ Build the core library shared. ] ]]
 '
 
-DEFAULT_SRC_PREPARE_PATCHES=(
-	"${FILES}"/fix-build-lrdf-raptor-h.patch
-)
+#DEFAULT_SRC_PREPARE_PATCHES=(
+#	"${FILES}"/fix-build-lrdf-raptor-h.patch
+#)

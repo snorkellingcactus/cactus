@@ -20,10 +20,12 @@ CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DCMAKE_PREFIX=/usr/$(exhost --target)
 )
 
-require cmake scm-hg
+require cmake scm-git
+#scm-hg
 
 export_exlib_phases src_prepare
 
+WORK="${WORKBASE}/${PNV}"
 doomseeker_src_prepare() {
 	default
 

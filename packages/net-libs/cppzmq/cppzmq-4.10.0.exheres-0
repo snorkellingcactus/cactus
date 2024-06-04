@@ -16,6 +16,7 @@ DEPENDENCIES='
 
 CMAKE_SRC_CONFIGURE_PARAMS+=(
 	-DCPPZMQ_CMAKECONFIG_INSTALL_DIR=/usr/share/cmake/cppzmq
+	-DCPPZMQ_BUILD_TESTS=OFF
 )
 
 require github [ user=zeromq tag=v${PV} ] autotools [ supported_automake=[ 1.15 ] supported_autoconf=[ 2.5 ] ] cmake [ api=2 ]
